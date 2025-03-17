@@ -8,6 +8,7 @@ import 'package:phictly/core/components/custom_outline_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_title_text.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
+import 'package:phictly/feature/profile/data/controller/profile_controller.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 class ProgressController extends GetxController {
@@ -18,6 +19,7 @@ class ProgressController extends GetxController {
 class ProfileScreen extends StatelessWidget {
   final ProgressController progressController = Get.put(ProgressController());
   final ChangeProfileController controller = Get.put(ChangeProfileController());
+  final ProfileController profileController = Get.put(ProfileController());
 
   ProfileScreen({super.key});
 
@@ -57,10 +59,15 @@ class ProfileScreen extends StatelessWidget {
                             SizedBox(
                               width: 16.h,
                             ),
-                            Image.asset(
-                              "assets/profile/icons/settings.png",
-                              height: 25.h,
-                              width: 25.w,
+                            GestureDetector(
+                              onTap: (){
+                                controller.updateIndex(3);
+                              },
+                              child: Image.asset(
+                                "assets/profile/icons/settings.png",
+                                height: 25.h,
+                                width: 25.w,
+                              ),
                             ),
                           ],
                         )
@@ -119,20 +126,39 @@ class ProfileScreen extends StatelessWidget {
             SizedBox(
               height: 12.h,
             ),
-            GestureDetector(
-              onTap: (){
-                controller.updateIndex(1);
-              },
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  statItem("22", "Clubs"),
-                  statItem("490", "Followers"),
-                  statItem("78", "Following"),
-                  statItem("3", "Groups"),
-                ],
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    controller.updateIndex(1);
+                    profileController.updateTabIndex(0);
+                  },
+                  child: statItem("22", "Clubs"),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    controller.updateIndex(1);
+                    profileController.updateTabIndex(1);
+                  },
+                  child: statItem("490", "Followers"),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    controller.updateIndex(1);
+                    profileController.updateTabIndex(2);
+                  },
+                  child: statItem("78", "Following"),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    controller.updateIndex(1);
+                    profileController.updateTabIndex(3);
+                  },
+                  child: statItem("3", "Groups"),
+                ),
+              ],
             ),
             SizedBox(
               height: 12.h,
@@ -201,6 +227,9 @@ class ProfileScreen extends StatelessWidget {
               child: Row(
                 children: [
                   CustomOutlineButton(
+                    onTap: (){
+                      controller.updateIndex(2);
+                    },
                     text: "Badges",
                     height: 28.h,
                     width: 80.w,
@@ -388,14 +417,24 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             CustomTitleText(title: "Active Read"),
-            CustomBookItem(imagePath: "assets/images/book_2.png", requestOrJoinImage: "assets/icons/join_read_icon.png", noReqOrJoinAvailable: true, requestOrJoin: "Join Read",),
-
+            CustomBookItem(
+              imagePath: "assets/images/book_2.png",
+              requestOrJoinImage: "assets/icons/join_read_icon.png",
+              noReqOrJoinAvailable: true,
+              requestOrJoin: "Join Read",
+            ),
             CustomTitleText(title: "Last Read"),
-            CustomBookItem(imagePath: "assets/images/book_1.png", noReqOrJoinAvailable: false, totalDuration: "2M",),
-
+            CustomBookItem(
+              imagePath: "assets/images/book_1.png",
+              noReqOrJoinAvailable: false,
+              totalDuration: "2M",
+            ),
             CustomTitleText(title: "Last Watch"),
-            CustomBookItem(imagePath: "assets/images/book_3.png", noReqOrJoinAvailable: false, totalDuration: "4M",),
-
+            CustomBookItem(
+              imagePath: "assets/images/book_3.png",
+              noReqOrJoinAvailable: false,
+              totalDuration: "4M",
+            ),
             SizedBox(
               height: 8.h,
             ),

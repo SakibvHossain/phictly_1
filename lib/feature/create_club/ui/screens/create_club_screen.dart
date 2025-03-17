@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:phictly/core/components/custom_button.dart';
@@ -130,7 +131,7 @@ class CreateClubScreen extends StatelessWidget {
                               Obx(() {
                                 return GestureDetector(
                                   onTap: () {
-                                    controller.updateCheckBox();
+                                    controller.updatePrivateField();
                                   },
                                   child: Container(
                                     width: 23.w,
@@ -145,7 +146,7 @@ class CreateClubScreen extends StatelessWidget {
                                         borderRadius:
                                             BorderRadius.circular(3.68),
                                         shape: BoxShape.rectangle),
-                                    child: controller.isCheckBoxSelected.value
+                                    child: controller.isPrivate.value
                                         ? Image.asset("assets/icons/check.png")
                                         : SizedBox(),
                                   ),
@@ -213,15 +214,15 @@ class CreateClubScreen extends StatelessWidget {
 
                     Row(
                       children: [
-                        checkBoxType("Book"),
+                        checkBoxBook("Book", (){controller.updateBookField();}, controller.isBook),
                         SizedBox(
                           width: 16.w,
                         ),
-                        checkBoxType("Show"),
+                        checkBoxShow("Show", (){controller.updateShowField();}, controller.isShow),
                         SizedBox(
                           width: 16.w,
                         ),
-                        checkBoxType("Movie"),
+                        checkBoxMovie("Movie", (){controller.updateMovieField();}, controller.isMovie),
                       ],
                     ),
 
@@ -494,11 +495,11 @@ class CreateClubScreen extends StatelessWidget {
 
                     Row(
                       children: [
-                        checkBoxType("Female Only"),
+                        checkBoxFemale("Female Only", (){controller.updateFemaleField();}, controller.isFemale),
                         SizedBox(
                           width: 8.w,
                         ),
-                        checkBoxType("Male Only"),
+                        checkBoxMale("Male Only", (){controller.updateMaleField();}, controller.isMale),
                       ],
                     ),
 
@@ -568,8 +569,8 @@ class CreateClubScreen extends StatelessWidget {
     );
   }
 
-  //* Check Box
-  Widget checkBoxType(String text) {
+  //* Check Box Book Field
+  Widget checkBoxBook(String text, Callback yourAction, RxBool value) {
     return Row(
       children: [
         CustomText(
@@ -583,9 +584,7 @@ class CreateClubScreen extends StatelessWidget {
         ),
         Obx(() {
           return GestureDetector(
-            onTap: () {
-              controller.updateCheckBox();
-            },
+            onTap: yourAction,
             child: Container(
               width: 23.w,
               height: 23.h,
@@ -597,7 +596,147 @@ class CreateClubScreen extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(3.68),
                   shape: BoxShape.rectangle),
-              child: controller.isCheckBoxSelected.value
+              child: value.value
+                  ? Image.asset("assets/icons/check.png")
+                  : SizedBox(),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+  Widget checkBoxShow(String text, Callback yourAction, RxBool value) {
+    return Row(
+      children: [
+        CustomText(
+          text: text,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+          color: Color(0xff000000).withValues(alpha: 0.6),
+        ),
+        SizedBox(
+          width: 6.w,
+        ),
+        Obx(() {
+          return GestureDetector(
+            onTap: yourAction,
+            child: Container(
+              width: 23.w,
+              height: 23.h,
+              padding: EdgeInsets.all(2.r),
+              decoration: BoxDecoration(
+                  border: const GradientBoxBorder(
+                    gradient: AppColors.primaryGradientColor,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(3.68),
+                  shape: BoxShape.rectangle),
+              child: value.value
+                  ? Image.asset("assets/icons/check.png")
+                  : SizedBox(),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+  Widget checkBoxMovie(String text, Callback yourAction, RxBool value) {
+    return Row(
+      children: [
+        CustomText(
+          text: text,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+          color: Color(0xff000000).withValues(alpha: 0.6),
+        ),
+        SizedBox(
+          width: 6.w,
+        ),
+        Obx(() {
+          return GestureDetector(
+            onTap: yourAction,
+            child: Container(
+              width: 23.w,
+              height: 23.h,
+              padding: EdgeInsets.all(2.r),
+              decoration: BoxDecoration(
+                  border: const GradientBoxBorder(
+                    gradient: AppColors.primaryGradientColor,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(3.68),
+                  shape: BoxShape.rectangle),
+              child: value.value
+                  ? Image.asset("assets/icons/check.png")
+                  : SizedBox(),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+  Widget checkBoxMale(String text, Callback yourAction, RxBool value)  {
+    return Row(
+      children: [
+        CustomText(
+          text: text,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+          color: Color(0xff000000).withValues(alpha: 0.6),
+        ),
+        SizedBox(
+          width: 6.w,
+        ),
+        Obx(() {
+          return GestureDetector(
+            onTap: yourAction,
+            child: Container(
+              width: 23.w,
+              height: 23.h,
+              padding: EdgeInsets.all(2.r),
+              decoration: BoxDecoration(
+                  border: const GradientBoxBorder(
+                    gradient: AppColors.primaryGradientColor,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(3.68),
+                  shape: BoxShape.rectangle),
+              child: value.value
+                  ? Image.asset("assets/icons/check.png")
+                  : SizedBox(),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+  Widget checkBoxFemale(String text, Callback yourAction, RxBool value) {
+    return Row(
+      children: [
+        CustomText(
+          text: text,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+          color: Color(0xff000000).withValues(alpha: 0.6),
+        ),
+        SizedBox(
+          width: 6.w,
+        ),
+        Obx(() {
+          return GestureDetector(
+            onTap: yourAction,
+            child: Container(
+              width: 23.w,
+              height: 23.h,
+              padding: EdgeInsets.all(2.r),
+              decoration: BoxDecoration(
+                  border: const GradientBoxBorder(
+                    gradient: AppColors.primaryGradientColor,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(3.68),
+                  shape: BoxShape.rectangle),
+              child: value.value
                   ? Image.asset("assets/icons/check.png")
                   : SizedBox(),
             ),

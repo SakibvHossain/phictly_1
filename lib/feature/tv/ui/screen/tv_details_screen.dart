@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:phictly/feature/book/ui/widgets/book_items.dart';
 import 'package:phictly/feature/tv/data/controller/change_tv_controller.dart';
 import 'package:get/get.dart';
 import '../../../../core/components/custom_book_items/custom_book_item.dart';
@@ -101,7 +102,7 @@ class TvDetailsScreen extends StatelessWidget {
                 itemBuilder: (context, index){
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: CustomBookItem(imagePath: "assets/images/book_2.png", requestOrJoinImage: "assets/icons/join_read_icon.png", noReqOrJoinAvailable: true, requestOrJoin: "Join Read",),
+                child: BookItems(imagePath: "assets/images/book_2.png", requestOrJoinImage: "assets/icons/join_read_icon.png", noReqOrJoinAvailable: true, requestOrJoin: "Join Read",),
               );
             }),
 

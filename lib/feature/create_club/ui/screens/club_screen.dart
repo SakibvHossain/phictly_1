@@ -147,6 +147,7 @@ class ClubScreen extends StatelessWidget {
                   index: index,
                   chapterCreatedTime: "${comments.chapterCreatedTime}",
                   chapterBannerText: "${comments.chapterBannerText}",
+                  isTextVisible: comments.isTextVisible,
                 );
               },
             ),

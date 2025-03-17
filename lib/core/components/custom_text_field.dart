@@ -16,6 +16,9 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? suffixIconAction;
   final IconData? suffixIcon;
   final bool? isReadOnlyTrue;
+  final BorderSide? borderSide;
+  final Color? fillColor;
+  final String? suffixText;
 
   const CustomTextField({
     super.key,
@@ -28,7 +31,9 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.suffixIcon,
     this.suffixIconAction,
-    this.isReadOnlyTrue, this.inputType,
+    this.isReadOnlyTrue,
+    this.inputType,
+    this.borderSide, this.fillColor, this.suffixText,
   });
 
   @override
@@ -52,17 +57,31 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         prefixIcon: Icon(prefixIcon, color: AppColors.primaryColor),
         suffixIcon: suffixIcon != null
-            ? IconButton(onPressed: suffixIconAction, icon: Icon(suffixIcon, color: AppColors.primaryColor,))
+            ? IconButton(
+                onPressed: suffixIconAction,
+                icon: Icon(
+                  suffixIcon,
+                  color: AppColors.primaryColor,
+                ),)
             : null,
+        suffixText:suffixText ?? "",
+        suffixStyle: GoogleFonts.dmSans(fontSize: 15.sp, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
         hintText: hintText,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: fillColor ?? Colors.white,
         border: OutlineInputBorder(
-          borderSide: BorderSide.none,
+          borderSide: borderSide ?? BorderSide.none,
+          borderRadius: BorderRadius.all(Radius.circular(6.r)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: borderSide ?? BorderSide.none,
+          borderRadius: BorderRadius.all(Radius.circular(6.r)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: borderSide ?? BorderSide.none,
           borderRadius: BorderRadius.all(Radius.circular(6.r)),
         ),
       ),
     );
   }
 }
-

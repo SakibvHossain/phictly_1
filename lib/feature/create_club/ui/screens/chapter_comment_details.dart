@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
+import 'package:phictly/feature/create_club/ui/widgets/reply.dart';
 import '../../data/controller/change_club_controller.dart';
+import '../../data/controller/chapter_comment_controller.dart';
 import '../../data/controller/talk_point_controller.dart';
+import '../../data/model/chapter_comment.dart';
+import '../widgets/comment_detail.dart';
 import '../widgets/custom_created_book_item.dart';
 
 class ChapterCommentDetails extends StatelessWidget {
   ChapterCommentDetails({super.key});
 
-  final ChangeClubController changeClubController =
-      Get.put(ChangeClubController());
+  final ChangeClubController changeClubController = Get.put(ChangeClubController());
   final TalkPointController pointController = Get.put(TalkPointController());
-
+  final ChapterCommentController commentController = Get.put(ChapterCommentController());
+  final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
 
   @override
   Widget build(BuildContext context) {
+    ChapterComment comment = commentController.chapterCommentList[commentDetailController.passedIndex];
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
       body: SingleChildScrollView(
@@ -127,6 +132,10 @@ class ChapterCommentDetails extends StatelessWidget {
                 ],
               ),
             ),
+
+            CommentDetail(userName: "${comment.userName}", comment: "${comment.comment}", commentCount: "${comment.commentCount}", chapter: "${comment.chapter}", chapterCreatedTime: "${comment.chapterCreatedTime}"),
+
+            SizedBox(height: 100.h,),
           ],
         ),
       ),

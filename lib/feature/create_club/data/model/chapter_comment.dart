@@ -1,10 +1,11 @@
 class ChapterComment{
-  final String? userName;
-  final String? comment;
-  final String? commentCount;
-  final String? chapter;
-  final String? chapterBannerText;
-  final String? chapterCreatedTime;
+  late String? userName;
+  late String? comment;
+  late String? commentCount;
+  late String? chapter;
+  late String? chapterBannerText;
+  late String? chapterCreatedTime;
+  late bool? isTextVisible;
 
   ChapterComment(
       this.userName,
@@ -12,5 +13,6 @@ class ChapterComment{
       this.commentCount,
       this.chapter,
       this.chapterBannerText,
-      this.chapterCreatedTime);
+      this.chapterCreatedTime,
+      this.isTextVisible);
 }
