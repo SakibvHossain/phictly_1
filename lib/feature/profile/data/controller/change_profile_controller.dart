@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class ChangeProfileController extends GetxController{
@@ -5,5 +6,6 @@ class ChangeProfileController extends GetxController{
 
   void updateIndex(int index) {
     currentIndex.value = index;
+    debugPrint("=-=====================${currentIndex.value}");
   }
 }

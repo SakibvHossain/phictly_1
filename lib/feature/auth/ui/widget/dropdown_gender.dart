@@ -2,16 +2,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-
-class GenderDropdownController extends GetxController {
-  var selectedGender = "Select".obs; // Default value
-
-  void updateGender(String gender) {
-    selectedGender.value = gender;
-  }
-}
-
+import '../../data/controller/gender_dropdown_controller.dart';
 
 class GenderDropdown extends StatelessWidget {
   GenderDropdown({super.key, required this.genderList, required this.selectedHint, required this.icon});
@@ -44,6 +35,7 @@ class GenderDropdown extends StatelessWidget {
           Expanded(
             child: Obx(() => DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
+                    dropdownColor: Colors.white,
                     value: controller.selectedGender.value == "Select"
                         ? null
                         : controller.selectedGender.value,

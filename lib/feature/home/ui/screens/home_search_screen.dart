@@ -4,14 +4,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/feature/home/data/controller/search_filter_controller.dart';
+import 'package:phictly/feature/home/ui/widgets/search_book%20_item.dart';
 
 import '../../../../core/components/custom_book_items/custom_book_item.dart';
+import '../../data/controller/change_home_controller.dart';
 
 class HomeSearchScreen extends StatelessWidget {
   HomeSearchScreen({super.key});
 
   final SearchFilterController controller = Get.put(SearchFilterController());
-
+  final changeHomeController = Get.find<ChangeHomeController>();
 
 
   @override
@@ -44,6 +46,15 @@ class HomeSearchScreen extends StatelessWidget {
             ),
           ),
 
+          /*
+                    Image.asset(
+            "assets/profile/icons/back_left_icon.png",
+            height: 25.h,
+            width: 13.75.w,
+          ),
+
+           */
+
           searchAndFilter(controller),
 
           SizedBox(height: 8.h),
@@ -61,8 +72,8 @@ class HomeSearchScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: CustomBookItem(
-                              imagePath: "assets/images/book_2.png",
+                            child: SearchBookItem(
+                              imagePath: "assets/images/search_club_image.png",
                               requestOrJoinImage:
                                   "assets/icons/join_read_icon.png",
                               noReqOrJoinAvailable: true,
@@ -118,6 +129,21 @@ class HomeSearchScreen extends StatelessWidget {
         height: 70,
         child: Row(
           children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: GestureDetector(
+                onTap: (){
+                  changeHomeController.updateIndex(0);
+                },
+                child: Image.asset(
+                  "assets/profile/icons/back_left_icon.png",
+                  height: 25.h,
+                  width: 13.75.w,
+                ),
+              ),
+            ),
+
+            SizedBox(width: 16.w,),
             Expanded(
                 child: TextFormField(
               controller: controller.searchFilterController,
@@ -175,6 +201,7 @@ class HomeSearchScreen extends StatelessWidget {
                 contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
               ),
             )),
+            SizedBox(width: 8.w,),
           ],
         ),
       ),

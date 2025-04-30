@@ -14,14 +14,16 @@ class ChangeClubController extends GetxController{
     isCheckBoxSelected.value =! isCheckBoxSelected.value;
   }
 
-  //* Private Field
   var isPrivate = false.obs;
+  var isPublicOrPrivate = "Public";
 
-  void updatePrivateField(){
-    isPrivate.value =! isPrivate.value;
+  void updatePrivateField() {
+    isPrivate.value = !isPrivate.value;
+    isPublicOrPrivate = isPrivate.value ? "Private" : "Public";
   }
 
   //* Type - Book, Show, Movie
+  var selectedBookType = "Book".obs;
   var isBook = true.obs;
   var isShow = false.obs;
   var isMovie = false.obs;
@@ -31,6 +33,7 @@ class ChangeClubController extends GetxController{
       isBook.value = true;
       isShow.value = false;
       isMovie.value = false;
+      selectedBookType.value = "Book";
     }
   }
 
@@ -39,6 +42,7 @@ class ChangeClubController extends GetxController{
       isShow.value = true;
       isBook.value = false;
       isMovie.value = false;
+      selectedBookType.value = "Show";
     }
   }
 
@@ -47,16 +51,21 @@ class ChangeClubController extends GetxController{
       isMovie.value = true;
       isBook.value = false;
       isShow.value = false;
+      selectedBookType.value = "Movie";
     }
   }
 
   var isMale = true.obs;
   var isFemale = false.obs;
+  var isNonBinary = false.obs;
+  var selectedGenderType = "Male"; // Default to Male
 
   void updateMaleField() {
     if (!isMale.value) {
       isMale.value = true;
       isFemale.value = false;
+      isNonBinary.value = false;
+      selectedGenderType = "Male";
     }
   }
 
@@ -64,7 +73,17 @@ class ChangeClubController extends GetxController{
     if (!isFemale.value) {
       isMale.value = false;
       isFemale.value = true;
+      isNonBinary.value = false;
+      selectedGenderType = "Female";
     }
   }
 
+  void updateNonBinaryField() {
+    if (!isNonBinary.value) {
+      isMale.value = false;
+      isFemale.value = false;
+      isNonBinary.value = true;
+      selectedGenderType = "Non-Binary";
+    }
+  }
 }

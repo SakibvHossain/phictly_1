@@ -1,11 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../../home/data/controller/home_controller.dart';
 import 'package:get/get.dart';
 
 class BookItems extends StatelessWidget {
-  BookItems({super.key, this.imagePath, this.requestOrJoin, this.totalDuration, this.requestOrJoinImage, required this.noReqOrJoinAvailable, this.title, this.season, });
+  BookItems({super.key, this.imagePath, this.requestOrJoin, this.totalDuration, this.requestOrJoinImage, required this.noReqOrJoinAvailable, this.title, this.season, this.clubId, this.clubLabel, this.author, this.clubCreator, required this.isPrivate, });
 
   final HomeController controller = Get.put(HomeController());
   final String? imagePath;
@@ -15,6 +17,12 @@ class BookItems extends StatelessWidget {
   final bool noReqOrJoinAvailable;
   final String? title;
   final String? season;
+  final String? clubId;
+  final String? clubLabel;
+  final String? author;
+  final String? clubCreator;
+  final bool isPrivate;
+
 
 
   @override
@@ -34,11 +42,20 @@ class BookItems extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      imagePath ?? "assets/images/book_1.png",
+                    CachedNetworkImage(
+                      imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
                       height: 160,
                       width: 104,
+                      placeholder: (context, url) => Center(
+                        child: SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                     ),
+
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,20 +63,20 @@ class BookItems extends StatelessWidget {
                         Row(
                           children: [
                             _customText(
-                                text: "Clb43534536",
+                                text: clubId ?? "Clb43534536",
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black),
 
                             SizedBox(width: 6.w,),
 
-                            Image.asset("assets/book/private_lock.png", height: 16.h, width: 12.w,)
+                            isPrivate ? Image.asset("assets/book/private_lock.png", height: 16.h, width: 12.w,) : SizedBox(),
                           ],
                         ),
-                        _customText(
+                        _customTextClubLabel(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
-                          text: "ClassicWatchers",
+                          text: clubLabel ?? "ClassicWatchers",
                           color: Colors.black.withOpacity(0.60),
                         ),
                         _rowCustomText(
@@ -68,14 +85,14 @@ class BookItems extends StatelessWidget {
                             secondText: title ?? "Jane Eyre",
                             secondFontSize: 12),
                         _rowCustomText(
-                            firstText: "Season: ",
+                            firstText: "Author: ",
                             firstFontSize: 12,
-                            secondText: "1",
+                            secondText: author ?? "1",
                             secondFontSize: 12),
                         _rowCustomText(
                           firstText: "Club Creator: ",
                           firstFontSize: 12,
-                          secondText: "jemmy155",
+                          secondText: clubCreator ?? "jemmy155",
                           secondFontSize: 12,
                           secondColor: Color(0xff29605E),
                         ),
@@ -116,9 +133,9 @@ class BookItems extends StatelessWidget {
                           ),
                         ),
                         _rowCustomText(
-                          firstText: "Watch Length: ",
+                          firstText: "Timeline: ",
                           firstFontSize: 12,
-                          secondText: "2 Month(s)",
+                          secondText: "18 Day(s)",
                           secondFontSize: 12,
                         ),
                         Padding(
@@ -164,7 +181,7 @@ class BookItems extends StatelessWidget {
                                 color: Colors.black),
                             SizedBox(width: 120),
                             _customText(
-                                text: "30",
+                                text: "28",
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black),
@@ -239,6 +256,25 @@ class BookItems extends StatelessWidget {
           fontSize: fontSize,
           fontWeight: fontWeight,
           color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _customTextClubLabel(
+      {required String text,
+        double? fontSize,
+        FontWeight? fontWeight,
+        Color? color}) {
+    return Padding(
+      padding: EdgeInsets.only(left: 8),
+      child: Text(
+        text,
+        style: GoogleFonts.dmSans(
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            color: color,
+            fontStyle: FontStyle.italic
         ),
       ),
     );

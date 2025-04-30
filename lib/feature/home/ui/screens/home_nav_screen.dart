@@ -4,7 +4,7 @@ import '../../../../core/utils/size_config.dart';
 import '../../../create_club/data/controller/talk_point_controller.dart';
 import '../widgets/bottom_nav_btn.dart';
 import '../widgets/screens.dart';
-import 'bottom_nav_controller.dart';
+import '../../data/controller/bottom_nav_controller.dart';
 
 class HomeNavScreen extends StatelessWidget {
   final BottomNavController controller = Get.put(BottomNavController());
@@ -26,9 +26,6 @@ class HomeNavScreen extends StatelessWidget {
               controller: controller.pageController,
               onPageChanged: (index) {
                 controller.currentIndex.value = index;
-                if(index == 2){
-                  pointController.generateLargeNumber();
-                }
               },
               children: screens,
             ),
@@ -52,7 +49,7 @@ class HomeNavScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topRight: Radius    .circular(20),
         ),
       ),
       child: Stack(

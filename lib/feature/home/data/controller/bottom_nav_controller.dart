@@ -8,10 +8,12 @@ class BottomNavController extends GetxController {
   late PageController pageController;
   int index = 9;
 
+  // Used to manage FAB state
+  var isBarSelected = false.obs;
+
   @override
   void onInit() {
     pageController = PageController(initialPage: currentIndex.value);
-
     super.onInit();
   }
 
@@ -21,27 +23,35 @@ class BottomNavController extends GetxController {
     super.dispose();
   }
 
-
+  //* Old behavior with animation (still here if needed)
   void animateToPage(int page) {
-    pageController.animateToPage(page,
-        duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+    pageController.animateToPage(
+      page,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.decelerate,
+    );
   }
 
-  void updateIndex(int index) {
+  //* New: Jump instantly without traversing pages
+  void jumpToPage(int index) {
     currentIndex.value = index;
-
-
-
-    animateToPage(index);
+    pageController.jumpToPage(index);
 
     if (isBarSelected.value == true) {
       isBarSelected.value = false;
     }
-
   }
 
+  //* Call this from BottomNavBtn onPressed
+  void updateIndex(int index) {
+    jumpToPage(index); // use jump instead of animate
+  }
 
-
+  //* Update FAB state and jump to page 2
+  void updateSelectedBar() {
+    jumpToPage(2);
+    isBarSelected.value = true;
+  }
 
   double animatedPositionedLeftValue() {
     double totalWidth =
@@ -51,20 +61,4 @@ class BottomNavController extends GetxController {
         (buttonWidth / 1.6) -
         (AppSizes.blockSizeHorizontal * 6);
   }
-
-  //Change bar
-  var isBarSelected = false.obs;
-
-  void updateSelectedBar() {
-
-    animateToPage(2);
-    if(isBarSelected.value==false){
-      isBarSelected.value = true;
-    }
-
-    if (isBarSelected.value) {
-      currentIndex.value = 2;
-    }
-  }
-
 }

@@ -55,7 +55,7 @@ class HelpScreen extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      controller.updateIndex(7);
+                      controller.updateIndex(3);
                     },
                     child: Image.asset(
                       "assets/profile/icons/back_arrow.png",
@@ -89,7 +89,7 @@ class HelpScreen extends StatelessWidget {
             ),
             settingActionButtons(
                 makeAction: () {
-                  controller.updateIndex(5);
+                  // controller.updateIndex(5);
                 },
                 iconImage: "assets/profile/icons/how_to_video.png",
                 text: "How to Videos"),
@@ -103,6 +103,9 @@ class HelpScreen extends StatelessWidget {
               color: Colors.grey.withValues(alpha: 0.60),
             ),
             settingActionButtons(
+                makeAction: () {
+                   controller.updateIndex(12);
+                },
                 iconImage: "assets/profile/icons/help_phone.png",
                 text: "Contact Us"),
             Divider(

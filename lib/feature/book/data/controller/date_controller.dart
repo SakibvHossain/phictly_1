@@ -7,6 +7,7 @@ import '../../../../core/utils/app_colors.dart';
 
 class DateController extends GetxController {
   var selectedDate = "".obs;
+  DateTime selectedDateTime = DateTime.now();
 
   Future<void> pickDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
@@ -32,11 +33,32 @@ class DateController extends GetxController {
 
     if (picked != null) {
       selectedDate.value = DateFormat("MM-dd-yyyy").format(picked);
+      selectedDateTime = picked;
     }
   }
-}
 
-/*
-yyyy-MM-dd
-MM-dd-yyyy
- */
+
+  bool isSelectedDateValid(String selectedDateStr, String type) {
+    DateTime now = DateTime.now();
+    DateTime? selectedDate;
+
+    try {
+      selectedDate = DateFormat("MM-dd-yyyy").parse(selectedDateStr);
+    } catch (_) {
+      return false;
+    }
+
+    Duration difference = selectedDate.difference(now);
+    int maxDays = 0;
+
+    if (type.contains("Book")) {
+      maxDays = 30;
+    } else if (type.contains("Show")) {
+      maxDays = 270;
+    } else if (type.contains("Movie")) {
+      maxDays = 7;
+    }
+
+    return difference.inDays >= 0 && difference.inDays <= maxDays;
+  }
+}

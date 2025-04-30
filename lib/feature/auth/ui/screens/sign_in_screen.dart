@@ -6,17 +6,20 @@ import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_text_field.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/core/validation/email_validation.dart';
-import 'package:phictly/feature/auth/data/sign_in_controller.dart';
 import 'package:get/get.dart';
 import 'package:phictly/feature/auth/ui/screens/sign_up_screen.dart';
-import 'package:phictly/feature/home/ui/screens/home_nav_screen.dart';
 import '../../../../core/utils/image_path.dart';
 import '../../../../core/validation/password_validation.dart';
+import '../../../home/data/controller/bottom_nav_controller.dart';
+import '../../../profile/data/controller/change_profile_controller.dart';
+import '../../data/controller/sign_in_controller.dart';
 
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
   final SignInController controller = Get.put(SignInController());
+  final ChangeProfileController changeProfileController = Get.put(ChangeProfileController());
+  final navController =  Get.find<BottomNavController>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +57,8 @@ class SignInScreen extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: SingleChildScrollView(
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Form(
                       key: signInKey,
                       child: Column(
@@ -83,6 +87,7 @@ class SignInScreen extends StatelessWidget {
                             height: 24,
                           ),
                           CustomTextField(
+                            controller: controller.emailController,
                             validator: validateEmail,
                             hintText: "email",
                             focusNode: controller.emailFocusNode,
@@ -94,6 +99,7 @@ class SignInScreen extends StatelessWidget {
                           ),
                           Obx(() {
                             return CustomTextField(
+                              controller: controller.passwordController,
                               hintText: "password",
                               validator: validatePassword,
                               prefixIcon: Icons.lock,
@@ -108,25 +114,32 @@ class SignInScreen extends StatelessWidget {
                           SizedBox(
                             height: 50.h,
                           ),
-
-                          CustomButton(
-                            text: "Sign in",
-                            onTap: (){
-                              if (signInKey.currentState!.validate()) {
-                                Get.to(HomeNavScreen());
-                              }
-                            },
-                            borderRadius: 8.r,
+                          Obx(
+                            () => controller.isLoading.value
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  )
+                                : CustomButton(
+                                    text: "Sign in",
+                                    onTap: () async {
+                                      if (signInKey.currentState!.validate()) {
+                                        debugPrint("+++++++++++++++++++++++++++++++++++++++++ Change Profile Controller: ${changeProfileController.currentIndex.value}");
+                                        debugPrint("+++++++++++++++++++++++++++++++++++++++++ Change Nav Controller: ${navController.currentIndex.value}");
+                                        await controller.logIn();
+                                      }
+                                    },
+                                    borderRadius: 8.r,
+                                  ),
                           ),
                           SizedBox(
                             height: 50.h,
                           ),
-
                           GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               Get.to(SignUpScreen());
                             },
-
                             child: RichText(
                               text: TextSpan(
                                 text: "Don’t have an account? ",
@@ -148,7 +161,6 @@ class SignInScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-
                           SizedBox(
                             height: 160.h,
                           ),

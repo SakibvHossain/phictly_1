@@ -2,38 +2,41 @@ import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
+import 'package:phictly/feature/create_club/ui/screens/chapter_comment_details.dart';
 import '../../../../core/components/custom_text.dart';
 import '../../../../core/utils/app_colors.dart';
 import 'package:get/get.dart';
 import '../../data/controller/change_club_controller.dart';
-import '../../data/controller/chapter_comment_controller.dart';
+import '../../data/controller/club_controller.dart';
+import '../../data/controller/post_club_controller.dart';
 
 class ChapterComments extends StatelessWidget {
   ChapterComments(
       {super.key,
       required this.userName,
       required this.comment,
-      required this.commentCount,
-      required this.chapter,
+      required this.commentCount, this.chapter,
       required this.chapterCreatedTime,
       this.chapterBannerText,
-      this.index, required this.isTextVisible});
+      this.index, required this.isTextVisible, this.parentID, this.type, this.episode, this.episodeBanner});
 
   final String userName;
   final String comment;
   final int? index;
+  final String? parentID;
+  final String? type;
+  final String? episodeBanner;
   final String commentCount;
-  final String chapter;
+  final String? chapter;
   final String? chapterBannerText;
   final String chapterCreatedTime;
   final bool? isTextVisible;
+  final String? episode;
 
-  final ChangeClubController changeClubController =
-      Get.put(ChangeClubController());
-  final ChapterCommentDetailController commentDetailController =
-      Get.put(ChapterCommentDetailController());
-
-  final ChapterCommentController chapterCommentController = Get.put(ChapterCommentController());
+  final ChangeClubController changeClubController = Get.put(ChangeClubController());
+  final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
+  final ClubController clubController = Get.put(ClubController());
+  final PostClubController bookController = Get.put(PostClubController());
 
   @override
   Widget build(BuildContext context) {
@@ -75,54 +78,103 @@ class ChapterComments extends StatelessWidget {
                       ),
 
                       //* Blur the text
-                      Obx((){
-                        RxBool value = chapterCommentController.isTextVisibleList[index ?? 0];
-                        return (chapterBannerText?.contains("CH5") ?? false) && (!value.value)
-                            ? Stack(
-                          children: [
-                            Blur(
-                              blur: 3,
-                              child: Align(
-                                alignment: AlignmentDirectional.centerStart,
-                                child: CustomText(
-                                  text: comment ??
-                                      "Did Isla really do that to Grim?",
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xff000000).withOpacity(0.6),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              left: width/3.8,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: (){
-                                  chapterCommentController.isTextVisibleList[index ?? 0] = true.obs;
-                                },
-                                child: CustomText(
-                                  text: "Tap to show",
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xff000000).withOpacity(0.8),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                            : Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: CustomText(
-                            text: comment ??
-                                "Did Isla really do that to Grim?",
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff000000).withOpacity(0.6),
-                          ),
-                        ) ;
+                      // Obx((){
+                      //   RxList<RxBool> selectedPosts = <RxBool>[].obs;
+                      //
+                      //   selectedPosts.assignAll(List.generate(clubController.clubDetail.value!.post.length, (_) => false.obs));
+                      //
+                      //   RxBool value = selectedPosts[index ?? 0];
+                      //
+                      //   return (chapterBannerText?.contains("CH5") ?? false) && (!value.value)
+                      //       ? Stack(
+                      //     children: [
+                      //       Blur(
+                      //         blur: 3,
+                      //         child: Align(
+                      //           alignment: AlignmentDirectional.centerStart,
+                      //           child: CustomText(
+                      //             text: comment ??
+                      //                 "Did Isla really do that to Grim?",
+                      //             fontSize: 16.sp,
+                      //             fontWeight: FontWeight.w600,
+                      //             color: Color(0xff000000).withOpacity(0.6),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Positioned(
+                      //         top: 0,
+                      //         left: width/3.8,
+                      //         right: 0,
+                      //         child: GestureDetector(
+                      //           onTap: (){
+                      //             chapterCommentController.isTextVisibleList[index ?? 0] = true.obs;
+                      //           },
+                      //           child: CustomText(
+                      //             text: "Tap to show",
+                      //             fontSize: 18.sp,
+                      //             fontWeight: FontWeight.w400,
+                      //             color: Color(0xff000000).withOpacity(0.8),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   )
+                      //       : Align(
+                      //     alignment: AlignmentDirectional.centerStart,
+                      //     child: CustomText(
+                      //       text: comment ?? "Did Isla really do that to Grim?",
+                      //       fontSize: 16.sp,
+                      //       fontWeight: FontWeight.w600,
+                      //       color: Color(0xff000000).withOpacity(0.6),
+                      //     ),
+                      //   );
+                      // }),
 
-                      })
+                      //* For blue feature
+                      // Stack(
+                      //   children: [
+                      //     Blur(
+                      //       blur: 3,
+                      //       child: Align(
+                      //         alignment: AlignmentDirectional.centerStart,
+                      //         child: CustomText(
+                      //           text: comment ??
+                      //               "Did Isla really do that to Grim?",
+                      //           fontSize: 16.sp,
+                      //           fontWeight: FontWeight.w600,
+                      //           color: Color(0xff000000).withOpacity(0.6),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Positioned(
+                      //       top: 0,
+                      //       left: width/3.8,
+                      //       right: 0,
+                      //       child: GestureDetector(
+                      //         onTap: (){
+                      //           //* Is it visible or not
+                      //           //* chapterCommentController.isTextVisibleList[index ?? 0] = true.obs;
+                      //         },
+                      //         child: CustomText(
+                      //           text: "Tap to show",
+                      //           fontSize: 18.sp,
+                      //           fontWeight: FontWeight.w400,
+                      //           color: Color(0xff000000).withOpacity(0.8),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: CustomText(
+                          text: comment ?? "Did Isla really do that to Grim?",
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff000000).withOpacity(0.6),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -140,25 +192,25 @@ class ChapterComments extends StatelessWidget {
                         SizedBox(
                           width: 6.w,
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            changeClubController.updateIndex(2);
-                            commentDetailController.updateIndex(index);
-                          },
-                          child: Image.asset(
-                            "assets/images/message_reply.png",
-                            height: 20,
-                            width: 26,
-                          ),
+                        Image.asset(
+                          "assets/images/message_reply.png",
+                          height: 20,
+                          width: 26,
                         ),
                       ],
                     ),
-                    CustomText(
+
+                    (chapter == null || chapter == "null")
+                        ? SizedBox.shrink()
+                        : CustomText(
                       text: chapter ?? "Chapter 2",
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xff000000).withValues(alpha: 0.6),
+                      color: const Color(0xff000000).withAlpha((0.6 * 255).toInt()), // fix alpha
                     ),
+
+
+
                     CustomText(
                       text: chapterCreatedTime ?? "3m",
                       fontSize: 14.sp,
@@ -185,10 +237,12 @@ class ChapterComments extends StatelessWidget {
                   left: 9.5,
                   right: 0,
                   child: CustomText(
-                    text: chapterBannerText ?? "CH2",
+                    text: type?.contains("BOOK") == true
+                        ? (returnBanner() ?? "CH2")
+                        : (returnBannerForShow() ?? "EP2"),
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff000000),
+                    color: const Color(0xff000000),
                   ),
                 ),
               ],
@@ -198,4 +252,35 @@ class ChapterComments extends StatelessWidget {
       ),
     );
   }
+
+  String returnBanner() {
+    final text = chapterBannerText?.toLowerCase().trim() ?? '';
+    print("++++++++++++++++++++++++++++++++++++++++++++++LOL: $text");
+    if (text.startsWith("chapter 1")) return "CH1";
+    if (text.startsWith("chapter 2")) return "CH2";
+    if (text.startsWith("chapter 3")) return "CH3";
+    if (text.startsWith("chapter 4")) return "CH4";
+    return "CH5";
+  }
+  String returnBannerForShow() {
+    final text = chapterBannerText?.toLowerCase().trim() ?? '';
+    print("++++++++++++++++++++++++++++++++++++++++++++++LOL: $text");
+    if (text.startsWith("chapter 1")) return "EP1";
+    if (text.startsWith("chapter 2")) return "EP2";
+    if (text.startsWith("chapter 3")) return "EP3";
+    if (text.startsWith("chapter 4")) return "EP4";
+    if (text.startsWith("chapter 5")) return "EP5";
+    if (text.startsWith("chapter 6")) return "EP6";
+    return "CH7";
+  }
+  String getChapterText(String? type, String? chapter) {
+    if (type?.contains("BOOK") == true) {
+      return chapter ?? "Chapter 2";
+    } else if (type?.contains("SHOW") == true) {
+      return chapter ?? "Episode 2";
+    } else {
+      return "";
+    }
+  }
+
 }

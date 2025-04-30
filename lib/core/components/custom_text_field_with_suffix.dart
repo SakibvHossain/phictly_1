@@ -20,6 +20,9 @@ class CustomTextFieldWithSuffix extends StatelessWidget {
   final Color? fillColor;
   final TextStyle textStyle;
   final TextStyle hintStyle;
+  final int? maxLine;
+  final BoxConstraints? suffixIconConstraints;
+  final BoxConstraints? prefixIconConstraints;
 
   const CustomTextFieldWithSuffix({
     super.key,
@@ -33,7 +36,12 @@ class CustomTextFieldWithSuffix extends StatelessWidget {
     this.suffixIconAction,
     this.isReadOnlyTrue,
     this.inputType,
-    this.borderSide, this.fillColor, this.suffix, required this.textStyle, required this.hintStyle,
+    this.borderSide,
+    this.fillColor,
+    this.suffix,
+    required this.textStyle,
+    required this.hintStyle,
+    this.maxLine, this.suffixIconConstraints, this.prefixIconConstraints,
   });
 
   @override
@@ -44,20 +52,23 @@ class CustomTextFieldWithSuffix extends StatelessWidget {
       focusNode: focusNode,
       obscureText: isObscure ?? false,
       validator: validator,
+      maxLines: maxLine ?? 1,
       keyboardType: inputType ?? TextInputType.text,
       onFieldSubmitted: (text) {
         if (nextFocus != null) {
           FocusScope.of(context).requestFocus(nextFocus); // Move to next field
         }
       },
-      style: textStyle ?? GoogleFonts.inter(
-        fontSize: 16.h,
-        fontWeight: FontWeight.w400,
-      ),
+      style: textStyle ??
+          GoogleFonts.inter(
+            fontSize: 16.h,
+            fontWeight: FontWeight.w400,
+          ),
       decoration: InputDecoration(
         prefixIcon: Icon(prefixIcon, color: AppColors.primaryColor),
-        suffixIcon: suffix
-            ?? SizedBox(),
+        prefixIconConstraints: prefixIconConstraints ?? BoxConstraints(minWidth: 48, minHeight: 48),
+        suffixIcon: suffix ?? SizedBox(),
+        suffixIconConstraints: suffixIconConstraints ?? BoxConstraints(minWidth: 48, minHeight: 48),
         hintText: hintText,
         hintStyle: hintStyle,
         filled: true,

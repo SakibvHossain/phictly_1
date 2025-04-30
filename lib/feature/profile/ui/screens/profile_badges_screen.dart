@@ -8,7 +8,7 @@ import '../../data/controller/change_profile_controller.dart';
 class ProfileBadgesScreen extends StatelessWidget {
   ProfileBadgesScreen({super.key});
 
-  final ChangeProfileController controller = Get.put(ChangeProfileController());
+  final controller = Get.find<ChangeProfileController>();
 
   final List<String> myBadges = [
     "assets/profile/image/badges_1.png",
@@ -56,10 +56,15 @@ class ProfileBadgesScreen extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Image.asset(
-                              "assets/profile/icons/settings.png",
-                              height: 25.h,
-                              width: 25.w,
+                            GestureDetector(
+                              onTap: () {
+                                controller.updateIndex(3);
+                              },
+                              child: Image.asset(
+                                "assets/profile/icons/settings.png",
+                                height: 25.h,
+                                width: 25.w,
+                              ),
                             ),
                           ],
                         )
@@ -92,7 +97,7 @@ class ProfileBadgesScreen extends StatelessWidget {
                           color: Color(0xffEEf0f8),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(6.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: ClipOval(
                             child: Image.asset(
                               "assets/profile/image/profile_image.png",

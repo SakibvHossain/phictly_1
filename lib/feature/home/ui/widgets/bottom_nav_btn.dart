@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/utils/size_config.dart';
-import '../screens/bottom_nav_controller.dart';
+import '../../data/controller/bottom_nav_controller.dart';
 
 class BottomNavBtn extends StatelessWidget {
   const BottomNavBtn({

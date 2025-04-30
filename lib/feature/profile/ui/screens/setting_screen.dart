@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_text.dart';
-import 'package:phictly/feature/auth/ui/screens/sign_in_screen.dart';
-
+import 'package:phictly/feature/profile/data/controller/logout_controller.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/custom_outline_button.dart';
 import '../../data/controller/change_profile_controller.dart';
@@ -12,7 +12,8 @@ import '../../data/controller/change_profile_controller.dart';
 class SettingScreen extends StatelessWidget {
   SettingScreen({super.key});
 
-  final ChangeProfileController controller = Get.put(ChangeProfileController());
+  final controller = Get.find<ChangeProfileController>();
+  final LogoutController logoutController = Get.put(LogoutController());
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +86,10 @@ class SettingScreen extends StatelessWidget {
               color: Colors.grey.withValues(alpha: 0.60),
             ),
             settingActionButtons(
+                makeAction: () {
+                  controller.updateIndex(4);
+                  debugPrint("++++++++++++++++++++++++++++++++You have clicked");
+                },
                 iconImage: "assets/profile/icons/edit.png",
                 text: "Edit Profile"),
             Divider(
@@ -100,12 +105,18 @@ class SettingScreen extends StatelessWidget {
               color: Colors.grey.withValues(alpha: 0.60),
             ),
             settingActionButtons(
+                makeAction: () {
+                  controller.updateIndex(6);
+                },
                 iconImage: "assets/profile/icons/app_theme.png",
                 text: "App Theme"),
             Divider(
               color: Colors.grey.withValues(alpha: 0.60),
             ),
             settingActionButtons(
+                makeAction: () {
+                  controller.updateIndex(7);
+                },
                 iconImage: "assets/profile/icons/my_group.png",
                 text: "My Groups"),
             Divider(
@@ -122,6 +133,9 @@ class SettingScreen extends StatelessWidget {
               color: Colors.grey.withValues(alpha: 0.60),
             ),
             settingActionButtons(
+                makeAction: () {
+                  controller.updateIndex(9);
+                },
                 iconImage: "assets/profile/icons/about.png", text: "About"),
             Divider(
               color: Colors.grey.withValues(alpha: 0.60),
@@ -194,8 +208,8 @@ class SettingScreen extends StatelessWidget {
                               width: 16.w,
                             ),
                             CustomButton(
-                              onTap: () {
-                                Get.to(SignInScreen());
+                              onTap: () async {
+                                await logoutController.logoutUser();
                               },
                               text: "YES",
                               width: 150.w,
@@ -203,6 +217,9 @@ class SettingScreen extends StatelessWidget {
                               textFontSize: 15.sp,
                               textFontWeight: FontWeight.w400,
                               borderRadius: 6.r,
+                              child: Obx(() => logoutController.isLoading.value
+                                  ? CircularProgressIndicator(color: Colors.white)
+                                  : Text("YES", style: GoogleFonts.dmSans(fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white),),),
                             ),
                           ],
                         ),

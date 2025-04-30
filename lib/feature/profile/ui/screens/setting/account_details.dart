@@ -57,7 +57,7 @@ class AccountDetails extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      screenController.updateIndex(7);
+                      screenController.updateIndex(3);
                     },
                     child: Image.asset(
                       "assets/profile/icons/back_arrow.png",
@@ -153,6 +153,7 @@ class AccountDetails extends StatelessWidget {
 
                   //* Multi Factor Auth
                   CustomTextFieldWithSuffix(
+                    isReadOnlyTrue: true,
                     hintText: "Enable Multi-Factor Authentication",
                     hintStyle: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w400, color: AppColors.primaryColor),
                     prefixIcon: Icons.privacy_tip,
@@ -160,7 +161,7 @@ class AccountDetails extends StatelessWidget {
                       color: Color(0xff000000).withOpacity(0.20),
                     ),
                     fillColor: Colors.transparent,
-                    suffix: IntrinsicWidth( // Constrains width to the content inside
+                    suffix: IntrinsicWidth(
                       child: Align(
                         alignment: AlignmentDirectional.centerStart,
                         child: Padding(

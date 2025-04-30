@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
 import 'package:phictly/feature/create_club/ui/widgets/reply.dart';
 import '../../../../core/components/custom_text.dart';
@@ -7,36 +8,39 @@ import '../../../../core/utils/app_colors.dart';
 import 'package:get/get.dart';
 
 import '../../data/controller/change_club_controller.dart';
-import '../../data/controller/chapter_comment_controller.dart';
-import '../../data/model/chapter_comment.dart';
-
+import '../../data/controller/club_controller.dart';
+import '../../data/controller/comment_controller.dart';
+import '../../data/controller/post_club_controller.dart';
 
 class CommentDetail extends StatelessWidget {
   CommentDetail(
       {super.key,
-        required this.userName,
-        required this.comment,
-        required this.commentCount,
-        required this.chapter,
-        required this.chapterCreatedTime,
-        this.chapterBannerText, this.index});
+      required this.userName,
+      required this.comment,
+      required this.commentCount,
+      required this.chapter,
+      required this.chapterCreatedTime,
+      this.chapterBannerText,
+      this.index});
 
   final String userName;
-  final String comment;
+  final String? comment;
   final int? index;
   final String commentCount;
   final String chapter;
   final String? chapterBannerText;
   final String chapterCreatedTime;
 
-  final ChangeClubController changeClubController = Get.put(ChangeClubController());
-  final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
-  final ChapterCommentController commentController = Get.put(ChapterCommentController());
+  final ChangeClubController changeClubController =
+      Get.put(ChangeClubController());
+  final ChapterCommentDetailController commentDetailController =
+      Get.put(ChapterCommentDetailController());
+  final CommentController commentController = Get.put(CommentController());
+  final PostClubController bookController = Get.put(PostClubController());
+  final ClubController clubController = Get.put(ClubController());
 
   @override
   Widget build(BuildContext context) {
-    ChapterComment comment = commentController.chapterCommentList[commentDetailController.passedIndex];
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -69,7 +73,9 @@ class CommentDetail extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: Color(0xff000000),
                           ),
-                          SizedBox(width: 10,),
+                          SizedBox(
+                            width: 10,
+                          ),
                           CustomText(
                             text: chapterCreatedTime ?? "3m",
                             fontSize: 14.sp,
@@ -78,25 +84,20 @@ class CommentDetail extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 6.h,),
+                      SizedBox(
+                        height: 6.h,
+                      ),
                       Align(
                         alignment: AlignmentDirectional.centerStart,
                         child: CustomText(
-                          text: comment.comment ?? "Did Isla really do that to Grim?",
+                          text: comment ?? "Did Isla really do that to Grim?",
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w400,
                           color: Color(0xff000000),
                         ),
                       ),
-                      SizedBox(height: 6.h,),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: CustomText(
-                          text: "I feel like I could go on and on, and I am honestly not trying to play favorites (I genuinely enjoyed reading about Isla's relationships with both Oro and Grim)",
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff000000).withValues(alpha: 0.6),
-                        ),
+                      SizedBox(
+                        height: 6.h,
                       ),
                     ],
                   ),
@@ -124,7 +125,7 @@ class CommentDetail extends StatelessWidget {
                           width: 6.w,
                         ),
                         GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             changeClubController.updateIndex(2);
                             commentDetailController.updateIndex(index);
                           },
@@ -137,20 +138,62 @@ class CommentDetail extends StatelessWidget {
                         SizedBox(
                           width: 16.w,
                         ),
-                        Icon(
-                          Icons.reply_outlined,
-                          color: AppColors.primaryColor,
+                        GestureDetector(
+                          onTap: (){
+                            addReply(clubController.clubDetail.value!.post[index ?? 0].id);
+                          },
+                          child: Icon(
+                            Icons.reply_outlined,
+                            color: AppColors.primaryColor,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
 
-                //* Available Replies
-                Divider(color: Color(0xff000000).withValues(alpha: 0.20),),
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: clubController.clubDetail.value!.post[index ?? 0].comment.length,
+                    itemBuilder: (context, commentIndex) {
 
-                Reply(userName: "${comment.userName}", comment: "${comment.comment}", commentCount: "${comment.commentCount}", chapter: "${comment.chapter}", chapterCreatedTime: "${comment.chapterCreatedTime}"),
+                      final createdAt = clubController.clubDetail.value!
+                          .post[clubController.selectedIndex ?? 0].comment[commentIndex].createdAt;
+                      final Duration diff = DateTime.now().toUtc().difference(createdAt);
 
+                      String difference;
+
+                      if (diff.inSeconds < 60) {
+                        difference = '${diff.inSeconds}s ago';
+                      } else if (diff.inMinutes < 60) {
+                        difference = '${diff.inMinutes}m ago';
+                      } else if (diff.inHours < 24) {
+                        difference = '${diff.inHours}h ago';
+                      } else if (diff.inDays < 7) {
+                        difference = '${diff.inDays}d ago';
+                      } else {
+                        difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                      }
+
+                  return Column(
+                    children: [
+                      //* Available Replies
+                      Divider(
+                        color: Color(0xff000000).withValues(alpha: 0.20),
+                      ),
+                      Reply(
+                        userName: clubController.clubDetail.value!.post[index ?? 0].comment[commentIndex].user.username,
+                        comment: clubController.clubDetail.value!.post[index ?? 0].comment[commentIndex].content,
+                        commentCount: "1m",
+                        chapter: "Chapter 1",
+                        chapterCreatedTime: difference,
+                        index: index,
+                      ),
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -168,10 +211,10 @@ class CommentDetail extends StatelessWidget {
                 ),
                 Positioned(
                   top: 10,
-                  left: 9.5     ,
+                  left: 9.5,
                   right: 0,
                   child: CustomText(
-                    text: chapterBannerText ?? "CH2",
+                    text: returnBanner() ?? "CH2",
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
                     color: Color(0xff000000),
@@ -181,6 +224,85 @@ class CommentDetail extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  String returnBanner() {
+    final text = chapter.toLowerCase().trim() ?? '';
+    print("++++++++++++++++++++++++++++++++++++++++++++++LOL: $text");
+    if (text.startsWith("chapter 1")) return "CH1";
+    if (text.startsWith("chapter 2")) return "CH2";
+    if (text.startsWith("chapter 3")) return "CH3";
+    if (text.startsWith("chapter 4")) return "CH4";
+    return "CH5";
+  }
+
+
+  //* Reply Bottom Sheet
+  void addReply(String postId) {
+    Get.bottomSheet(
+      Container(
+        height: 100.h,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            color: Color(0xffEEf0f8),
+            border: Border(
+              top: BorderSide(color: Colors.white.withOpacity(0.17), width: 1),
+            )),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Container(
+                height: 33.h,
+                width: 33.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  shape: BoxShape.circle
+                ),
+                child: Center(child: CustomText(text: clubController.clubDetail.value!.post[index ?? 0].user.username.substring(0,1), fontSize: 18.sp, fontWeight: FontWeight.w400, color: Colors.white)),
+              ),
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: TextFormField(
+                    controller: commentController.replyController,
+                    cursorColor: AppColors.primaryColor,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: "Add Comment for This Username",
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black.withValues(alpha: 0.7),
+                      ),
+                      border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent)),
+                      enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent)),
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent)),
+                    ),
+                  ),
+                ),
+              ),
+
+              GestureDetector(
+                  onTap: () async {
+                    Get.back();
+                    await commentController.postClubReply(postId);
+                    clubController.fetchCreatedClub(bookController.createdClubId);
+                  },
+                  child: Icon(Icons.send_rounded, color: AppColors.primaryColor, size: 24,))
+            ],
+          ),
+        ),
       ),
     );
   }

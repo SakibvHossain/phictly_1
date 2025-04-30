@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
+import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
 import '../../../../core/components/custom_text.dart';
 import '../../../../core/utils/app_colors.dart';
 import 'package:get/get.dart';
-
 import '../../data/controller/change_club_controller.dart';
-import '../../data/controller/chapter_comment_controller.dart';
 
 
 class Reply extends StatelessWidget {
@@ -32,13 +31,14 @@ class Reply extends StatelessWidget {
 
   final ChangeClubController changeClubController = Get.put(ChangeClubController());
   final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
+  final ClubController club = Get.put(ClubController());
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
-          padding: EdgeInsets.only(left: 16, bottom: 8, top: 8),
+          padding: EdgeInsets.only(left: 16, bottom: 8,),
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -54,7 +54,7 @@ class Reply extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CustomText(
-                            text: "Scherriw777",
+                            text: userName ?? "Scherriw777",
                             textDecoration: TextDecoration.underline,
                             fontSize: 18.sp,
                             fontWeight: FontWeight.w500,
@@ -74,7 +74,7 @@ class Reply extends StatelessWidget {
                     Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: CustomText(
-                        text: "Grimm better be endgame. Oro also gave me the ick",
+                        text: comment ?? "Grimm better be endgame. Oro also gave me the ick",
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w400,
                         color: Color(0xff000000).withValues(alpha: 0.6),

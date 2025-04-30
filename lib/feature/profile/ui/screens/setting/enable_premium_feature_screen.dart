@@ -57,7 +57,7 @@ class EnablePremiumFeatureScreen extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap:(){
-                    screenController.updateIndex(7);
+                    screenController.updateIndex(3);
                   },
                   child: Image.asset(
                     "assets/profile/icons/back_arrow.png",

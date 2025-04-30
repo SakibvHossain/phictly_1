@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:phictly/feature/create_club/data/model/add_talk_points.dart';
 
 class TalkPointController extends GetxController {
@@ -11,7 +12,10 @@ class TalkPointController extends GetxController {
 
   var selectedDate = DateTime.now().obs;
   var talkPoints = <int>[].obs;
-  var randomNumber = 50588791;
+
+  int clubIdNumber = 1;
+  String formattedClubId = "";
+
   var createdClubBook = [];
 
   void addTalkPoint() {
@@ -45,17 +49,47 @@ class TalkPointController extends GetxController {
     print("+++++++++++++++++++++++++++++++++++++++${talkPointRxList.length}");
   }
 
+  void updateClubId() {
+    clubIdNumber += 1;
 
-  //* Reduced Collisions
-  void generateLargeNumber() {
-    Random secure = Random.secure();
-    Uint8List bytes =
-    Uint8List(4); //* 4 bytes = 32 bits (can hold a large enough number)
+    if (clubIdNumber < 1000000) {
+      formattedClubId = clubIdNumber.toString();
+    } else {
+      //* Determine the letter prefix based on million groups
+      int millions = clubIdNumber ~/ 1000000; //* 1 for A, 2 for B, 3 for C
+      int offset = clubIdNumber % 1000000;
 
-    for (int i = 0; i < bytes.length; i++) {
-      bytes[i] = secure.nextInt(256); //* Filling bytes with random values
+      String letter = String.fromCharCode(64 + millions); //* 65 is 'A', 66 is 'B', ...
+      int subId = offset == 0 ? 1 : offset; //* start with A1, not A0
+
+      formattedClubId = "$letter$subId";
     }
 
-    randomNumber = bytes.buffer.asByteData().getUint32(0) % 90000000 + 10000000;
+    print("Generated Club ID: $formattedClubId");
   }
+
+  bool isSelectedDateValid(String selectedDateStr, String type) {
+    DateTime now = DateTime.now();
+    DateTime? selectedDate;
+
+    try {
+      selectedDate = DateFormat("MM-dd-yyyy").parse(selectedDateStr);
+      debugPrint("++++++++++++++++++++AAAAAAAAAAAAAAAAA+++++++++++++++++++++++++$now");
+      debugPrint("++++++++++++++++++++AAAAAAAAAAAAAAAAA+++++++++++++++++++++++++$selectedDate");
+    } catch (_) {
+      return false;
+    }
+
+    Duration difference = selectedDate.difference(now);
+    int maxDays = 0;
+    if (type.contains("Book")) {
+      maxDays = 30;
+    } else if (type.contains("Show")) {
+      maxDays = 270;
+    } else if (type.contains("Movie")) {
+      maxDays = 7;
+    }
+    return difference.inDays >= 0 && difference.inDays <= maxDays;
+  }
+
 }

@@ -10,11 +10,12 @@ import 'package:phictly/core/validation/email_validation.dart';
 import 'package:get/get.dart';
 import 'package:phictly/core/validation/name_validator.dart';
 import 'package:phictly/core/validation/phone_validation.dart';
-import 'package:phictly/feature/auth/data/sign_up_controller.dart';
-import 'package:phictly/feature/auth/ui/screens/confirm_sign_up_screen.dart';
+import 'package:phictly/feature/auth/data/controller/sign_up_controller.dart';
 import '../../../../core/utils/image_path.dart';
 import '../../../../core/validation/password_validation.dart';
-import '../../../home/ui/screens/home_nav_screen.dart';
+import '../../../book/data/controller/date_controller.dart';
+import '../../../home/data/controller/bottom_nav_controller.dart';
+import '../../../profile/data/controller/change_profile_controller.dart';
 import '../widget/dropdown_gender.dart';
 import '../widget/dropdown_location.dart';
 
@@ -22,8 +23,11 @@ class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
 
   final SignUpController controller = Get.put(SignUpController());
-  final List<String> genderList = ["Male", "Female"];
-  final List<String> locationList = ["Dhaka", "Banasree", "Mirpure"];
+  final DateController dateController = Get.put(DateController());
+  final ChangeProfileController changeProfileController = Get.put(ChangeProfileController());
+  final navController = Get.find<BottomNavController>();
+  final List<String> genderList = ["Male", "Female", "Nonbinary"];
+  final List<String> locationList = ["United States", "Canada", "Jamaica", "Dominican Republic", "Mexico", "Brazil", "Argentina", "Chile", "Colombia", "Peru", "Bolivia", "United Kingdom", "Germany", "France", "Spain", "Italy", "Netherlands", "Sweden", "Poland", "China", "India", "Japan", "South Korea" , "Indonesia" , "Thailand" , "Philippines" , "Australia" , "New Zealand" , "South Africa" , "Nigeria" , "Kenya" , "Egypt" , "United Arab Emirates" , "Saudi Arabia" , "Turkey" , "Israel"];
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +115,7 @@ class SignUpScreen extends StatelessWidget {
 
                           //* Email
                           CustomTextField(
+                            controller: controller.emailController,
                             validator: validateEmail,
                             hintText: "email",
                             prefixIcon: Icons.email,
@@ -122,6 +127,7 @@ class SignUpScreen extends StatelessWidget {
 
                           //* Username
                           CustomTextField(
+                            controller: controller.usernameController,
                             validator: validateName,
                             hintText: "username",
                             prefixIcon: Icons.person,
@@ -134,6 +140,7 @@ class SignUpScreen extends StatelessWidget {
                           //* Password
                           Obx(() {
                             return CustomTextField(
+                              controller: controller.passwordController,
                               hintText: "password",
                               validator: validatePassword,
                               prefixIcon: Icons.lock,
@@ -152,6 +159,7 @@ class SignUpScreen extends StatelessWidget {
 
                           //*
                           CustomTextField(
+                            controller: controller.phoneController,
                             validator: phoneValidation,
                             hintText: "phone",
                             inputType: TextInputType.number,
@@ -162,12 +170,22 @@ class SignUpScreen extends StatelessWidget {
                             height: 16.h,
                           ),
 
-                          CustomTextField(
-                            validator: dateValidation,
-                            hintText: "mm/dd/yyyy",
-                            prefixIcon: Icons.calendar_month,
-                            inputType: TextInputType.datetime,
-                          ),
+                          Obx((){
+                            return CustomTextField(
+                              isReadOnlyTrue: true,
+                              onTap: () {
+                                dateController.pickDate(context);
+
+                                debugPrint("+++++++++++++++++++++++${dateController.selectedDate.value}");
+                              },
+                              // validator: dateValidation,
+                              hintText: dateController.selectedDate.value.isEmpty
+                                  ? "Select Date"
+                                  : dateController.selectedDate.value,
+                              prefixIcon: Icons.calendar_month,
+                              inputType: TextInputType.datetime,
+                            );
+                          }),
 
                           SizedBox(
                             height: 16.h,
@@ -193,16 +211,22 @@ class SignUpScreen extends StatelessWidget {
                             height: 40.h,
                           ),
 
-                          CustomButton(
-                            text: "Sign up",
-                            onTap: () {
-                              if (signInKey.currentState!.validate()) {
-                                Get.to(
-                                  HomeNavScreen(),
-                                );
-                              }
-                            },
-                            borderRadius: 8.r,
+                          Obx(
+                            () => controller.isLoading.value
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  )
+                                : CustomButton(
+                                    text: "Sign up",
+                                    onTap: () {
+                                      if (signInKey.currentState!.validate()) {
+                                        controller.signUp(context);
+                                      }
+                                    },
+                                    borderRadius: 8.r,
+                                  ),
                           ),
 
                           SizedBox(

@@ -1,20 +1,40 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:phictly/feature/create_club/data/controller/talk_point_controller.dart';
 import '../../../feature/home/data/controller/home_controller.dart';
+import '../../../feature/profile/data/controller/timeline_controller.dart';
+import '../../utils/app_colors.dart';
 
 class CustomBookItem extends StatelessWidget {
-  CustomBookItem({super.key, this.imagePath, this.requestOrJoin, this.totalDuration, this.requestOrJoinImage, required this.noReqOrJoinAvailable, this.title, this.author});
+  CustomBookItem({super.key, this.imagePath, this.requestOrJoin, this.totalDuration, this.requestOrJoinImage, required this.noReqOrJoinAvailable, this.title, this.author, this.clubId, this.clubLabel, this.clubCreator, this.memberCount, this.timeLine, this.isPublic, required this.clubType, this.talkPoint, this.totalSeason,});
 
   final HomeController controller = Get.put(HomeController());
+  final TalkPointController talkPointController = Get.put(TalkPointController());
+  final TimelineController timelineController = Get.put(TimelineController());
+  final Logger logger = Logger();
+
+
+
   final String? imagePath;
   final String? requestOrJoin;
   final String? requestOrJoinImage;
   final String? totalDuration;
   final bool noReqOrJoinAvailable;
   final String? title;
+  final String? memberCount;
   final String? author;
+  final String? clubId;
+  final String? clubLabel;
+  final String? isPublic;
+  final String? timeLine;
+  final String? clubCreator;
+  final String clubType;
+  final String? totalSeason;
+  final List<DateTime>? talkPoint;
 
 
   @override
@@ -34,47 +54,84 @@ class CustomBookItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      imagePath ?? "assets/images/book_1.png",
+                    CachedNetworkImage(
+                      imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
                       height: 160,
                       width: 104,
+                      placeholder: (context, url) => Center(
+                        child: SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                     ),
+
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            _customText(
+                                text: "Clb$clubId" ?? "Clb12547896",
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black),
+
+                            SizedBox(width: 6.w,),
+
+                            (isPublic ?? "").contains("PUBLIC") ? SizedBox.shrink() : Icon(Icons.lock, color: Colors.black, size: 15),
+                          ],
+                        ),
+
                         _customText(
-                            text: "Clb12547896",
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black),
-                        _customText(
-                          text: "The Booksters",
+                          text: clubLabel ?? "The Booksters",
                           color: Colors.black.withOpacity(0.5),
                         ),
+
                         _rowCustomText(
                             firstText: "Title: ",
                             firstFontSize: 12,
                             secondText: title ?? "Ascent",
                             secondFontSize: 12),
-                        _rowCustomText(
-                            firstText: "Author: ",
-                            firstFontSize: 12,
-                            secondText: author ?? "Zilpha Carr",
-                            secondFontSize: 12),
+
+                        (author == null || author!.trim().isEmpty || author == "null")
+                            ? SizedBox.shrink()
+                            : _rowCustomText(
+                          firstText: "Author: ",
+                          firstFontSize: 12,
+                          secondText: author!,
+                          secondFontSize: 12,
+                        ),
+
+                        (totalSeason == null || totalSeason!.trim().isEmpty || totalSeason == "null")
+                            ? SizedBox.shrink()
+                            : _rowCustomText(
+                          firstText: "Season: ",
+                          firstFontSize: 12,
+                          secondText: totalSeason!,
+                          secondFontSize: 12,
+                        ),
+
                         _rowCustomText(
                           firstText: "Club Creator: ",
                           firstFontSize: 12,
-                          secondText: "Zilpha Carr",
+                          secondText: (clubCreator?.length ?? 0) > 12
+                              ? '${clubCreator!.substring(0, 12)}...'
+                              : clubCreator ?? 'Zilpha Carr',
                           secondFontSize: 12,
                           secondColor: Color(0xff29605E),
                         ),
+
                         _rowCustomText(
                           firstText: "Member Count: ",
                           firstFontSize: 12,
-                          secondText: "15",
+                          secondText: memberCount ?? "15",
                           secondFontSize: 12,
                         ),
+
                         Padding(
                           padding: const EdgeInsets.only(left: 6),
                           child: SizedBox(
@@ -105,46 +162,86 @@ class CustomBookItem extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         _rowCustomText(
                           firstText: "Timeline: ",
                           firstFontSize: 12,
-                          secondText: "18 Day(s)",
+                          secondText: "$timeLine Day(s)" ?? "18 Day(s)",
                           secondFontSize: 12,
                         ),
+
+
+                        //* Slider
                         Padding(
-                          padding: const EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.only(right: 8.0),
                           child: SizedBox(
                             height: 15,
-                            child: Obx(() {
-                              return SliderTheme(
-                                data: SliderTheme.of(context).copyWith(
-                                  trackShape:
-                                  const RoundedRectSliderTrackShape(),
-                                  trackHeight: 2.0,
-                                  thumbShape:
-                                  const RoundSliderThumbShape(
-                                      enabledThumbRadius: 3.0),
-                                  overlayShape:
-                                  SliderComponentShape.noOverlay,
-                                  thumbColor: Color(0xff29605E),
-                                  activeTrackColor: Color(0xff29605E),
-                                  inactiveTrackColor:
-                                  Colors.grey.shade300,
-                                ),
-                                child: Slider(
-                                  min: 1,
-                                  max: 30,
-                                  value:
-                                  controller.recentTimeLine.value,
-                                  onChanged: (value) {
-                                    controller
-                                        .changeRecentTimeLine(value);
-                                  },
-                                ),
-                              );
-                            }),
+                            child: SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                trackShape: const RoundedRectSliderTrackShape(),
+                                trackHeight: 2.0,
+                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5.0),
+                                overlayShape: SliderComponentShape.noOverlay,
+                                thumbColor: Color(0xff29605E),
+                                activeTrackColor: Color(0xff29605E),
+                                inactiveTrackColor: Colors.grey.shade300,
+                              ),
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double sliderMin = 1;
+                                  double sliderMax = clubType.contains("BOOK") ? 30 : (clubType.contains("SHOW") ? 270 : 9) ;
+                                  double sliderWidth = constraints.maxWidth;
+
+
+                                  List<double> talkPointValue = [];
+
+                                  DateTime now = DateTime.now();
+
+                                  if (talkPoint != null && talkPoint!.isNotEmpty) {
+                                    talkPointValue = talkPoint!.map((date) {
+                                      Duration diff = date.difference(now);
+                                      return diff.inDays.toDouble(); //* Convert day difference to double
+                                    }).toList();
+                                  }
+
+                                  debugPrint("+++++++++++++++++++++++++++++++++++++++++++++ $clubType");
+                                  debugPrint("+++++++++++++++++++++++++++++++++++++++++++++ $sliderWidth");
+                                  debugPrint("+++++++++++++++++++++++++++++++++++++++++++++ ${talkPointValue.length}");
+                                  logger.i(talkPointValue);
+
+                                  return Stack(
+                                    children: [
+                                      Slider(
+                                        min: sliderMin,
+                                        max: sliderMax,
+                                        value: sliderMax,
+                                        onChanged: (value) {
+                                          //* No need any implementation here
+                                        },
+                                      ),
+
+                                      ...talkPointValue.map((value) {
+                                        return Positioned(
+                                          top: 3.5,
+                                          left: mapSliderValue(value, sliderMax),
+                                          child: Container(
+                                            height: 8,
+                                            width: 8,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ),
+
                         Row(
                           children: [
                             _customText(
@@ -154,12 +251,12 @@ class CustomBookItem extends StatelessWidget {
                                 color: Colors.black),
                             SizedBox(width: 120),
                             _customText(
-                                text: "18",
+                                text: "$timeLine" ?? "18",
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ],
@@ -269,5 +366,21 @@ class CustomBookItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  //* Placing perfect Position
+  double mapSliderValue(double x, double max) {
+    double y = -1.1;
+
+    if(max == 30.0){
+      y = -1.1;
+    }else if(max == 90.0){
+      y = -5.5;
+    }else if(max == 270.0){
+      y = -18;
+    }else if(max == 9.0){
+      y = 0.42;
+    }
+    return -5 + ((x - y) / (max - y)) * 150;
   }
 }
