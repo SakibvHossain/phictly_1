@@ -71,6 +71,4 @@ class NotificationService extends GetxService {
       payload: data['route'],
     );
   }
-
-
 }

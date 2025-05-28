@@ -67,16 +67,14 @@ class CommentDetail extends StatelessWidget {
                               fontSize: 18.sp,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryColor),
-
                           (chapter.trim().isEmpty || chapter == "null")
                               ? SizedBox.shrink()
                               : CustomText(
-                            text: chapter ?? "Chapter 2",
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xff000000),
-                          ),
-
+                                  text: chapter ?? "Chapter 2",
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xff000000),
+                                ),
                           SizedBox(
                             width: 10,
                           ),
@@ -146,8 +144,9 @@ class CommentDetail extends StatelessWidget {
                           width: 16.w,
                         ),
                         GestureDetector(
-                          onTap: (){
-                            addReply(clubController.clubDetail.value!.post[index ?? 0].id);
+                          onTap: () {
+                            addReply(clubController
+                                .clubDetail.value!.post[index ?? 0].id);
                           },
                           child: Icon(
                             Icons.reply_outlined,
@@ -158,17 +157,21 @@ class CommentDetail extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 ListView.builder(
-                  padding: EdgeInsets.zero,
-                  physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: clubController.clubDetail.value!.post[index ?? 0].comment.length,
+                    itemCount: clubController
+                        .clubDetail.value!.post[index ?? 0].comment.length,
                     itemBuilder: (context, commentIndex) {
-
-                      final createdAt = clubController.clubDetail.value!
-                          .post[clubController.selectedIndex ?? 0].comment[commentIndex].createdAt;
-                      final Duration diff = DateTime.now().toUtc().difference(createdAt);
+                      final createdAt = clubController
+                          .clubDetail
+                          .value!
+                          .post[clubController.selectedIndex ?? 0]
+                          .comment[commentIndex]
+                          .createdAt;
+                      final Duration diff =
+                          DateTime.now().toUtc().difference(createdAt);
 
                       String difference;
 
@@ -181,26 +184,35 @@ class CommentDetail extends StatelessWidget {
                       } else if (diff.inDays < 7) {
                         difference = '${diff.inDays}d';
                       } else {
-                        difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                        difference =
+                            '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
                       }
 
-                  return Column(
-                    children: [
-                      //* Available Replies
-                      Divider(
-                        color: Color(0xff000000).withValues(alpha: 0.20),
-                      ),
-                      Reply(
-                        userName: clubController.clubDetail.value!.post[index ?? 0].comment[commentIndex].user.username,
-                        comment: clubController.clubDetail.value!.post[index ?? 0].comment[commentIndex].content,
-                        commentCount: "1m",
-                        chapter: clubController.clubDetail.value!.post[index ?? 0].chapter,
-                        chapterCreatedTime: difference,
-                        index: index,
-                      ),
-                    ],
-                  );
-                }),
+                      return Column(
+                        children: [
+                          //* Available Replies
+                          Divider(
+                            color: Color(0xff000000).withValues(alpha: 0.20),
+                          ),
+                          Reply(
+                            userName: clubController
+                                .clubDetail
+                                .value!
+                                .post[index ?? 0]
+                                .comment[commentIndex]
+                                .user
+                                .username,
+                            comment: clubController.clubDetail.value!
+                                .post[index ?? 0].comment[commentIndex].content,
+                            commentCount: "1m",
+                            chapter: clubController
+                                .clubDetail.value!.post[index ?? 0].chapter,
+                            chapterCreatedTime: difference,
+                            index: index,
+                          ),
+                        ],
+                      );
+                    }),
               ],
             ),
           ),
@@ -223,11 +235,11 @@ class CommentDetail extends StatelessWidget {
                   child: (chapter.trim().isEmpty || chapter == "null")
                       ? SizedBox.shrink()
                       : CustomText(
-                    text: returnBanner() ?? "CH2",
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xff000000),
-                  ),
+                          text: returnBanner() ?? "CH2",
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff000000),
+                        ),
                 ),
               ],
             ),
@@ -246,7 +258,6 @@ class CommentDetail extends StatelessWidget {
     if (text.startsWith("chapter 4")) return "CH4";
     return "CH5";
   }
-
 
   //* Reply Bottom Sheet
   void addReply(String postId) {
@@ -267,12 +278,16 @@ class CommentDetail extends StatelessWidget {
                 height: 33.h,
                 width: 33.w,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  shape: BoxShape.circle
-                ),
-                child: Center(child: CustomText(text: clubController.clubDetail.value!.post[index ?? 0].user.username.substring(0,1), fontSize: 18.sp, fontWeight: FontWeight.w400, color: Colors.white)),
+                    color: AppColors.primaryColor, shape: BoxShape.circle),
+                child: Center(
+                    child: CustomText(
+                        text: clubController
+                            .clubDetail.value!.post[index ?? 0].user.username
+                            .substring(0, 1),
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white)),
               ),
-
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -301,14 +316,18 @@ class CommentDetail extends StatelessWidget {
                   ),
                 ),
               ),
-
               GestureDetector(
-                  onTap: () async {
-                    Get.back();
-                    await commentController.postClubReply(postId);
-                    clubController.fetchCreatedClub(bookController.createdClubId);
-                  },
-                  child: Icon(Icons.send_rounded, color: AppColors.primaryColor, size: 24,))
+                onTap: () async {
+                  Get.back();
+                  await commentController.postClubReply(postId);
+                  clubController.fetchCreatedClub(bookController.createdClubId);
+                },
+                child: Icon(
+                  Icons.send_rounded,
+                  color: AppColors.primaryColor,
+                  size: 24,
+                ),
+              ),
             ],
           ),
         ),

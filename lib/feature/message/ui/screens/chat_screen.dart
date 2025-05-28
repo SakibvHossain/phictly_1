@@ -9,11 +9,12 @@ import '../../data/controller/chat_controller.dart';
 import '../../data/model/chat_model.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String? receiverId;
+  final String receiverId;
   final String? userName;
   final String? image;
 
-  const ChatScreen({super.key, this.receiverId, this.userName, this.image});
+  const ChatScreen(
+      {super.key, required this.receiverId, this.userName, this.image});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -26,7 +27,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    chatController.getMesseages(widget.receiverId ?? "");
+
+    chatController.joinPrivateChat(widget.receiverId);
+    // chatController.getMesseages();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
@@ -57,6 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     debugPrint(
         "========>>>>${widget.image},=======>>${widget.receiverId}========>>${widget.userName},");
 
@@ -69,12 +74,11 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CircleAvatar(
               radius: 20,
+             backgroundColor: Colors.grey,
               backgroundImage: (widget.image?.isNotEmpty ?? false)
-                  ? CachedNetworkImageProvider(widget.image!)
+                  ? CachedNetworkImageProvider(widget.image ?? "https://i.ibb.co/HTZSdvpG/Male-Avatar.jpg")
                   : null,
-              child: widget.image == null || widget.image!.isEmpty
-                  ? Icon(Icons.person)
-                  : null,
+
             ),
             SizedBox(width: 10.w),
             CustomText(
@@ -115,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           : ListView.builder(
                               padding: EdgeInsets.symmetric(
                                   vertical: 20.h, horizontal: 12.w),
-                              itemCount: chatController.allMessages.length + 1,
+                              itemCount: chatController.allMessages.length,
                               controller: chatController.scrollController,
                               reverse: false,
                               itemBuilder: (context, index) {
@@ -294,11 +298,16 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    width: 5.w,
+                  ),
                   GestureDetector(
                       onTap: () {
-                        final receiverId = widget.receiverId ?? "";
+                        final receiverId = widget.receiverId;
                         final text = messageController.text.trim();
                         if (text.isNotEmpty && receiverId.isNotEmpty) {
+                          chatController.sendPrivateMessage(
+                              widget.receiverId, text);
                           messageController.clear();
                         }
                       },

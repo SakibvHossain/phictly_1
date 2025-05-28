@@ -1,11 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+
+import '../../helper/sheared_prefarences_helper.dart';
 import '../model/model.dart';
 
 class NetworkCaller {
-  final int timeoutDuration = 15;
+  SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
+  final int timeoutDuration = 60;
 
   Uri _parseUrl(String url) {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -15,12 +22,12 @@ class NetworkCaller {
   }
 
   Future<ResponseData> _makeRequest(
-    String method,
-    String url, {
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-    String? token,
-  }) async {
+      String method,
+      String url, {
+        Map<String, dynamic>? body,
+        Map<String, String>? headers,
+        String? token,
+      }) async {
     final parsedUrl = _parseUrl(url);
     headers ??= {};
     if (token != null) {
@@ -152,5 +159,53 @@ class NetworkCaller {
         errorMessage: 'Unexpected error occurred: $error',
       );
     }
+  }
+
+  Future<String> uploadImage(File imageFile, String imagUrl,String fileName ) async {
+    await preferencesHelper.init();
+    String? token = preferencesHelper.getString("userToken");
+
+    if(token!= null){
+      try {
+        var url = Uri.parse(imagUrl);
+
+
+        var request = http.MultipartRequest('POST', url);
+
+        String? mimeType = lookupMimeType(imageFile.path);
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            fileName,
+            imageFile.path,
+            contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+          ),
+        );
+
+        request.headers.addAll({
+
+          "Content-Type": "multipart/form-data",
+        });
+
+        var response = await request.send();
+
+        var responseBody = await response.stream.bytesToString();
+
+        if (response.statusCode == 200) {
+          debugPrint("=========done===>>>>${response.stream}");
+          debugPrint("========>>>File uploaded successfully");
+          return responseBody;
+        } else {
+          debugPrint("============>>>>${response.stream}");
+          debugPrint("============>>Failed to upload file: ${response.statusCode}");
+        }
+      } catch (e) {
+        debugPrint("==============>>Error uploading file: $e");
+      }
+    }else{
+      debugPrint("==================>>>>Token Null");
+    }
+
+    return '';
   }
 }

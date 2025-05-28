@@ -36,8 +36,8 @@ class HomeScreens extends StatelessWidget {
         backgroundColor: AppColors.whiteColor,
         color: AppColors.primaryColor,
         onRefresh: () async {
-          await clubItemController.fetchRecentClubs();
-          await clubItemController.fetchTrendingClubs();
+           clubItemController.fetchRecentClubs();
+           clubItemController.fetchTrendingClubs();
         },
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -269,7 +269,7 @@ class HomeScreens extends StatelessWidget {
                                 onTap: () {
                                   Get.to(
                                     () => ChatScreen(
-                                      receiverId: '67a898f5b1a7f29886ea1a24',
+                                      receiverId: '6836dc1ed96f19f15cef310e',
                                     ),
                                   );
                                 },
@@ -284,7 +284,7 @@ class HomeScreens extends StatelessWidget {
                                 onTap: () {
                                   Get.to(
                                     () => ChatScreen(
-                                      receiverId: "682b05d2b91e319dde13901b",
+                                      receiverId: "6836dbead96f19f15cef310d",
                                     ),
                                   );
                                 },

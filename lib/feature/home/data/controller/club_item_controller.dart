@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
@@ -114,7 +112,6 @@ class ClubItemController extends GetxController {
     }
   }
 
-
   var selectedClubIndex = (-1).obs;
 
   void toggleClubIndex(int index) {
@@ -122,6 +119,16 @@ class ClubItemController extends GetxController {
       selectedClubIndex.value = -1; // Collapse
     } else {
       selectedClubIndex.value = index; // Expand selected
+    }
+  }
+
+  var selectedRecentClubIndex = (-1).obs;
+
+  void toggleRecentClubIndex(int index) {
+    if (selectedRecentClubIndex.value == index) {
+      selectedRecentClubIndex.value = -1; // Collapse
+    } else {
+      selectedRecentClubIndex.value = index; // Expand selected
     }
   }
 

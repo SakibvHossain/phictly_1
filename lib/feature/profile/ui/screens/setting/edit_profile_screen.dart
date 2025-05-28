@@ -60,12 +60,31 @@ class EditProfileScreen extends StatelessWidget {
                 ),
 
                 //* Profile & Background
-                Image.asset(
-                  "assets/profile/image/profile_background_image.png",
-                  height: 200.h,
-                  width: 440.w,
-                  fit: BoxFit.cover,
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    debugPrint("You have clicked");
+                    profileController.pickCoverImage();
+                  },
+                  child: Obx(() {
+                    final file = profileController.pickedCoverImage.value;
+                    return file != null
+                        ? Image.file(
+                      file,
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
+                      "assets/images/udesign_portfolio_placeholder.jpg",
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    );
+                  }),
                 ),
+
+
 
                 SizedBox(
                   height: 90.h,
@@ -312,7 +331,25 @@ class EditProfileScreen extends StatelessWidget {
                           )
                         : CustomButton(
                             onTap: () async {
-                              await profileController.postClubContent();
+                              if(profileController.pickedCoverImage.value != null && profileController.pickedImage.value != null && profileController.userNameController.text.isNotEmpty && profileController.bioController.text.isNotEmpty){
+                                await profileController.postClubContent();
+                              }else{
+                                if(profileController.pickedCoverImage.value != null){
+                                  await profileController.postCoverImage();
+                                }
+
+                                if(profileController.pickedImage.value != null){
+                                  await profileController.postProfileImage();
+                                }
+
+                                if(profileController.userNameController.text.isNotEmpty){
+                                  await profileController.postUsername();
+                                }
+
+                                if(profileController.bioController.text.isNotEmpty){
+                                  await profileController.postBio();
+                                }
+                              }
                               await profileDataController.fetchProfileDetails();
                               controller.updateIndex(0);
                             },
@@ -355,7 +392,7 @@ class EditProfileScreen extends StatelessWidget {
                                   fit: BoxFit.cover,
                                 )
                               : Image.asset(
-                                  "assets/profile/image/profile_image.png",
+                                  "assets/images/profile_image_placeholder.jpg",
                                   width: 108.w,
                                   height: 108.h,
                                 ),

@@ -1,5 +1,6 @@
 class Utils {
-  static const String baseUrl = "https://phictly-backend.vercel.app/api/v1";
+  static const String baseUrl = "http://69.62.71.168:5006/api/v1";
+  // static const String baseUrl = "https://phictly-backend.vercel.app/api/v1";
   static const String secondBaseUrl = "https://cpneena-backend.vercel.app/api/v1";
   static const String singup = '/users/create';
   static const String login = "/auth/login";
@@ -20,5 +21,6 @@ class Utils {
   static String statusUpdate(String id) => "/post/post-status-update/$id";
   static String clubStatusUpdate = "/club/join-status-update";
   static String privateClubJoinRequest(String id) => "/club/joining-private/$id";
+  static String publicClubJoinRequest(String id) => "/club/joining-public/$id";
   static String searchAllClubs(String queryValue) => "/club?page=1&limit=35&searchQuery=$queryValue";
 }

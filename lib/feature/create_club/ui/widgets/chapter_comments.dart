@@ -7,6 +7,7 @@ import 'package:phictly/feature/create_club/ui/screens/chapter_comment_details.d
 import '../../../../core/components/custom_text.dart';
 import '../../../../core/utils/app_colors.dart';
 import 'package:get/get.dart';
+import '../../../message/ui/screens/chat_screen.dart';
 import '../../data/controller/change_club_controller.dart';
 import '../../data/controller/club_controller.dart';
 import '../../data/controller/post_club_controller.dart';
@@ -19,12 +20,14 @@ class ChapterComments extends StatelessWidget {
       required this.commentCount, this.chapter,
       required this.chapterCreatedTime,
       this.chapterBannerText,
-      this.index, required this.isTextVisible, this.parentID, this.type, this.episode, this.episodeBanner, required this.id});
+      this.index, required this.isTextVisible, this.parentID, this.type, this.episode, this.episodeBanner, required this.id, required this.userId, this.image});
 
   final String userName;
   final String comment;
   final String id;
+  final String userId;
   final int? index;
+  final String? image;
   final String? parentID;
   final String? type;
   final String? episodeBanner;
@@ -66,12 +69,24 @@ class ChapterComments extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText(
-                              text: userName ?? "hp990",
-                              textDecoration: TextDecoration.underline,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryColor),
+                          GestureDetector(
+                            onTap:(){
+                              Get.to(
+                                    () => ChatScreen(
+                                  receiverId: userId,
+                                      image:  image,
+                                      userName: userName,
+
+                                ),
+                              );
+                            },
+                            child: CustomText(
+                                text: userName ??  "hp990",
+                                textDecoration: TextDecoration.underline,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primaryColor),
+                          ),
                           // Icon(
                           //   Icons.share,
                           //   color: AppColors.primaryColor,

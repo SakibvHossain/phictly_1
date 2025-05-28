@@ -14,6 +14,7 @@ class ChatController extends GetxController {
   RxBool isLoading = false.obs;
   ScrollController scrollController = ScrollController();
   RxString roomId = "".obs;
+  String id = "";
   RxString userId = "".obs;
   late String currentUserId;
   late String friendId;
@@ -28,11 +29,8 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    Future.wait([
-      connect(),
-    ]);
-    joinApp();
+    connect();
+    connectAndJoin();
   }
 
   Future<void> connect() async {
@@ -43,7 +41,7 @@ class ChatController extends GetxController {
     if (token != null) {
       try {
         _channel = IOWebSocketChannel.connect(
-          Uri.parse('ws://10.0.20.15:5006'),
+          Uri.parse('ws://69.62.71.168:5006'),
           headers: {"x-token": token},
         );
         isConnected.value = true;
@@ -79,6 +77,21 @@ class ChatController extends GetxController {
 
     switch (type) {
       case 'receivePrivateMessage':
+        final msgData = decodedMessage['message'];
+
+        if (msgData != null && msgData is Map<String, dynamic>) {
+          try {
+            final msg = Message.fromJson(msgData);
+            allMessages.add(msg); // Add without removing previous messages
+            debugPrint(
+                "✅ New message added. Total messages: ${allMessages.length}");
+          } catch (e) {
+            debugPrint("❌ Error parsing message: $e");
+          }
+        } else {
+          debugPrint("❌ Invalid or null message field in response: $msgData");
+        }
+
         break;
 
       case 'joinApp':
@@ -86,7 +99,9 @@ class ChatController extends GetxController {
         break;
       case 'joinSuccess':
         roomId.value = decodedMessage['chatroomId'];
-        debugPrint("+++++======$roomId");
+        id = decodedMessage['chatroomId'];
+        getMesseages();
+        debugPrint("Room=========ID=======${roomId.value} $id");
         break;
 
       case 'sendPrivateMessage':
@@ -103,9 +118,24 @@ class ChatController extends GetxController {
     }
   }
 
+  Future<void> connectAndJoin() async {
+    await connect(); // wait for WebSocket connection
+    if (_channel != null) {
+      joinApp(); // now it's safe
+    } else {
+      debugPrint("WebSocket connection failed. joinApp() not called.");
+    }
+  }
+
   void joinApp() {
     debugPrint("=================api called");
-    final data = {"type":"joinApp"};
+
+    if (_channel == null) {
+      debugPrint("WebSocket channel is null! Cannot send joinApp message.");
+      return;
+    }
+
+    final data = {"type": "joinApp"};
     final join = jsonEncode(data);
     _channel!.sink.add(join);
 
@@ -119,11 +149,11 @@ class ChatController extends GetxController {
     _channel!.sink.add(joinPrivate);
   }
 
-  void sendPrivateMessage(String senderId, String receiverId, String content) {
+  void sendPrivateMessage(String receiverId, String content) {
     debugPrint("Sending private message: $content");
     final message = jsonEncode({
       "type": "sendPrivateMessage",
-      "senderId": senderId,
+      "senderId": userId.value,
       "receiverId": receiverId,
       "content": content,
     });
@@ -147,19 +177,22 @@ class ChatController extends GetxController {
     }
   }
 
-  Future<void> getMesseages(String id) async {
+  Future<void> getMesseages() async {
     await preferencesHelper.init();
     String? token = preferencesHelper.getString('userToken');
+
+    final data = {"conversationId": id};
 
     if (token != null) {
       try {
         isLoading.value = true;
 
-        final response = await NetworkCaller().getRequest(
-          "${Utils.baseUrl}/chat/get-single-message/$id",
+        final response = await NetworkCaller().postRequest(
+          '${Utils.baseUrl}/chat/get-single-message',
           token: token,
+          body: data,
         );
-
+        debugPrint("Room=========ID2=======${roomId.value}");
         if (response.isSuccess) {
           final List<dynamic> resultList = response.responseData;
           allMessages.clear();
@@ -167,6 +200,8 @@ class ChatController extends GetxController {
               .addAll(resultList.map((e) => Message.fromJson(e)).toList());
           debugPrint("=====data=========${allMessages.length}");
         } else {
+          debugPrint(
+              "======urtl===========${"${Utils.baseUrl}/chat/get-single-message/$roomId"}");
           debugPrint("=============Request failed: ${response.responseData}");
         }
       } catch (e) {

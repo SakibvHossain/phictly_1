@@ -11,394 +11,522 @@ import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
 import 'package:phictly/feature/home/data/controller/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
+import '../../../create_club/data/controller/change_club_controller.dart';
+import '../../../create_club/data/controller/club_controller.dart';
+import '../../data/controller/bottom_nav_controller.dart';
 import '../../data/controller/join_club_controller.dart';
+import '../../data/controller/slider_controller.dart';
 
 class RecentItem extends StatelessWidget {
   RecentItem({super.key});
 
-  final HomeController controller = Get.put(HomeController());
+  final controller = Get.put(HomeController());
   final changeHomeController = Get.find<ChangeHomeController>();
-  final ClubItemController clubItemController = Get.put(ClubItemController());
+  final sliderController = Get.put(SliderController());
+  final clubItemController = Get.put(ClubItemController());
+  final changeClubController = Get.put(ChangeClubController());
+  final navController = Get.put(BottomNavController());
+  final clubController = Get.put(ClubController());
   final joinClubController = Get.put(JoinClubController());
-  final Logger logger = Logger();
+  final logger = Logger();
 
   @override
   Widget build(BuildContext context) {
-    return _buildRecentItem();
+    return _buildTrendingItem();
   }
 
-  //* Recent Item
-  Widget _buildRecentItem() {
+  //* Trending Item
+  Widget _buildTrendingItem() {
     return SizedBox(
-        height: 180,
-        child: Obx(() {
-          if (clubItemController.isRecentDataLoading.value) {
-            return const Center(
-              child: SpinKitWave(
-                duration: Duration(seconds: 2),
-                size: 15,
-                color: AppColors.primaryColor,
-              ),
-            );
-          }
+      height: 180,
+      child: Obx(() {
+        if (clubItemController.isRecentDataLoading.value) {
+          return const Center(
+            child: SpinKitWave(
+              duration: Duration(seconds: 2),
+              size: 15,
+              color: AppColors.primaryColor,
+            ),
+          );
+        }
 
-          if (clubItemController.recentDataList.isEmpty) {
-            return Center(
-              child: CustomText(
-                text: "No recent data found",
+        if (clubItemController.recentDataList.isEmpty) {
+          return Center(
+            child: CustomText(
+                text: "No trending data found",
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
-                color: Color(0xff000000),
-              ),
-            );
-          }
+                color: Color(0xff000000)),
+          );
+        }
 
-          return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: clubItemController.recentDataList.length,
-              itemBuilder: (context, index) {
-                ClubModel recentClubs =
-                    clubItemController.recentDataList[index];
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: clubItemController.recentDataList.length,
+          itemBuilder: (context, index) {
+            ClubModel recent = clubItemController.recentDataList[index];
 
-                //* Time & Date
-                DateTime? createdAt = recentClubs.startDate != null
-                    ? DateTime.tryParse(recentClubs.startDate!)
-                    : null;
+            final status =
+            (recent.clubMember != null && recent.clubMember!.isNotEmpty)
+                ? recent.clubMember!.first.status
+                : null;
 
-                String difference = "";
-                if (createdAt != null) {
-                  final Duration diff =
-                      DateTime.now().toUtc().difference(createdAt.toUtc());
+            debugPrint(
+                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
+            debugPrint(
+                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}");
 
-                  if (diff.inSeconds < 60) {
-                    difference = '${diff.inSeconds}s';
-                  } else if (diff.inMinutes < 60) {
-                    difference = '${diff.inMinutes}m';
-                  } else if (diff.inHours < 24) {
-                    difference = '${diff.inHours}h';
-                  } else if (diff.inDays < 7) {
-                    difference = '${diff.inDays}d';
-                  } else {
-                    difference =
-                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                  }
-                } else {
-                  difference = "Unknown time";
-                }
+            final memberSize = recent.memberSize;
+            final activeMembers = recent.count?.clubMember;
+            double maxValue = 0.0;
+            double minValue = 0.0;
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
+            if (memberSize != null && activeMembers != null) {
+              minValue = activeMembers.toDouble();
+              maxValue = memberSize.toDouble();
+            } else {
+              sliderController.min.value = 0.0;
+              sliderController.max.value =
+              100.0; //* or 0.0 if you want to disable the slider
+            }
+
+            debugPrint(
+                "+++++++++++++++++++++++MAX+++++++++++++++++++++++++$maxValue");
+            debugPrint(
+                "+++++++++++++++++++++++MIN+++++++++++++++++++++++++$minValue");
+
+            //* Time & Date
+            DateTime? createdAt = recent.startDate != null
+                ? DateTime.tryParse(recent.startDate!)
+                : null;
+
+            String difference = "";
+            if (createdAt != null) {
+              final Duration diff =
+              DateTime.now().toUtc().difference(createdAt.toUtc());
+
+              if (diff.inSeconds < 60) {
+                difference = '${diff.inSeconds}s';
+              } else if (diff.inMinutes < 60) {
+                difference = '${diff.inMinutes}m';
+              } else if (diff.inHours < 24) {
+                difference = '${diff.inHours}h';
+              } else if (diff.inDays < 7) {
+                difference = '${diff.inDays}d';
+              } else {
+                difference =
+                '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+              }
+            } else {
+              difference = "Unknown time";
+            }
+
+            return Obx(() {
+              final trendingClubs = clubItemController.recentDataList[index];
+              final isExpanded = clubItemController.selectedRecentClubIndex.value == index;
+
+              return GestureDetector(
+                onTap: () {
+                  // sliderController.updateSlider(minValue, minValue, sliderValue);
+                  clubItemController.toggleRecentClubIndex(index);
+                },
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  width: isExpanded ? 340 : 120,
+                  margin: EdgeInsets.only(left: 4, right: 4),
+                  padding:
+                  EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
+                  // No right padding here
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 5,
+                      )
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: CachedNetworkImage(
-                                    imageUrl: "${recentClubs.poster}" ??
-                                        "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                                    height: 160,
-                                    width: 104,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => Center(
-                                      child: SizedBox(
-                                        height: 25,
-                                        width: 25,
-                                        child: SpinKitWave(
-                                          duration: Duration(seconds: 2),
-                                          size: 15,
-                                          color: AppColors.primaryColor,
-                                        ),
-                                      ),
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        Image.asset(
-                                      "assets/images/placeholder_image.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: CachedNetworkImage(
+                            imageUrl: trendingClubs.poster ??
+                                "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                            height: 160,
+                            width: 100,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Center(
+                              child: SizedBox(
+                                height: 25,
+                                width: 25,
+                                child: SpinKitWave(
+                                  duration: Duration(seconds: 2),
+                                  size: 15,
+                                  color: AppColors.primaryColor,
                                 ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Image.asset(
+                              "assets/images/placeholder_image.png",
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (isExpanded) SizedBox(width: 4),
+                      if (isExpanded)
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () async {
+                                  if (status!=null) {
+                                    if(status.contains("ACCPECT")){
+                                      navController.updateIndex(2);
+                                      changeClubController.updateIndex(1);
+                                      clubController.fetchCreatedClub(recent.id ?? "");
+                                    }
+                                  } else {
+                                    debugPrint("+++++++++++++++Private Club++++++++++++++++++");
+                                  }
+                                },
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _customText(
-                                        text: "${recentClubs.clubId}",
+                                        text: "${trendingClubs.clubId}",
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.black),
                                     _customText(
-                                      text: "${recentClubs.clubLabel}",
+                                      text: "${trendingClubs.clubLabel}",
                                       color: Colors.black.withOpacity(0.5),
                                     ),
                                     _rowCustomText(
                                         firstText: "Title: ",
                                         firstFontSize: 12,
-                                        secondText: "${recentClubs.title}",
+                                        secondText: "${trendingClubs.title}",
                                         secondFontSize: 12),
                                     _rowCustomText(
                                         firstText: "Author: ",
                                         firstFontSize: 12,
-                                        secondText: "${recentClubs.writer}",
+                                        secondText: "${trendingClubs.writer}",
                                         secondFontSize: 12),
                                     _rowCustomText(
                                       firstText: "Club Creator: ",
                                       firstFontSize: 12,
                                       secondText:
-                                          "${recentClubs.admin?.username}" ??
-                                              "${recentClubs.writer}",
+                                      "${trendingClubs.admin?.username}" ??
+                                          "${trendingClubs.writer}",
                                       secondFontSize: 12,
                                       secondColor: Color(0xff29605E),
                                     ),
                                     _rowCustomText(
                                       firstText: "Member Count: ",
                                       firstFontSize: 12,
-                                      secondText: "${recentClubs.memberSize}",
+                                      secondText: "${trendingClubs.memberSize}",
                                       secondFontSize: 12,
                                     ),
-
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 6),
-                                      child: SizedBox(
-                                        height: 15,
-                                        child: SliderTheme(
-                                          data:
-                                              SliderTheme.of(context).copyWith(
-                                            trackShape:
-                                                const RoundedRectSliderTrackShape(),
-                                            trackHeight: 2.0,
-                                            thumbShape:
-                                                const RoundSliderThumbShape(
-                                                    enabledThumbRadius: 1.0),
-                                            overlayShape:
-                                                SliderComponentShape.noOverlay,
-                                            thumbColor: Color(0xff29605E),
-                                            activeTrackColor: Color(0xff29605E),
-                                            inactiveTrackColor:
-                                                Colors.grey.shade300,
-                                          ),
-                                          child: Slider(
-                                            min: 1,
-                                            max: 30,
-                                            value: controller.memberCount.value,
-                                            onChanged: (value) {
-                                              controller.changeTotalPersonCount(
-                                                  value);
-                                            },
-                                          ),
+                                    Flexible(
+                                      flex: 3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 55, left: 6),
+                                        child: SizedBox(
+                                          height: 15,
+                                          child: Obx(() => SliderTheme(
+                                            data: SliderTheme.of(context)
+                                                .copyWith(
+                                              trackShape:
+                                              const RoundedRectSliderTrackShape(),
+                                              trackHeight: 2.0,
+                                              thumbShape:
+                                              const RoundSliderThumbShape(
+                                                  enabledThumbRadius:
+                                                  1.0),
+                                              overlayShape:
+                                              SliderComponentShape
+                                                  .noOverlay,
+                                              thumbColor:
+                                              const Color(0xff29605E),
+                                              activeTrackColor:
+                                              const Color(0xff29605E),
+                                              inactiveTrackColor:
+                                              Colors.grey.shade300,
+                                            ),
+                                            child: Slider(
+                                              min: 0.0,
+                                              max: maxValue,
+                                              value: sliderController
+                                                  .value.value
+                                                  .clamp(minValue, maxValue),
+                                              onChanged: (val) {
+                                                debugPrint(
+                                                    "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
+                                                // sliderController.value.value = val;
+                                              },
+                                            ),
+                                          )),
                                         ),
                                       ),
                                     ),
-
                                     _rowCustomText(
                                       firstText: "Timeline: ",
                                       firstFontSize: 12,
                                       secondText:
-                                          "${recentClubs.timeLine} day(s)",
+                                      "${trendingClubs.timeLine} day(s)",
                                       secondFontSize: 12,
                                     ),
-
-                                    //* Fully functional Slider
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: SizedBox(
-                                        height: 15,
-                                        child: SliderTheme(
-                                          data:
-                                              SliderTheme.of(context).copyWith(
-                                            trackShape:
+                                    Flexible(
+                                      flex: 3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 55, left: 2),
+                                        child: SizedBox(
+                                          height: 15,
+                                          child: Obx(
+                                                () => SliderTheme(
+                                              data: SliderTheme.of(context)
+                                                  .copyWith(
+                                                trackShape:
                                                 const RoundedRectSliderTrackShape(),
-                                            trackHeight: 2.0,
-                                            thumbShape:
+                                                trackHeight: 2.0,
+                                                thumbShape:
                                                 const RoundSliderThumbShape(
                                                     enabledThumbRadius: 5.0),
-                                            overlayShape:
-                                                SliderComponentShape.noOverlay,
-                                            thumbColor: Color(0xff29605E),
-                                            activeTrackColor: Color(0xff29605E),
-                                            inactiveTrackColor:
+                                                overlayShape: SliderComponentShape
+                                                    .noOverlay,
+                                                thumbColor:
+                                                const Color(0xff29605E),
+                                                activeTrackColor:
+                                                const Color(0xff29605E),
+                                                inactiveTrackColor:
                                                 Colors.grey.shade300,
-                                          ),
-                                          child: LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              double sliderMin = 1;
-                                              double sliderMax = recentClubs
-                                                          .clubMediumType
-                                                          ?.contains("BOOK") ==
-                                                      true
-                                                  ? 30
-                                                  : (recentClubs.clubMediumType
-                                                              ?.contains(
-                                                                  "SHOW") ==
-                                                          true
-                                                      ? 270
-                                                      : 9);
-
-                                              double sliderWidth =
-                                                  constraints.maxWidth;
-                                              List<DateTime>? talkPoint =
-                                                  recentClubs.talkPoint;
-                                              List<double> talkPointValue = [];
-                                              DateTime now = DateTime.now();
-
-                                              if (talkPoint != null &&
-                                                  talkPoint.isNotEmpty) {
-                                                talkPointValue =
-                                                    talkPoint.map((date) {
-                                                  Duration diff =
-                                                      date.difference(now);
-                                                  return diff.inDays
-                                                      .toDouble(); //* Convert day difference to double
-                                                }).toList();
-                                              }
-
-                                              debugPrint(
-                                                  "+++++++++++++++++++++++++++++++++++++++++++++ ${recentClubs.clubMediumType}");
-                                              debugPrint(
-                                                  "+++++++++++++++++++++++++++++++++++++++++++++ $sliderWidth");
-                                              debugPrint(
-                                                  "+++++++++++++++++++++++++++++++++++++++++++++ ${talkPointValue.length}");
-
-                                              logger.i(talkPointValue);
-
-                                              return Stack(
-                                                children: [
-                                                  Slider(
-                                                    min: sliderMin,
-                                                    max: sliderMax,
-                                                    value: sliderMax,
-                                                    onChanged: (value) {
-                                                      //* No need any implementation here
-                                                    },
-                                                  ),
-                                                  ...talkPointValue
-                                                      .map((value) {
-                                                    return Positioned(
-                                                      top: 3.5,
-                                                      left: mapSliderValue(
-                                                          value, sliderMax),
-                                                      child: Container(
-                                                        height: 8,
-                                                        width: 8,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: Colors.red,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }),
-                                                ],
-                                              );
-                                            },
+                                              ),
+                                              child: Slider(
+                                                min: 0.0,
+                                                max: maxValue,
+                                                value: sliderController
+                                                    .value.value
+                                                    .clamp(maxValue, maxValue),
+                                                onChanged: (val) {
+                                                  // sliderController.value.value =
+                                                  //     val;
+                                                },
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-
-                                    Row(
-                                      children: [
-                                        _customText(
-                                            text: "1",
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.black),
-                                        SizedBox(width: 120),
-                                        _customText(
-                                            text: "${recentClubs.timeLine}",
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.black),
-                                      ],
+                                    SizedBox(
+                                      height: 16.h,
+                                      child: Flexible(
+                                        flex: 1,
+                                        fit: FlexFit.loose,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Flexible(
+                                              flex: 2,
+                                              fit: FlexFit.loose,
+                                              child: _customText(
+                                                  text: "1",
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.black),
+                                            ),
+                                            Flexible(
+                                              flex: 1,
+                                              fit: FlexFit.tight,
+                                              child: _customText(
+                                                  text:
+                                                  "${trendingClubs.timeLine}",
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 160,
-                              child: Column(
-                                mainAxisAlignment:
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 6,
+                                child: SizedBox(
+                                  height: 160,
+                                  child: Column(
+                                    mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
                                     children: [
-                                      SizedBox(
-                                        // "assets/icons/bag_icon.png",
-                                        height: 20,
-                                        width: 20,
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            // "assets/icons/bag_icon.png",
+                                            height: 20,
+                                            width: 20,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Image.asset(
+                                            "assets/icons/share.png",
+                                            height: 20,
+                                            width: 20,
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(width: 4),
-                                      Image.asset(
-                                        "assets/icons/share.png",
-                                        height: 20,
-                                        width: 20,
+                                      /*
+                                        PENDING
+                                        ACCPECT
+                                        DELETED
+                                       */
+
+                                      Column(
+                                        children: [
+                                          (status == null ||
+                                              status == "DELETED")
+                                              ? GestureDetector(
+                                            behavior:
+                                            HitTestBehavior.opaque,
+                                            onTap: () async {
+                                              if (recent.id == null || recent.type == null) return;
+
+                                              if (recent.type!.contains("PRIVATE")) {
+                                                await joinClubController.joinPrivateClub(recent.id!);
+                                              } else {
+                                                await joinClubController.joinPublicClub(recent.id!);
+                                                navController.updateIndex(2);
+                                                changeClubController.updateIndex(1);
+                                                clubController.fetchCreatedClub(recent.id ?? "");
+                                              }
+
+                                              await clubItemController.fetchTrendingClubs();
+                                            },
+                                            child: Image.asset(
+                                              "assets/icons/join_read_icon.png",
+                                              height: 28.16,
+                                              width: 28.52,
+                                            ),
+                                          )
+                                              : (status == "PENDING")
+                                              ? GestureDetector(
+                                            behavior: HitTestBehavior
+                                                .opaque,
+                                            onTap: () async {
+                                              // joinClubController.joinPrivateClub(
+                                              //     trending.id ?? "");
+                                            },
+                                            child: Image.asset(
+                                              "assets/icons/request_icon.png",
+                                              height: 28.16,
+                                              width: 28.52,
+                                            ),
+                                          )
+                                              : SizedBox(
+                                            height: 28.16,
+                                            width: 28.52,
+                                          ),
+
+                                          // buildStatusIcon(status!, trending.id ?? ""),
+                                          buildStatusText(status),
+
+                                          SizedBox(
+                                            height: 6.h,
+                                          ),
+                                          _customText(
+                                              text: difference,
+                                              color:
+                                              Colors.black.withOpacity(0.6),
+                                              fontSize: 9.78,
+                                              fontWeight: FontWeight.w400),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  Column(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          joinClubController.clubId =
-                                              recentClubs.id!;
-                                          joinClubController.joinPrivateClub(
-                                              recentClubs.id ?? "");
-                                        },
-                                        child: Image.asset(
-                                          "assets/icons/request_icon.png",
-                                          height: 28.16,
-                                          width: 28.52,
-                                        ),
-                                      ),
-                                      _customText(
-                                          text: "Request",
-                                          color: Colors.black,
-                                          fontSize: 9.78,
-                                          fontWeight: FontWeight.w400),
-                                      SizedBox(
-                                        height: 6.h,
-                                      ),
-                                      _customText(
-                                          text: difference,
-                                          color: Colors.black.withOpacity(0.6),
-                                          fontSize: 9.78,
-                                          fontWeight: FontWeight.w400),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                   ),
-                );
-              });
-        }));
+                ),
+              );
+            });
+          },
+        );
+      }),
+    );
+  }
+
+  //* Row Texts
+  Widget _rowCustomText({
+    required String firstText,
+    required String secondText,
+    double? firstFontSize,
+    double? secondFontSize,
+    int? secondTextSubStringLength,
+    Color? secondColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 1),
+      child: Row(
+        children: [
+          Flexible(
+            // Or use Expanded
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: firstText.length > 20
+                        ? '${firstText.substring(0, 20)}...'
+                        : firstText,
+                    style: GoogleFonts.dmSans(
+                      fontSize: firstFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  TextSpan(
+                    text: secondText.length > 16
+                        ? '${secondText.substring(0, 16)}...'
+                        : secondText,
+                    style: GoogleFonts.dmSans(
+                      fontSize: secondFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: secondColor ?? Colors.black.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   //* Single Text
-  Widget _customText(
-      {required String text,
-      double? fontSize,
-      FontWeight? fontWeight,
-      Color? color}) {
+  Widget _customText({
+    required String text,
+    double? fontSize,
+    FontWeight? fontWeight,
+    Color? color,
+  }) {
     return Padding(
-      padding: EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 8.0),
       child: Text(
         text,
         style: GoogleFonts.dmSans(
@@ -406,51 +534,8 @@ class RecentItem extends StatelessWidget {
           fontWeight: fontWeight,
           color: color,
         ),
-      ),
-    );
-  }
-
-  //* Row Texts
-  Widget _rowCustomText(
-      {required String firstText,
-      required String secondText,
-      double? firstFontSize,
-      double? secondFontSize,
-      int? secondTextSubStringLength,
-      Color? secondColor}) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
-      child: Row(
-        children: [
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: firstText.length > 20
-                      ? '${firstText.substring(0, 20)}...'
-                      : firstText,
-                  style: GoogleFonts.dmSans(
-                    fontSize: firstFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-                TextSpan(
-                  text: secondText.length > 16
-                      ? '${secondText.substring(0, 16)}...'
-                      : secondText,
-                  style: GoogleFonts.dmSans(
-                    fontSize: secondFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: secondColor ?? Colors.black.withOpacity(0.6),
-                  ),
-                ),
-              ],
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          )
-        ],
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
       ),
     );
   }
@@ -470,5 +555,72 @@ class RecentItem extends StatelessWidget {
     }
 
     return -5 + ((x - y) / (max - y)) * 150;
+  }
+
+  Widget buildStatusIcon(String? status, String id) {
+    debugPrint(
+        "++++++++++++++++++++++++++buildStatusIcon+++++++++++++++++++++++++++++$status");
+
+    if (status == null || status == "DELETED") {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          await joinClubController.joinPrivateClub(id);
+          await clubItemController.fetchTrendingClubs();
+        },
+        child: Image.asset(
+          "assets/icons/join_read_icon.png",
+          height: 28.16,
+          width: 28.52,
+        ),
+      );
+    } else if (status == "PENDING") {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          // await joinClubController.acceptPrivateClubRequest(id);
+        },
+        child: Image.asset(
+          "assets/icons/request_icon.png",
+          height: 28.16,
+          width: 28.52,
+        ),
+      );
+    } else if (status == "ACCPECT") {
+      return SizedBox(
+        height: 28.16,
+        width: 28.52,
+      );
+    } else {
+      return SizedBox(
+        height: 28.16,
+        width: 28.52,
+      );
+    }
+  }
+
+  Widget buildStatusText(String? status) {
+    debugPrint(
+        "++++++++++++++++++++++++++buildStatusText+++++++++++++++++++++++++++++$status");
+
+    if (status == null || status == "DELETED") {
+      return _customText(
+        text: "Join Read",
+        color: Colors.black,
+        fontSize: 9.78,
+        fontWeight: FontWeight.w400,
+      );
+    } else if (status == "PENDING") {
+      return _customText(
+        text: "Request",
+        color: Colors.black,
+        fontSize: 9.78,
+        fontWeight: FontWeight.w400,
+      );
+    } else if (status == "ACCPECT") {
+      return SizedBox.shrink();
+    } else {
+      return SizedBox.shrink();
+    }
   }
 }

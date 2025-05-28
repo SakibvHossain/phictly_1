@@ -99,12 +99,40 @@ class ProfileScreen extends StatelessWidget {
                   ),
 
                   //* Background Image
-                  Image.asset(
-                    "assets/profile/image/profile_background_image.png",
-                    height: 200.h,
-                    width: 440.w,
-                    fit: BoxFit.cover,
-                  ),
+                  Obx(() {
+                    final profile =
+                        profileDataController.profileResponse.value;
+
+                    if (profile == null ||
+                        profile.coverPhoto == null ||
+                        profile.coverPhoto!.isEmpty) {
+                      return Image.asset(
+                        "assets/images/udesign_portfolio_placeholder.jpg",
+                        height: 200.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      );
+                    }
+
+                    final coverPath = profile.coverPhoto!
+                        .replaceFirst("File: '", "")
+                        .replaceFirst("'", "");
+                    final avatarFile = File(coverPath);
+
+                    return avatarFile.existsSync()
+                        ? Image.file(
+                      avatarFile,
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
+                      "assets/images/udesign_portfolio_placeholder.jpg",
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    );
+                  }),
 
                   SizedBox(
                     height: 12.h,
@@ -844,11 +872,10 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
-                            child: Center(
+                            child: ClipOval(
                               child: Image.asset(
-                                "assets/profile/image/profile_image.png",
-                                width: 108.w,
-                                height: 108.h,
+                                "assets/images/profile_image_placeholder.jpg",
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
@@ -878,7 +905,7 @@ class ProfileScreen extends StatelessWidget {
                                     fit: BoxFit.cover,
                                   )
                                 : Image.asset(
-                                    "assets/profile/image/profile_image.png",
+                                    "assets/images/profile_image_placeholder.jpg",
                                     width: 108.w,
                                     height: 108.h,
                                   ),

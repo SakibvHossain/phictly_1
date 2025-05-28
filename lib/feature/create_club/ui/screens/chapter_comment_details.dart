@@ -230,6 +230,7 @@ class ChapterCommentDetails extends StatelessWidget {
                   clubLabel: clubDetail.clubLebel,
                   createdDate: difference,
                   length: clubDetail.length,
+                  timeLine: clubDetail.timeLine,
                   clubCreator: clubDetail.admin?.username ?? "Unknown",
                 ) : clubDetail.clubMediumType.contains("MOVIE") ? CustomCreatedBookItem(
                   selectedType: clubDetail.clubMediumType,

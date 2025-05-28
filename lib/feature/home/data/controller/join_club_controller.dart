@@ -52,6 +52,43 @@ class JoinClubController extends GetxController{
     }
   }
 
+
+  Future<void> joinPublicClub(String id) async{
+    preferencesHelper.init();
+    isLoading.value = true;
+    final Logger logger = Logger();
+
+    try{
+      await preferencesHelper.init();
+      String url = Utils.baseUrl + Utils.publicClubJoinRequest(id);
+      final response = await NetworkCaller().postRequest(
+        url,
+        body: {},
+        token: preferencesHelper.getString('userToken'),
+      );
+
+      logger.i(response);
+
+      if (response.statusCode == 200) {
+        logger.i(response.responseData);
+        var isPending = response.responseData;
+        logger.i(isPending);
+      } else {
+        Get.snackbar(
+          "Failed",
+          response.errorMessage,
+        );
+        logger.w(response.responseData);
+      }
+
+    }catch (e) {
+      debugPrint("Error: $e");
+      logger.e(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   //* Accept Private Club
   Future<void> acceptPrivateClubRequest(String id, String userid) async{
     preferencesHelper.init();

@@ -135,7 +135,7 @@ class Reply extends StatelessWidget {
                 child: (chapter == "null")
                     ? SizedBox.shrink()
                     : CustomText(
-                  text: chapter ?? "CH2",
+                  text: returnBanner() ?? "CH2",
                   fontSize: 10.sp,
                   fontWeight: FontWeight.bold,
                   color: Color(0xffFFFFFF),
@@ -146,5 +146,16 @@ class Reply extends StatelessWidget {
         ),
       ],
     );
+  }
+
+
+  String returnBanner() {
+    final text = chapter?.toLowerCase().trim() ?? '';
+    print("++++++++++++++++++++++++++++++++++++++++++++++LOL: $text");
+    if (text.startsWith("chapter 1")) return "CH1";
+    if (text.startsWith("chapter 2")) return "CH2";
+    if (text.startsWith("chapter 3")) return "CH3";
+    if (text.startsWith("chapter 4")) return "CH4";
+    return "CH5";
   }
 }

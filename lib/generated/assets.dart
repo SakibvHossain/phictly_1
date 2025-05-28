@@ -131,12 +131,14 @@ class Assets {
   static const String imagesMessageReply = 'assets/images/message_reply.png';
   static const String imagesPhone = 'assets/images/phone.png';
   static const String imagesPlaceholderImage = 'assets/images/placeholder_image.png';
+  static const String imagesProfileImagePlaceholder = 'assets/images/profile_image_placeholder.jpg';
   static const String imagesSearchClubImage = 'assets/images/search_club_image.png';
   static const String imagesSearchImage = 'assets/images/search_image.png';
   static const String imagesSocialFeedProfile1 = 'assets/images/social_feed_profile_1.png';
   static const String imagesSocialFeedProfile2 = 'assets/images/social_feed_profile_2.png';
   static const String imagesSocialFeedProfile3 = 'assets/images/social_feed_profile_3.png';
   static const String imagesSplashLogo = 'assets/images/splash_logo.png';
+  static const String imagesUdesignPortfolioPlaceholder = 'assets/images/udesign_portfolio_placeholder.jpg';
   static const String profileIconsEdit = 'assets/profile/icons/edit.png';
   static const String profileIconsEmail = 'assets/profile/icons/email.png';
   static const String tvAnime = 'assets/tv/anime.png';

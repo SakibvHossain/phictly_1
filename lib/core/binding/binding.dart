@@ -14,14 +14,14 @@ class AppBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(MainAppController());
-
     Get.put(ChangeHomeController());
+    Get.put(ChatController());
     Get.put(ChangeProfileController());
     Get.put(ChangeBookController());
     Get.put(ChangeTvController());
     Get.put(ChangeClubController());
     Get.put(BottomNavController());
-    Get.put(ChatController());
+
     Get.put(BookGenreController());
   }
 }

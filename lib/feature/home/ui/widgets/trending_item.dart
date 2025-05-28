@@ -14,17 +14,23 @@ import 'package:phictly/feature/home/data/controller/slider_controller.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/custom_outline_button.dart';
+import '../../../create_club/data/controller/change_club_controller.dart';
+import '../../../create_club/data/controller/club_controller.dart';
+import '../../data/controller/bottom_nav_controller.dart';
 import '../../data/controller/join_club_controller.dart';
 
 class TrendingItem extends StatelessWidget {
   TrendingItem({super.key});
 
-  final HomeController controller = Get.put(HomeController());
+  final controller = Get.put(HomeController());
   final changeHomeController = Get.find<ChangeHomeController>();
-  final SliderController sliderController = Get.put(SliderController());
-  final ClubItemController clubItemController = Get.put(ClubItemController());
+  final sliderController = Get.put(SliderController());
+  final clubItemController = Get.put(ClubItemController());
+  final changeClubController = Get.put(ChangeClubController());
+  final navController = Get.put(BottomNavController());
+  final clubController = Get.put(ClubController());
   final joinClubController = Get.put(JoinClubController());
-  final Logger logger = Logger();
+  final logger = Logger();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +42,7 @@ class TrendingItem extends StatelessWidget {
     return SizedBox(
       height: 180,
       child: Obx(() {
-        if (clubItemController.isRecentDataLoading.value) {
+        if (clubItemController.isTrendingDataLoading.value) {
           return const Center(
             child: SpinKitWave(
               duration: Duration(seconds: 2),
@@ -119,8 +125,7 @@ class TrendingItem extends StatelessWidget {
 
             return Obx(() {
               final trendingClubs = clubItemController.trendingDataList[index];
-              final isExpanded =
-                  clubItemController.selectedClubIndex.value == index;
+              final isExpanded = clubItemController.selectedClubIndex.value == index;
 
               return GestureDetector(
                 onTap: () {
@@ -181,51 +186,115 @@ class TrendingItem extends StatelessWidget {
                         Expanded(
                           child: Stack(
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _customText(
-                                      text: "${trendingClubs.clubId}",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black),
-                                  _customText(
-                                    text: "${trendingClubs.clubLabel}",
-                                    color: Colors.black.withOpacity(0.5),
-                                  ),
-                                  _rowCustomText(
-                                      firstText: "Title: ",
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () async {
+                                  if (status!=null) {
+                                    if(status.contains("ACCPECT")){
+                                      navController.updateIndex(2);
+                                      changeClubController.updateIndex(1);
+                                      clubController.fetchCreatedClub(trending.id ?? "");
+                                    }
+                                  } else {
+                                    debugPrint("+++++++++++++++Private Club++++++++++++++++++");
+                                  }
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _customText(
+                                        text: "${trendingClubs.clubId}",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black),
+                                    _customText(
+                                      text: "${trendingClubs.clubLabel}",
+                                      color: Colors.black.withOpacity(0.5),
+                                    ),
+                                    _rowCustomText(
+                                        firstText: "Title: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.title}",
+                                        secondFontSize: 12),
+                                    _rowCustomText(
+                                        firstText: "Author: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.writer}",
+                                        secondFontSize: 12),
+                                    _rowCustomText(
+                                      firstText: "Club Creator: ",
                                       firstFontSize: 12,
-                                      secondText: "${trendingClubs.title}",
-                                      secondFontSize: 12),
-                                  _rowCustomText(
-                                      firstText: "Author: ",
+                                      secondText:
+                                          "${trendingClubs.admin?.username}" ??
+                                              "${trendingClubs.writer}",
+                                      secondFontSize: 12,
+                                      secondColor: Color(0xff29605E),
+                                    ),
+                                    _rowCustomText(
+                                      firstText: "Member Count: ",
                                       firstFontSize: 12,
-                                      secondText: "${trendingClubs.writer}",
-                                      secondFontSize: 12),
-                                  _rowCustomText(
-                                    firstText: "Club Creator: ",
-                                    firstFontSize: 12,
-                                    secondText:
-                                        "${trendingClubs.admin?.username}" ??
-                                            "${trendingClubs.writer}",
-                                    secondFontSize: 12,
-                                    secondColor: Color(0xff29605E),
-                                  ),
-                                  _rowCustomText(
-                                    firstText: "Member Count: ",
-                                    firstFontSize: 12,
-                                    secondText: "${trendingClubs.memberSize}",
-                                    secondFontSize: 12,
-                                  ),
-                                  Flexible(
-                                    flex: 3,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 55, left: 6),
-                                      child: SizedBox(
-                                        height: 15,
-                                        child: Obx(() => SliderTheme(
+                                      secondText: "${trendingClubs.memberSize}",
+                                      secondFontSize: 12,
+                                    ),
+                                    Flexible(
+                                      flex: 3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 55, left: 6),
+                                        child: SizedBox(
+                                          height: 15,
+                                          child: Obx(() => SliderTheme(
+                                                data: SliderTheme.of(context)
+                                                    .copyWith(
+                                                  trackShape:
+                                                      const RoundedRectSliderTrackShape(),
+                                                  trackHeight: 2.0,
+                                                  thumbShape:
+                                                      const RoundSliderThumbShape(
+                                                          enabledThumbRadius:
+                                                              1.0),
+                                                  overlayShape:
+                                                      SliderComponentShape
+                                                          .noOverlay,
+                                                  thumbColor:
+                                                      const Color(0xff29605E),
+                                                  activeTrackColor:
+                                                      const Color(0xff29605E),
+                                                  inactiveTrackColor:
+                                                      Colors.grey.shade300,
+                                                ),
+                                                child: Slider(
+                                                  min: 0.0,
+                                                  max: maxValue,
+                                                  value: sliderController
+                                                      .value.value
+                                                      .clamp(minValue, maxValue),
+                                                  onChanged: (val) {
+                                                    debugPrint(
+                                                        "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
+                                                    // sliderController.value.value = val;
+                                                  },
+                                                ),
+                                              )),
+                                        ),
+                                      ),
+                                    ),
+                                    _rowCustomText(
+                                      firstText: "Timeline: ",
+                                      firstFontSize: 12,
+                                      secondText:
+                                          "${trendingClubs.timeLine} day(s)",
+                                      secondFontSize: 12,
+                                    ),
+                                    Flexible(
+                                      flex: 3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 55, left: 2),
+                                        child: SizedBox(
+                                          height: 15,
+                                          child: Obx(
+                                            () => SliderTheme(
                                               data: SliderTheme.of(context)
                                                   .copyWith(
                                                 trackShape:
@@ -233,11 +302,9 @@ class TrendingItem extends StatelessWidget {
                                                 trackHeight: 2.0,
                                                 thumbShape:
                                                     const RoundSliderThumbShape(
-                                                        enabledThumbRadius:
-                                                            1.0),
-                                                overlayShape:
-                                                    SliderComponentShape
-                                                        .noOverlay,
+                                                        enabledThumbRadius: 5.0),
+                                                overlayShape: SliderComponentShape
+                                                    .noOverlay,
                                                 thumbColor:
                                                     const Color(0xff29605E),
                                                 activeTrackColor:
@@ -250,99 +317,51 @@ class TrendingItem extends StatelessWidget {
                                                 max: maxValue,
                                                 value: sliderController
                                                     .value.value
-                                                    .clamp(minValue, maxValue),
+                                                    .clamp(maxValue, maxValue),
                                                 onChanged: (val) {
-                                                  debugPrint(
-                                                      "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
-                                                  // sliderController.value.value = val;
+                                                  // sliderController.value.value =
+                                                  //     val;
                                                 },
                                               ),
-                                            )),
-                                      ),
-                                    ),
-                                  ),
-                                  _rowCustomText(
-                                    firstText: "Timeline: ",
-                                    firstFontSize: 12,
-                                    secondText:
-                                        "${trendingClubs.timeLine} day(s)",
-                                    secondFontSize: 12,
-                                  ),
-                                  Flexible(
-                                    flex: 3,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 55, left: 2),
-                                      child: SizedBox(
-                                        height: 15,
-                                        child: Obx(
-                                          () => SliderTheme(
-                                            data: SliderTheme.of(context)
-                                                .copyWith(
-                                              trackShape:
-                                                  const RoundedRectSliderTrackShape(),
-                                              trackHeight: 2.0,
-                                              thumbShape:
-                                                  const RoundSliderThumbShape(
-                                                      enabledThumbRadius: 5.0),
-                                              overlayShape: SliderComponentShape
-                                                  .noOverlay,
-                                              thumbColor:
-                                                  const Color(0xff29605E),
-                                              activeTrackColor:
-                                                  const Color(0xff29605E),
-                                              inactiveTrackColor:
-                                                  Colors.grey.shade300,
-                                            ),
-                                            child: Slider(
-                                              min: 0.0,
-                                              max: maxValue,
-                                              value: sliderController
-                                                  .value.value
-                                                  .clamp(maxValue, maxValue),
-                                              onChanged: (val) {
-                                                // sliderController.value.value =
-                                                //     val;
-                                              },
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 16.h,
-                                    child: Flexible(
-                                      flex: 1,
-                                      fit: FlexFit.loose,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Flexible(
-                                            flex: 2,
-                                            fit: FlexFit.loose,
-                                            child: _customText(
-                                                text: "1",
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.black),
-                                          ),
-                                          Flexible(
-                                            flex: 1,
-                                            fit: FlexFit.tight,
-                                            child: _customText(
-                                                text:
-                                                    "${trendingClubs.timeLine}",
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.black),
-                                          ),
-                                        ],
+                                    SizedBox(
+                                      height: 16.h,
+                                      child: Flexible(
+                                        flex: 1,
+                                        fit: FlexFit.loose,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Flexible(
+                                              flex: 2,
+                                              fit: FlexFit.loose,
+                                              child: _customText(
+                                                  text: "1",
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.black),
+                                            ),
+                                            Flexible(
+                                              flex: 1,
+                                              fit: FlexFit.tight,
+                                              child: _customText(
+                                                  text:
+                                                      "${trendingClubs.timeLine}",
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               Positioned(
                                 bottom: 0,
@@ -376,18 +395,24 @@ class TrendingItem extends StatelessWidget {
 
                                       Column(
                                         children: [
-
                                           (status == null ||
                                                   status == "DELETED")
                                               ? GestureDetector(
                                                   behavior:
                                                       HitTestBehavior.opaque,
                                                   onTap: () async {
-                                                    await joinClubController
-                                                        .joinPrivateClub(
-                                                            trending.id ?? "");
-                                                    await clubItemController
-                                                        .fetchTrendingClubs();
+                                                    if (trending.id == null || trending.type == null) return;
+
+                                                    if (trending.type!.contains("PRIVATE")) {
+                                                      await joinClubController.joinPrivateClub(trending.id!);
+                                                    } else {
+                                                      await joinClubController.joinPublicClub(trending.id!);
+                                                      navController.updateIndex(2);
+                                                      changeClubController.updateIndex(1);
+                                                      clubController.fetchCreatedClub(trending.id ?? "");
+                                                    }
+
+                                                    await clubItemController.fetchTrendingClubs();
                                                   },
                                                   child: Image.asset(
                                                     "assets/icons/join_read_icon.png",
@@ -400,10 +425,8 @@ class TrendingItem extends StatelessWidget {
                                                       behavior: HitTestBehavior
                                                           .opaque,
                                                       onTap: () async {
-                                                        // await joinClubController
-                                                        //     .acceptPrivateClubRequest(
-                                                        //         trending.id ??
-                                                        //             "");
+                                                        // joinClubController.joinPrivateClub(
+                                                        //     trending.id ?? "");
                                                       },
                                                       child: Image.asset(
                                                         "assets/icons/request_icon.png",
