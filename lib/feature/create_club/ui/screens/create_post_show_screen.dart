@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
@@ -190,7 +191,9 @@ class CreatePostShowScreen extends StatelessWidget {
                         Obx(
                               () => commentController.isLoading.value
                               ? Center(
-                            child: CircularProgressIndicator(
+                            child: SpinKitWave(
+                              duration: Duration(seconds: 2),
+                              size: 15,
                               color: AppColors.primaryColor,
                             ),
                           )

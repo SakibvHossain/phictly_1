@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/utils/app_colors.dart';
@@ -40,26 +41,37 @@ class CustomItem extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(4.0),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: imagePath ??
-                          "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                      height: 140,
-                      width: 104,
-                      placeholder: (context, url) => Center(
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                    Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4.r),
+                        child: CachedNetworkImage(
+                          imageUrl: imagePath ??
+                              "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                          height: 140,
+                          width: 104,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Center(
+                            child: SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: SpinKitWave(
+                                duration: Duration(seconds: 2),
+                                size: 15,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                         ),
                       ),
-                      errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

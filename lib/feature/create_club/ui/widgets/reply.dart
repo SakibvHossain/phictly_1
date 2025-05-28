@@ -25,7 +25,7 @@ class Reply extends StatelessWidget {
   final String comment;
   final int? index;
   final String commentCount;
-  final String chapter;
+  final String? chapter;
   final String? chapterBannerText;
   final String chapterCreatedTime;
 
@@ -90,10 +90,13 @@ class Reply extends StatelessWidget {
                   SizedBox(),
                   Row(
                     children: [
-                      Icon(
-                        Icons.share,
-                        color: AppColors.primaryColor,
-                      ),
+                      // Icon(
+                      //   Icons.share,
+                      //   color: AppColors.primaryColor,
+                      // ),
+
+                      SizedBox(),
+
                       SizedBox(
                         width: 16.w,
                       ),
@@ -129,8 +132,10 @@ class Reply extends StatelessWidget {
                 top: 10,
                 left: 9.5     ,
                 right: 0,
-                child: CustomText(
-                  text: chapterBannerText ?? "CH2",
+                child: (chapter == "null")
+                    ? SizedBox.shrink()
+                    : CustomText(
+                  text: chapter ?? "CH2",
                   fontSize: 10.sp,
                   fontWeight: FontWeight.bold,
                   color: Color(0xffFFFFFF),

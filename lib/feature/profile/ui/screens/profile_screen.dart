@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
@@ -22,18 +23,18 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class ProgressController extends GetxController {
   ValueNotifier<double> progressNotifier =
-      ValueNotifier<double>(20.0); // Set progress manually
+      ValueNotifier<double>(20.0);
 }
 
 class ProfileScreen extends StatelessWidget {
-  final ProgressController progressController = Get.put(ProgressController());
+  final progressController = Get.put(ProgressController());
   final controller = Get.find<ChangeProfileController>();
-  final ProfileController profileController = Get.put(ProfileController());
-  final ProfileDataController profileDataController =
-      Get.put(ProfileDataController());
+  final profileController = Get.put(ProfileController());
+  final profileDataController = Get.put(ProfileDataController());
   final Logger logger = Logger();
-
   ProfileScreen({super.key});
+
+  final List<String> genres = ["Fantasy", "Mystery", "Horror", "Thriller"];
 
   @override
   Widget build(BuildContext context) {
@@ -122,15 +123,17 @@ class ProfileScreen extends StatelessWidget {
                           final profile =
                               profileDataController.profileResponse.value;
 
-                          if (profileDataController.isProfileDetailsAvailable.value) {
-                            return Skeletonizer(child: statItem("22", "Clubs"));
+                          if (profileDataController
+                              .isProfileDetailsAvailable.value) {
+                            return Skeletonizer(child: statItem("0", "Clubs"));
                           }
 
                           if (profile == null) {
-                            return statItem("22", "Clubs");
+                            return statItem("0", "Clubs");
                           }
 
-                          return statItem("${profile.count.clubMember}", "Clubs");
+                          return statItem(
+                              "${profile.count.clubMember}", "Clubs");
                         }),
                       ),
                       GestureDetector(
@@ -138,20 +141,22 @@ class ProfileScreen extends StatelessWidget {
                           controller.updateIndex(1);
                           profileController.updateTabIndex(1);
                         },
-
-                        child:  Obx(() {
+                        child: Obx(() {
                           final profile =
                               profileDataController.profileResponse.value;
 
-                          if (profileDataController.isProfileDetailsAvailable.value) {
-                            return Skeletonizer(child: statItem("490", "Followers"));
+                          if (profileDataController
+                              .isProfileDetailsAvailable.value) {
+                            return Skeletonizer(
+                                child: statItem("0", "Followers"));
                           }
 
                           if (profile == null) {
-                            return statItem("490", "Followers");
+                            return statItem("0", "Followers");
                           }
 
-                          return statItem("${profile.count.followers}", "Followers");
+                          return statItem(
+                              "${profile.count.followers}", "Followers");
                         }),
                       ),
                       GestureDetector(
@@ -164,15 +169,18 @@ class ProfileScreen extends StatelessWidget {
                           final profile =
                               profileDataController.profileResponse.value;
 
-                          if (profileDataController.isProfileDetailsAvailable.value) {
-                            return Skeletonizer(child: statItem("78", "Following"),);
+                          if (profileDataController
+                              .isProfileDetailsAvailable.value) {
+                            return Skeletonizer(
+                              child: statItem("0", "Following"),
+                            );
                           }
 
                           if (profile == null) {
-                            return statItem("78", "Following");
+                            return statItem("0", "Following");
                           }
 
-                          return statItem("1", "Following");
+                          return statItem("0", "Following");
                         }),
                       ),
                       GestureDetector(
@@ -185,12 +193,15 @@ class ProfileScreen extends StatelessWidget {
                           final profile =
                               profileDataController.profileResponse.value;
 
-                          if (profileDataController.isProfileDetailsAvailable.value) {
-                            return Skeletonizer(child: statItem("3", "Groups"),);
+                          if (profileDataController
+                              .isProfileDetailsAvailable.value) {
+                            return Skeletonizer(
+                              child: statItem("0", "Groups"),
+                            );
                           }
 
                           if (profile == null) {
-                            return statItem("3", "Groups");
+                            return statItem("0", "Groups");
                           }
 
                           return statItem("${profile.count.groups}", "Groups");
@@ -270,38 +281,39 @@ class ProfileScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Obx(() {
-                          final profile =
-                              profileDataController.profileResponse.value;
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Obx(() {
+                        final profile =
+                            profileDataController.profileResponse.value;
 
-                          if (profileDataController
-                              .isProfileDetailsAvailable.value) {
-                            return Skeletonizer(
-                              child: CustomText(
-                                text: "Sakib X Hossain",
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            );
-                          }
-
-                          if (profile == null) {
-                            return CustomText(
-                                text: "Failed to fetch Name",
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black);
-                          }
-
-                          return CustomText(
-                            text: profile.username ?? "username",
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                        if (profileDataController
+                            .isProfileDetailsAvailable.value) {
+                          return Skeletonizer(
+                            child: CustomText(
+                              text: "Sakib X Hossain",
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
                           );
-                        })),
+                        }
+
+                        if (profile == null) {
+                          return CustomText(
+                              text: "Failed to fetch Name",
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black);
+                        }
+
+                        return CustomText(
+                          text: profile.username ?? "username",
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        );
+                      }),
+                    ),
                   ),
 
                   //* Space
@@ -427,50 +439,49 @@ class ProfileScreen extends StatelessWidget {
                                   )
                                 ],
                               ),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
+                              child: Obx((){
+                                final lastWatch = profileDataController.profileResponse.value?.userGenre;
+
+                                if (profileDataController.isProfileDetailsAvailable.value) {
+                                  return Center(
+                                    child: SpinKitWave(
+                                      duration: Duration(seconds: 2),
+                                      size: 15,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  );
+                                }
+
+                                //* Handle null or empty record list
+                                if (lastWatch == null || lastWatch.isEmpty) {
+                                  return Center(
                                     child: CustomText(
-                                        text: "Fantasy",
+                                      text: "Genre Empty",
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black,
+                                    ),
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  padding: EdgeInsets.symmetric(vertical: 8),
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: genres.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                                      child: CustomText(
+                                        text: genres[index],
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w400,
-                                        color: Colors.black),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: CustomText(
-                                        text: "Mystery",
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: CustomText(
-                                        text: "Horror",
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: CustomText(
-                                        text: "Thriller",
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            )
+                                        color: Colors.black,
+                                      ),
+                                    );
+                                  },
+                                );
+                              }),
+                            ),
                           ],
                         ),
                         Column(
@@ -577,8 +588,11 @@ class ProfileScreen extends StatelessWidget {
 
                     if (profileDataController.isProfileDetailsAvailable.value) {
                       return Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.primaryColor),
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
                       );
                     }
 
@@ -598,6 +612,29 @@ class ProfileScreen extends StatelessWidget {
 
                     final talkPoint = activeRead[0].activeRead?.talkPoint;
 
+                    //* Time & Date
+                    DateTime? createdAt = activeRead[0].activeRead?.startDate;
+
+                    String difference = "";
+                    if (createdAt != null) {
+                      final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
+
+                      if (diff.inSeconds < 60) {
+                        difference = '${diff.inSeconds}s';
+                      } else if (diff.inMinutes < 60) {
+                        difference = '${diff.inMinutes}m';
+                      } else if (diff.inHours < 24) {
+                        difference = '${diff.inHours}h';
+                      } else if (diff.inDays < 7) {
+                        difference = '${diff.inDays}d';
+                      } else {
+                        difference =
+                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                      }
+                    } else {
+                      difference = "Unknown time";
+                    }
+
                     //* If all good, show the book item
                     return CustomBookItem(
                       clubId: "${activeRead[0].activeRead?.clubId}",
@@ -608,9 +645,9 @@ class ProfileScreen extends StatelessWidget {
                       noReqOrJoinAvailable: true,
                       author: "${activeRead[0].activeRead?.writer}",
                       memberCount: "${activeRead[0].activeRead?.memberSize}",
+                      totalDuration: difference,
                       requestOrJoin: "Join Read",
-                      clubCreator:
-                          "${activeRead[0].activeRead?.admin?.username}",
+                      clubCreator: "${activeRead[0].activeRead?.admin?.username}",
                       timeLine: "${activeRead[0].activeRead?.timeLine}",
                       isPublic: "${activeRead[0].activeRead?.type}",
                       clubType: "${activeRead[0].activeRead?.clubMediumType}",
@@ -626,8 +663,11 @@ class ProfileScreen extends StatelessWidget {
 
                     if (profileDataController.isProfileDetailsAvailable.value) {
                       return Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.primaryColor),
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
                       );
                     }
 
@@ -647,6 +687,29 @@ class ProfileScreen extends StatelessWidget {
 
                     final talkPoint = lastRead[1].lastRead?.talkPoint;
 
+                    //* Time & Date
+                    DateTime? createdAt = lastRead[1].lastRead?.startDate;
+
+                    String difference = "";
+                    if (createdAt != null) {
+                      final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
+
+                      if (diff.inSeconds < 60) {
+                        difference = '${diff.inSeconds}s';
+                      } else if (diff.inMinutes < 60) {
+                        difference = '${diff.inMinutes}m';
+                      } else if (diff.inHours < 24) {
+                        difference = '${diff.inHours}h';
+                      } else if (diff.inDays < 7) {
+                        difference = '${diff.inDays}d';
+                      } else {
+                        difference =
+                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                      }
+                    } else {
+                      difference = "Unknown time";
+                    }
+
                     //* If all good, show the book item
                     return CustomBookItem(
                       clubId: "${lastRead[1].lastRead?.clubId}",
@@ -658,6 +721,7 @@ class ProfileScreen extends StatelessWidget {
                       author: "${lastRead[1].lastRead?.writer}",
                       memberCount: "${lastRead[1].lastRead?.memberSize}",
                       requestOrJoin: "Join Read",
+                      totalDuration: difference,
                       clubCreator: "${lastRead[1].lastRead?.admin?.username}",
                       timeLine: "${lastRead[1].lastRead?.timeLine}",
                       isPublic: "${lastRead[1].lastRead?.type}",
@@ -674,15 +738,24 @@ class ProfileScreen extends StatelessWidget {
 
                     if (profileDataController.isProfileDetailsAvailable.value) {
                       return Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.primaryColor),
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
                       );
                     }
 
                     //* Handle null or empty record list
                     if (lastWatch == null || lastWatch.isEmpty) {
-                      return Center(
-                        child: Text("No active reading record found."),
+                      return Column(
+                        children: [
+                          Center(
+                            child: Text("No active reading record found."),
+                          ),
+
+                          SizedBox(height: 100.h,)
+                        ],
                       );
                     }
 
@@ -695,6 +768,29 @@ class ProfileScreen extends StatelessWidget {
 
                     final talkPoint = lastWatch[2].lastWatched?.talkPoint;
 
+                    //* Time & Date
+                    DateTime? createdAt = lastWatch[2].lastWatched?.startDate;
+
+                    String difference = "";
+                    if (createdAt != null) {
+                      final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
+
+                      if (diff.inSeconds < 60) {
+                        difference = '${diff.inSeconds}s';
+                      } else if (diff.inMinutes < 60) {
+                        difference = '${diff.inMinutes}m';
+                      } else if (diff.inHours < 24) {
+                        difference = '${diff.inHours}h';
+                      } else if (diff.inDays < 7) {
+                        difference = '${diff.inDays}d';
+                      } else {
+                        difference =
+                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                      }
+                    } else {
+                      difference = "Unknown time";
+                    }
+
                     //* If all good, show the book item
                     return CustomBookItem(
                       clubId: "${lastWatch[2].lastWatched?.clubId}",
@@ -706,8 +802,8 @@ class ProfileScreen extends StatelessWidget {
                       author: "${lastWatch[2].lastWatched?.writer}",
                       memberCount: "${lastWatch[2].lastWatched?.memberSize}",
                       requestOrJoin: "Join Read",
-                      clubCreator:
-                          "${lastWatch[2].lastWatched?.admin?.username}",
+                      totalDuration: difference,
+                      clubCreator: "${lastWatch[2].lastWatched?.admin?.username}",
                       timeLine: "${lastWatch[2].lastWatched?.timeLine}",
                       isPublic: "${lastWatch[2].lastWatched?.type}",
                       clubType: "${lastWatch[2].lastWatched?.clubMediumType}",
@@ -749,8 +845,10 @@ class ProfileScreen extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primaryColor,
+                              child: Image.asset(
+                                "assets/profile/image/profile_image.png",
+                                width: 108.w,
+                                height: 108.h,
                               ),
                             ),
                           ),

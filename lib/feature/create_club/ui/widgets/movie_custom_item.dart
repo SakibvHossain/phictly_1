@@ -27,6 +27,8 @@ class MovieCustomItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("++++++++++++++++++++++++++++++++++++++++++++$genre");
+    debugPrint("++++++++++++++++++++++++++++++++++++++++++++$publishDate");
     return Padding(
       padding: padding ?? EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
@@ -43,19 +45,26 @@ class MovieCustomItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: imagePath ??
-                          "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                      height: 140,
-                      width: 104,
-                      placeholder: (context, url) => Center(
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0, bottom: 4.0, top: 4.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4.r),
+                        child: CachedNetworkImage(
+                          imageUrl: imagePath ??
+                              "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                          height: 140,
+                          width: 104,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Center(
+                            child: SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                         ),
                       ),
-                      errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

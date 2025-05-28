@@ -13,7 +13,7 @@ class DateController extends GetxController {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime(1921),
       lastDate: DateTime(2100),
       builder: (BuildContext context, Widget? child) {
         return Theme(

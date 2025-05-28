@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/feature/book/data/model/book_model.dart';
@@ -16,10 +19,15 @@ class TvGenreController extends GetxController {
 
   Future<void> fetchGenre() async {
     await preferencesHelper.init();
+    if (!await hasInternetConnection()) {
+      debugPrint("🚫 No Internet Detected");
+      showNoConnectionDialog();
+      return;
+    }
+
 
     try {
       isTvGenreListAvailable.value = true;
-
       tvGenreDataList.clear();
 
       String url = Utils.baseUrl + Utils.genreTv;
@@ -29,10 +37,7 @@ class TvGenreController extends GetxController {
       );
 
       if (response.isSuccess) {
-        // Get.snackbar(
-        //   "Success",
-        //   "Club data fetched successfully.",
-        // );
+
 
         var genreJson = response.responseData;
 
@@ -46,10 +51,6 @@ class TvGenreController extends GetxController {
         debugPrint("++++++++++++++++++++++++++++++++++++Tv Genre List ${tvGenreDataList.length}");
       } else {
         logger.e("API call failed with message: ${response.responseData}");
-        Get.snackbar(
-          "Error",
-          "Check Internet connection.",
-        );
       }
     } catch (e) {
       debugPrint("Error: $e");
@@ -67,5 +68,60 @@ class TvGenreController extends GetxController {
   void onInit() {
     super.onInit();
     fetchGenre();
+  }
+
+  Future<bool> hasInternetConnection() async {
+    try {
+      final result = await HttpClient().getUrl(Uri.parse('https://www.google.com'))
+          .then((request) => request.close());
+
+      return result.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void showNoConnectionDialog() {
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Center(
+          child: Text(
+            "No Connection",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Please check your internet connectivity",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Divider(height: 1),
+          ],
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        actionsPadding: EdgeInsets.zero,
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(Get.context!).pop();
+            },
+            child: Text(
+              "OK",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -55,6 +56,8 @@ class TvScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
       body: RefreshIndicator(
+        color: AppColors.primaryColor,
+        backgroundColor: AppColors.whiteColor,
         onRefresh: () async {
           await genreController.fetchGenre();
         },
@@ -101,7 +104,7 @@ class TvScreen extends StatelessWidget {
             ),
 
             // **Wrap GridView in Expanded to fix the issue**
-            _buildTvGenreItems(),
+            _buildTvGenreItems(context),
 
             SizedBox(
               height: 90.h,
@@ -112,32 +115,40 @@ class TvScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTvGenreItems() {
+  Widget _buildTvGenreItems(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(left: 8, right: 8, top: 16),
+        padding: EdgeInsets.only(left: 8, right: 8),
         child: Obx(() {
           if (genreController.isTvGenreListAvailable.value) {
             return const Center(
-              child: CircularProgressIndicator(
+              child: SpinKitWave(
+                duration: Duration(seconds: 2),
+                size: 15,
                 color: AppColors.primaryColor,
               ),
             );
           }
 
           if (genreController.tvGenreDataList.isEmpty) {
-            return Center(
-              child: CustomText(
-                text: "No Tv club genre found",
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff000000),
-              ),
+            return ListView(
+              children: [
+                SizedBox(height: MediaQuery.sizeOf(context).height * 0.218),
+                Center(
+                  child: CustomText(
+                    text: "No Show/Movie club genre found",
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff000000),
+                  ),
+                ),
+              ],
             );
           }
 
           return GridView.builder(
             padding: EdgeInsets.zero,
+            physics: AlwaysScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               childAspectRatio: 1,

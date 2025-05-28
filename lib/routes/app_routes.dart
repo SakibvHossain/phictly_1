@@ -1,59 +1,42 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
+import 'package:phictly/core/binding/binding.dart';
+import 'package:phictly/feature/auth/ui/screens/sign_in_screen.dart';
+import 'package:phictly/feature/auth/ui/screens/sign_up_screen.dart';
+import 'package:phictly/feature/home/ui/screens/home_nav_screen.dart';
+import 'package:phictly/feature/splash/ui/screens/splash_screen.dart';
 
 class AppRoute {
   static const String splash = '/splash';
-  static const String onboarding = '';
   static const String navBar = '/navHome';
-  static const String adminNav = '';
-  static const String chooseAccountRole = '/chooseAccountRole';
   static const String signUp = '/signUp';
-  static const String resetPassword = '/resetPasswordScreen';
-  static const String emailVerification = '/emailVerification';
-  static const String createNewPassword = '/createNewPasswordScreen';
-  static const String passwordChanged = '/passwordChangedScreen';
-  static const String signIn = '/signInScreen';
-  static const String allowLocationScreen = '/allowLocationScreen';
-  static const String enterLocationScreen = '/EnterLocationScreen';
-  static const String setupProfileScreen = '/SetupProfileScreen';
-  static const String userProfileScreen = '/userProfileScreen';
-  static const String editUserProfileScreen = '/editUserProfileScreen';
-  static const String notificationScreen = '/notificationScreen';
-  static const String changePasswordScreen = '/changePasswordScreen';
-  static const String supportScreen = '/supportScreen';
-  static const String privacyPolicy = '/privacyPolicyScreen';
+  static const String signIn = '/signIn';
 
-  static String getInitialRoute() => splash;
-  // static String getSplashRoute() => splash;
-  static String getChooseAccountRole() => chooseAccountRole;
+
+  static String getInitial() => splash;
   static String getSignUp() => signUp;
-  static String getResetPasswordRoute() => resetPassword;
-  static String getEmailVerificationRoute() => emailVerification;
-  static String getcreateNewPasswordRoute() => createNewPassword;
-  static String getpasswordChangedRoute() => passwordChanged;
-  static String getSignInScreenRoute() => signIn;
-  static String getAllowLocationRoute() => allowLocationScreen;
-  static String getEnterLocationRoute() => enterLocationScreen;
-  static String getSetupProfileScreen() => setupProfileScreen;
-  static String getUserProfiloeScreen() => userProfileScreen;
-  static String getEditUserProfiloeScreen() => editUserProfileScreen;
-  static String getNotificationScreen() => notificationScreen;
-  static String getChangePasswordScreen() => changePasswordScreen;
-  static String getSupportScreen() => supportScreen;
-  static String getPrivacyPolicyScreen() => privacyPolicy;
+  static String getSignInScreen() => signIn;
+  static String getHomeScreen() => navBar;
+
 
   static final route = [
-    // GetPage(
-    //     name: navBar,
-    //     page: () => HomeNav(),
-    //     transition: Transition.rightToLeft),
-    // GetPage(
-    //     name: chooseAccountRole,
-    //     page: () => ChooseAccountRole(),
-    //     transition: Transition.rightToLeft),
-    // GetPage(
-    //     name: signUp,
-    //     page: () => SignUpScreen(),
-    //     transition: Transition.rightToLeft),
+    GetPage(
+        name: navBar,
+        page: () => HomeNavScreen(),
+        transition: Transition.rightToLeft,
+      binding: AppBinding()
+    ),
+    GetPage(
+        name: signUp,
+        page: () => SignUpScreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: signIn,
+        page: () => SignInScreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: splash,  // fixed this line
+        page: () => SplashScreen(),
+        transition: Transition.rightToLeft),
   ];
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -30,6 +31,7 @@ class ChapterCommentDetails extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
       body: RefreshIndicator(
+        color: AppColors.primaryColor,
         onRefresh: () async {
           clubController.fetchCreatedClub(bookController.createdClubId);
         },
@@ -92,8 +94,8 @@ class ChapterCommentDetails extends StatelessWidget {
                     //* 3 dots
                     Row(
                       children: [
-                        Image.asset(
-                          "assets/images/phone.png",
+                        SizedBox(
+                          // "assets/images/phone.png",
                           height: 30.h,
                           width: 30.w,
                         ),
@@ -179,7 +181,13 @@ class ChapterCommentDetails extends StatelessWidget {
                 debugPrint("++++++++++++++++++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
 
                 if (clubController.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+                  return Center(
+                    child: SpinKitWave(
+                      duration: Duration(seconds: 2),
+                      size: 15,
+                      color: AppColors.primaryColor,
+                    ),
+                  );
                 }
 
                 final clubDetail = clubController.clubDetail.value;
@@ -195,6 +203,23 @@ class ChapterCommentDetails extends StatelessWidget {
                   );
                 }
 
+                final createdAt = clubDetail.createdAt;
+                final Duration diff = DateTime.now().toUtc().difference(createdAt);
+
+                String difference;
+
+                if (diff.inSeconds < 60) {
+                  difference = '${diff.inSeconds}s';
+                } else if (diff.inMinutes < 60) {
+                  difference = '${diff.inMinutes}m';
+                } else if (diff.inHours < 24) {
+                  difference = '${diff.inHours}h';
+                } else if (diff.inDays < 7) {
+                  difference = '${diff.inDays}d';
+                } else {
+                  difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                }
+
                 return clubDetail.clubMediumType.contains("BOOK") ? CustomCreatedBookItem(
                   selectedType: clubDetail.clubMediumType,
                   clubNumber: clubDetail.clubId,
@@ -203,6 +228,7 @@ class ChapterCommentDetails extends StatelessWidget {
                   imagePath: clubDetail.poster,
                   clubMember: clubDetail.memberSize,
                   clubLabel: clubDetail.clubLebel,
+                  createdDate: difference,
                   length: clubDetail.length,
                   clubCreator: clubDetail.admin?.username ?? "Unknown",
                 ) : clubDetail.clubMediumType.contains("MOVIE") ? CustomCreatedBookItem(
@@ -210,15 +236,19 @@ class ChapterCommentDetails extends StatelessWidget {
                   clubNumber: clubDetail.clubId,
                   title: clubDetail.title,
                   imagePath: clubDetail.poster,
+                  timeLine: clubDetail.timeLine,
                   clubMember: clubDetail.memberSize,
                   clubLabel: clubDetail.clubLebel,
+                  createdDate: difference,
                   length: clubDetail.length,
                   clubCreator: clubDetail.admin?.username ?? "Unknown",
                 ) : CustomCreatedBookItem(
                   selectedType: clubDetail.clubMediumType,
                   clubNumber: clubDetail.clubId,
                   title: clubDetail.title,
+                  timeLine: clubDetail.timeLine,
                   imagePath: clubDetail.poster,
+                  createdDate: difference,
                   clubMember: clubDetail.memberSize,
                   clubLabel: clubDetail.clubLebel,
                   clubCreator: clubDetail.admin?.username ?? "Unknown",
@@ -229,40 +259,45 @@ class ChapterCommentDetails extends StatelessWidget {
                 height: 8.h,
               ),
 
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0, top: 8, bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(),
-                    Row(
-                      children: [
-                        Image.asset(
-                          "assets/tv/tune.png",
-                          height: 20.h,
-                          width: 18.w,
-                        ),
-                        SizedBox(
-                          width: 16.h,
-                        ),
-                        Image.asset(
-                          "assets/tv/sort_by.png",
-                          height: 20.h,
-                          width: 18.w,
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(),
+                  Row(
+                    children: [
+                      SizedBox(
+                        // "assets/tv/tune.png",
+                        height: 20.h,
+                        width: 18.w,
+                      ),
+                      SizedBox(
+                        width: 16.h,
+                      ),
+                      SizedBox(
+                        // "assets/tv/sort_by.png",
+                        height: 20.h,
+                        width: 18.w,
+                      ),
+                    ],
+                  )
+                ],
               ),
 
               Obx(() {
 
                 if (clubController.isLoading.value) {
-                  return Center(
-                      child: CircularProgressIndicator(
-                    color: AppColors.primaryColor,
-                  ));
+                  return Column(
+                    children: [
+                      SizedBox(height: 200.h,),
+                      Center(
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                    ],
+                  );
                 }
 
                 if (clubController.clubDetail.value == null ||
@@ -291,13 +326,13 @@ class ChapterCommentDetails extends StatelessWidget {
                 String difference;
 
                 if (diff.inSeconds < 60) {
-                  difference = '${diff.inSeconds}s ago';
+                  difference = '${diff.inSeconds}s';
                 } else if (diff.inMinutes < 60) {
-                  difference = '${diff.inMinutes}m ago';
+                  difference = '${diff.inMinutes}m';
                 } else if (diff.inHours < 24) {
-                  difference = '${diff.inHours}h ago';
+                  difference = '${diff.inHours}h';
                 } else if (diff.inDays < 7) {
-                  difference = '${diff.inDays}d ago';
+                  difference = '${diff.inDays}d';
                 } else {
                   difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
                 }

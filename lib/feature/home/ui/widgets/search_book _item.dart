@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:phictly/core/utils/app_colors.dart';
 import '../../data/controller/home_controller.dart';
 
 class SearchBookItem extends StatelessWidget {
@@ -22,6 +24,14 @@ class SearchBookItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final label = clubLabel;
+    String? result = label != null && label.length > 20
+        ? '${label.substring(0, 20)}...'
+        : label;
+
+
+
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
@@ -37,10 +47,16 @@ class SearchBookItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      imagePath ?? "assets/images/book_1.png",
-                      height: 160,
-                      width: 104,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: CachedNetworkImage(
+                        imageUrl: imagePath ?? "",
+                        height: 160,
+                        width: 104,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: AppColors.primaryColor,)),
+                        errorWidget: (context, url, error) => Image.asset("assets/images/book_1.png", height: 160, width: 104),
+                      ),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -52,7 +68,7 @@ class SearchBookItem extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: Colors.black),
                         _customTextClubLabel(
-                          text: clubLabel ?? "The Booksters",
+                          text: result ?? "The Booksters",
                           color: Colors.black.withOpacity(0.5),
                         ),
                         _rowCustomText(
@@ -143,17 +159,11 @@ class SearchBookItem extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Image.asset(
-                            "assets/icons/bag_icon.png",
-                            height: 20,
-                            width: 20,
-                          ),
+                          SizedBox(height: 20,
+                            width: 20,),
                           SizedBox(width: 4),
-                          Image.asset(
-                            "assets/icons/share.png",
-                            height: 20,
-                            width: 20,
-                          ),
+                          SizedBox(height: 20,
+                            width: 20,)
                         ],
                       ),
                       Column(
@@ -215,7 +225,9 @@ class SearchBookItem extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 8),
       child: Text(
-        text,
+          text.length > 20
+              ? '${text.substring(0, 20)}...'
+              : text,
         style: GoogleFonts.dmSans(
           fontSize: fontSize,
           fontWeight: fontWeight,
@@ -240,14 +252,18 @@ class SearchBookItem extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: firstText,
+                  text: firstText.length > 20
+                ? '${firstText.substring(0, 20)}...'
+        : firstText,
                   style: GoogleFonts.dmSans(
                       fontSize: firstFontSize,
                       fontWeight: FontWeight.w600,
                       color: Colors.black),
                 ),
                 TextSpan(
-                  text: secondText,
+                  text: secondText.length > 14
+                ? '${secondText.substring(0, 14)}...'
+        : secondText,
                   style: GoogleFonts.dmSans(
                     fontSize: secondFontSize,
                     fontWeight: FontWeight.w400,

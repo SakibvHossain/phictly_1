@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:iconly/iconly.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -15,6 +16,7 @@ import '../../../../core/utils/image_path.dart';
 import '../../../../core/validation/password_validation.dart';
 import '../../../book/data/controller/date_controller.dart';
 import '../../../home/data/controller/bottom_nav_controller.dart';
+import '../../../home/data/controller/change_home_controller.dart';
 import '../../../profile/data/controller/change_profile_controller.dart';
 import '../widget/dropdown_gender.dart';
 import '../widget/dropdown_location.dart';
@@ -24,10 +26,48 @@ class SignUpScreen extends StatelessWidget {
 
   final SignUpController controller = Get.put(SignUpController());
   final DateController dateController = Get.put(DateController());
-  final ChangeProfileController changeProfileController = Get.put(ChangeProfileController());
+  final ChangeProfileController changeProfileController =
+      Get.put(ChangeProfileController());
   final navController = Get.find<BottomNavController>();
   final List<String> genderList = ["Male", "Female", "Nonbinary"];
-  final List<String> locationList = ["United States", "Canada", "Jamaica", "Dominican Republic", "Mexico", "Brazil", "Argentina", "Chile", "Colombia", "Peru", "Bolivia", "United Kingdom", "Germany", "France", "Spain", "Italy", "Netherlands", "Sweden", "Poland", "China", "India", "Japan", "South Korea" , "Indonesia" , "Thailand" , "Philippines" , "Australia" , "New Zealand" , "South Africa" , "Nigeria" , "Kenya" , "Egypt" , "United Arab Emirates" , "Saudi Arabia" , "Turkey" , "Israel"];
+  final List<String> locationList = [
+    "United States",
+    "Canada",
+    "Jamaica",
+    "Dominican Republic",
+    "Mexico",
+    "Brazil",
+    "Argentina",
+    "Chile",
+    "Colombia",
+    "Peru",
+    "Bolivia",
+    "United Kingdom",
+    "Germany",
+    "France",
+    "Spain",
+    "Italy",
+    "Netherlands",
+    "Sweden",
+    "Poland",
+    "China",
+    "India",
+    "Japan",
+    "South Korea",
+    "Indonesia",
+    "Thailand",
+    "Philippines",
+    "Australia",
+    "New Zealand",
+    "South Africa",
+    "Nigeria",
+    "Kenya",
+    "Egypt",
+    "United Arab Emirates",
+    "Saudi Arabia",
+    "Turkey",
+    "Israel"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +158,7 @@ class SignUpScreen extends StatelessWidget {
                             controller: controller.emailController,
                             validator: validateEmail,
                             hintText: "email",
+                            cursorColor: AppColors.primaryColor,
                             prefixIcon: Icons.email,
                           ),
 
@@ -130,6 +171,7 @@ class SignUpScreen extends StatelessWidget {
                             controller: controller.usernameController,
                             validator: validateName,
                             hintText: "username",
+                            cursorColor: AppColors.primaryColor,
                             prefixIcon: Icons.person,
                           ),
 
@@ -142,6 +184,7 @@ class SignUpScreen extends StatelessWidget {
                             return CustomTextField(
                               controller: controller.passwordController,
                               hintText: "password",
+                              cursorColor: AppColors.primaryColor,
                               validator: validatePassword,
                               prefixIcon: Icons.lock,
                               suffixIcon: controller.isEyeOpen.value
@@ -162,6 +205,7 @@ class SignUpScreen extends StatelessWidget {
                             controller: controller.phoneController,
                             validator: phoneValidation,
                             hintText: "phone",
+                            cursorColor: AppColors.primaryColor,
                             inputType: TextInputType.number,
                             prefixIcon: Icons.phone,
                           ),
@@ -170,22 +214,13 @@ class SignUpScreen extends StatelessWidget {
                             height: 16.h,
                           ),
 
-                          Obx((){
-                            return CustomTextField(
-                              isReadOnlyTrue: true,
-                              onTap: () {
-                                dateController.pickDate(context);
-
-                                debugPrint("+++++++++++++++++++++++${dateController.selectedDate.value}");
-                              },
-                              // validator: dateValidation,
-                              hintText: dateController.selectedDate.value.isEmpty
-                                  ? "Select Date"
-                                  : dateController.selectedDate.value,
-                              prefixIcon: Icons.calendar_month,
-                              inputType: TextInputType.datetime,
-                            );
-                          }),
+                          CustomTextField(
+                            controller: controller.dateController,
+                            validator: dateValidation,
+                            hintText: "Select Date",
+                            prefixIcon: Icons.calendar_month,
+                            inputType: TextInputType.number,
+                          ),
 
                           SizedBox(
                             height: 16.h,
@@ -214,7 +249,9 @@ class SignUpScreen extends StatelessWidget {
                           Obx(
                             () => controller.isLoading.value
                                 ? Center(
-                                    child: CircularProgressIndicator(
+                                    child: SpinKitWave(
+                                      duration: Duration(seconds: 2),
+                                      size: 15,
                                       color: AppColors.primaryColor,
                                     ),
                                   )

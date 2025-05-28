@@ -2,6 +2,7 @@ import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
+import 'package:phictly/feature/create_club/data/controller/status_controller.dart';
 import 'package:phictly/feature/create_club/ui/screens/chapter_comment_details.dart';
 import '../../../../core/components/custom_text.dart';
 import '../../../../core/utils/app_colors.dart';
@@ -18,10 +19,11 @@ class ChapterComments extends StatelessWidget {
       required this.commentCount, this.chapter,
       required this.chapterCreatedTime,
       this.chapterBannerText,
-      this.index, required this.isTextVisible, this.parentID, this.type, this.episode, this.episodeBanner});
+      this.index, required this.isTextVisible, this.parentID, this.type, this.episode, this.episodeBanner, required this.id});
 
   final String userName;
   final String comment;
+  final String id;
   final int? index;
   final String? parentID;
   final String? type;
@@ -37,10 +39,13 @@ class ChapterComments extends StatelessWidget {
   final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
   final ClubController clubController = Get.put(ClubController());
   final PostClubController bookController = Get.put(PostClubController());
+  final status = Get.put(StatusController());
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
+
+    debugPrint("+++++++++++++++++++++++++READ TRUE?++++++++++++++++++++++++++++++++++$id");
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -67,114 +72,19 @@ class ChapterComments extends StatelessWidget {
                               fontSize: 18.sp,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryColor),
-                          Icon(
-                            Icons.share,
-                            color: AppColors.primaryColor,
-                          )
+                          // Icon(
+                          //   Icons.share,
+                          //   color: AppColors.primaryColor,
+                          // )
+
+                          SizedBox(),
                         ],
                       ),
                       SizedBox(
                         height: 6.h,
                       ),
 
-                      //* Blur the text
-                      // Obx((){
-                      //   RxList<RxBool> selectedPosts = <RxBool>[].obs;
-                      //
-                      //   selectedPosts.assignAll(List.generate(clubController.clubDetail.value!.post.length, (_) => false.obs));
-                      //
-                      //   RxBool value = selectedPosts[index ?? 0];
-                      //
-                      //   return (chapterBannerText?.contains("CH5") ?? false) && (!value.value)
-                      //       ? Stack(
-                      //     children: [
-                      //       Blur(
-                      //         blur: 3,
-                      //         child: Align(
-                      //           alignment: AlignmentDirectional.centerStart,
-                      //           child: CustomText(
-                      //             text: comment ??
-                      //                 "Did Isla really do that to Grim?",
-                      //             fontSize: 16.sp,
-                      //             fontWeight: FontWeight.w600,
-                      //             color: Color(0xff000000).withOpacity(0.6),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //       Positioned(
-                      //         top: 0,
-                      //         left: width/3.8,
-                      //         right: 0,
-                      //         child: GestureDetector(
-                      //           onTap: (){
-                      //             chapterCommentController.isTextVisibleList[index ?? 0] = true.obs;
-                      //           },
-                      //           child: CustomText(
-                      //             text: "Tap to show",
-                      //             fontSize: 18.sp,
-                      //             fontWeight: FontWeight.w400,
-                      //             color: Color(0xff000000).withOpacity(0.8),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   )
-                      //       : Align(
-                      //     alignment: AlignmentDirectional.centerStart,
-                      //     child: CustomText(
-                      //       text: comment ?? "Did Isla really do that to Grim?",
-                      //       fontSize: 16.sp,
-                      //       fontWeight: FontWeight.w600,
-                      //       color: Color(0xff000000).withOpacity(0.6),
-                      //     ),
-                      //   );
-                      // }),
-
-                      //* For blue feature
-                      // Stack(
-                      //   children: [
-                      //     Blur(
-                      //       blur: 3,
-                      //       child: Align(
-                      //         alignment: AlignmentDirectional.centerStart,
-                      //         child: CustomText(
-                      //           text: comment ??
-                      //               "Did Isla really do that to Grim?",
-                      //           fontSize: 16.sp,
-                      //           fontWeight: FontWeight.w600,
-                      //           color: Color(0xff000000).withOpacity(0.6),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     Positioned(
-                      //       top: 0,
-                      //       left: width/3.8,
-                      //       right: 0,
-                      //       child: GestureDetector(
-                      //         onTap: (){
-                      //           //* Is it visible or not
-                      //           //* chapterCommentController.isTextVisibleList[index ?? 0] = true.obs;
-                      //         },
-                      //         child: CustomText(
-                      //           text: "Tap to show",
-                      //           fontSize: 18.sp,
-                      //           fontWeight: FontWeight.w400,
-                      //           color: Color(0xff000000).withOpacity(0.8),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: CustomText(
-                          text: comment ?? "Did Isla really do that to Grim?",
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff000000).withOpacity(0.6),
-                        ),
-                      )
+                      isBlurContent(isTextVisible ?? false, width)
                     ],
                   ),
                 ),
@@ -239,7 +149,7 @@ class ChapterComments extends StatelessWidget {
                   child: CustomText(
                     text: type?.contains("BOOK") == true
                         ? (returnBanner() ?? "CH2")
-                        : (returnBannerForShow() ?? "EP2"),
+                        : type?.contains("SHOW") == true ? (returnBannerForShow() ?? "EP2") : "",
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xff000000),
@@ -281,6 +191,58 @@ class ChapterComments extends StatelessWidget {
     } else {
       return "";
     }
+  }
+  
+  //* Is Content blur
+  Widget isBlurContent(bool isTextVisible, double width){
+    return isTextVisible ? Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: CustomText(
+        text: comment ?? "Did Isla really do that to Grim?",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        color: Color(0xff000000).withOpacity(0.6),
+      ),
+    ) : Stack(
+      children: [
+        Blur(
+          blur: 3,
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: CustomText(
+              text: comment ??
+                  "Did Isla really do that to Grim?",
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff000000).withOpacity(0.6),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: width/3.8,
+          right: 0,
+          child: GestureDetector(
+            onTap: (){
+              //* Is it visible or not
+              //* chapterCommentController.isTextVisibleList[index ?? 0] = true.obs;
+            },
+            child: GestureDetector(
+              onTap: () async {
+                status.updateStatus(id);
+                await clubController.fetchCreatedClub(bookController.createdClubId);
+              },
+              child: CustomText(
+                text: "Tap to show",
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w400,
+                color: Color(0xff000000).withOpacity(0.8),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
 }

@@ -33,7 +33,7 @@ class Book {
   final String writer;
   final String poster;
   final String imdbID;
-  final int publishDate;
+  final String publishDate;
   final int bookNo;
   final List<Genre> genre;
 
@@ -53,7 +53,7 @@ class Book {
       writer: json['writer'],
       poster: json['poster'],
       imdbID: json['imdbID'].toString(),
-      publishDate: json['publishDate'],
+      publishDate: json['publishDate'].toString(),
       bookNo: json['book_No'],
       genre: (json['genre'] as List)
           .map((e) => Genre.fromJson(e))

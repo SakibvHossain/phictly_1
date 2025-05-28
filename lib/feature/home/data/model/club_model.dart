@@ -57,8 +57,13 @@ class ClubModel {
   final int? rating;
   final String? publishDate;
   final String? imdbID;
+  final int? totalSeasons;
+  final int? totalEpisodes;
+  final String? bookNo;
+  final String? length;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<ClubMember>? clubMember; // ✅ Newly added field
 
   ClubModel({
     this.id,
@@ -82,8 +87,13 @@ class ClubModel {
     this.rating,
     this.publishDate,
     this.imdbID,
+    this.totalSeasons,
+    this.totalEpisodes,
+    this.bookNo,
+    this.length,
     this.createdAt,
     this.updatedAt,
+    this.clubMember, // ✅ Added to constructor
   });
 
   factory ClubModel.fromJson(Map<String, dynamic> json) {
@@ -113,15 +123,36 @@ class ClubModel {
       rating: json['rating'] as int? ?? 0,
       publishDate: json['publishDate'] as String?,
       imdbID: json['imdbID'] as String?,
+      totalSeasons: json['totalSeasons'] as int?,
+      totalEpisodes: json['totalEpisodes'] as int?,
+      bookNo: json['book_No'] as String?,
+      length: json['length'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt'])
           : null,
+      clubMember: (json['clubMember'] as List?)
+          ?.map((e) => ClubMember.fromJson(e))
+          .toList() ??
+          [],
     );
   }
 }
+
+class ClubMember {
+  final String? status;
+
+  ClubMember({this.status});
+
+  factory ClubMember.fromJson(Map<String, dynamic> json) {
+    return ClubMember(
+      status: json['status'] as String?,
+    );
+  }
+}
+
 
 class Admin {
   final String? username;

@@ -42,18 +42,22 @@ class BookItems extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                      height: 160,
-                      width: 104,
-                      placeholder: (context, url) => Center(
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4.r),
+                      child: CachedNetworkImage(
+                        imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                        height: 160,
+                        width: 104,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: SizedBox(
+                            height: 25,
+                            width: 25,
+                            child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                          ),
                         ),
+                        errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                       ),
-                      errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                     ),
 
                     Column(
@@ -225,7 +229,7 @@ class BookItems extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 16.0),
                             child: _customText(
-                                text: totalDuration ?? "5m",
+                                text: totalDuration ?? "2m",
                                 color: Colors.black.withOpacity(0.6),
                                 fontSize: 9.78,
                                 fontWeight: FontWeight.w400),
@@ -251,7 +255,9 @@ class BookItems extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 8),
       child: Text(
-        text,
+        text.length > 20
+            ? '${text.substring(0, 20)}...'
+            : text,
         style: GoogleFonts.dmSans(
           fontSize: fontSize,
           fontWeight: fontWeight,
@@ -269,7 +275,9 @@ class BookItems extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 8),
       child: Text(
-        text,
+        text.length > 16
+            ? '${text.substring(0, 16)}...'
+            : text,
         style: GoogleFonts.dmSans(
             fontSize: fontSize,
             fontWeight: fontWeight,
@@ -294,14 +302,18 @@ class BookItems extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: firstText,
+                  text: firstText.length > 20
+                ? '${firstText.substring(0, 20)}...'
+        : firstText,
                   style: GoogleFonts.dmSans(
                       fontSize: firstFontSize,
                       fontWeight: FontWeight.w600,
                       color: Colors.black),
                 ),
                 TextSpan(
-                  text: secondText,
+                  text: secondText.length > 16
+                      ? '${secondText.substring(0, 16)}...'
+                      : secondText,
                   style: GoogleFonts.dmSans(
                     fontSize: secondFontSize,
                     fontWeight: FontWeight.w400,

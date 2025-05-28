@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
@@ -26,9 +26,13 @@ import 'package:phictly/feature/create_club/ui/widgets/selected_tags.dart';
 import 'package:phictly/feature/create_club/ui/widgets/show_custom_item.dart';
 import 'package:phictly/feature/show/data/model/show_model.dart';
 import 'package:phictly/feature/tv/data/model/movie_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../home/data/controller/home_controller.dart';
+import '../../../profile/ui/screens/setting/group_selected_members.dart';
 import '../../data/controller/get_created_club_controller.dart';
+import '../../data/controller/tag_controller.dart';
 import '../../data/model/search_response_model.dart';
+import '../widgets/selected_tag_fields.dart';
 
 class CreateClubScreen extends StatelessWidget {
   CreateClubScreen({super.key});
@@ -41,17 +45,33 @@ class CreateClubScreen extends StatelessWidget {
   final TextEditingController talkPointController = TextEditingController();
   final DateController dateController = Get.put(DateController());
   final PostClubController bookController = Get.put(PostClubController());
-  final ChangeClubController changeClubController = Get.put(ChangeClubController());
+  final ChangeClubController changeClubController =
+      Get.put(ChangeClubController());
   final TalkPointController pointController = Get.put(TalkPointController());
   final BookGenreController genreController = Get.put(BookGenreController());
-  final GetCreatedClubController getCreatedClubController = Get.put(GetCreatedClubController());
+  final GetCreatedClubController getCreatedClubController =
+      Get.put(GetCreatedClubController());
   final ClubController clubController = Get.put(ClubController());
+  final TagsController tagsController = Get.put(TagsController());
   final Logger logger = Logger();
-
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
+
+    pointController.clubLabelController.clear();
+    controller.selectedBookType.value = "Book";
+    controller.updateBookField();
+    pointController.talkPointList.clear();
+    pointController.talkPoints.clear();
+    pointController.talkPointRxList.clear();
+    homeController.talkPoints.clear();
+    bookController.selectedBooks.clear();
+    bookController.selectedMovie.clear();
+    bookController.selectedShows.clear();
+    tagsController.selectedGenres.clear();
+    bookController.ageController.clear();
+    bookController.sizeController.clear();
 
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
@@ -59,560 +79,648 @@ class CreateClubScreen extends StatelessWidget {
         color: AppColors.primaryColor,
         onRefresh: () async {
           bookController.fetchClubId();
+          pointController.clubLabelController.clear();
+          controller.selectedBookType.value = "Book ";
+          controller.updateBookField();
+          pointController.talkPointList.clear();
+          pointController.talkPoints.clear();
+          pointController.talkPointRxList.clear();
+          homeController.talkPoints.clear();
+          bookController.selectedBooks.clear();
+          bookController.selectedMovie.clear();
+          bookController.selectedShows.clear();
+          tagsController.selectedGenres.clear();
+          bookController.ageController.clear();
+          bookController.sizeController.clear();
         },
         child: SingleChildScrollView(
-        child: Column(
-          children: [
-            //* App Bar
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(color: Color(0xff29605E)),
-              child: Column(
-                children: [
-                  SizedBox(height: 75.h),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        bottom: 20.0, left: 28, right: 28),
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          "assets/icons/home_logo.png",
-                          height: 42.93.h,
-                          width: 130.96.w,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                ],
-              ),
-            ),
-
-            SizedBox(
-              height: 16.h,
-            ),
-
-            //* Create Club
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
-              child: Row(
-                children: [
-                  Icon(Icons.arrow_back_ios_sharp),
-                  SizedBox(
-                    width: width / 4.2,
-                  ),
-                  CustomText(
-                    text: "Create Club",
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff000000),
-                  ),
-                ],
-              ),
-            ),
-
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: 8,
-              ),
-              width: width,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6.0.r),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, top: 8, bottom: 8),
+          child: Column(
+            children: [
+              //* App Bar
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(color: Color(0xff29605E)),
                 child: Column(
                   children: [
-
-                    //* Club ID & Private
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CustomText(
-                          text: "Club ID",
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff000000),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Row(
-                            children: [
-                              CustomText(
-                                text: "Private",
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xff000000),
-                              ),
-                              SizedBox(
-                                width: 8.h,
-                              ),
-                              Obx(() {
-                                return GestureDetector(
-                                  onTap: () {
-                                    controller.updatePrivateField();
-                                  },
-                                  child: Container(
-                                    width: 23.w,
-                                    height: 23.h,
-                                    padding: EdgeInsets.all(2.r),
-                                    decoration: BoxDecoration(
-                                        border: const GradientBoxBorder(
-                                          gradient:
-                                          AppColors.primaryGradientColor,
-                                          width: 2,
-                                        ),
-                                        borderRadius:
-                                        BorderRadius.circular(3.68),
-                                        shape: BoxShape.rectangle),
-                                    child: controller.isPrivate.value
-                                        ? Image.asset("assets/icons/check.png")
-                                        : SizedBox(),
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-
-                    /*
-                    CustomText(
-                        text: "${pointController.clubIdNumber}",
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff000000).withValues(alpha: 0.6),
-                      );
-                     */
-
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Obx((){
-                        if(bookController.clubIDLoading.value){
-                          return CustomText(text: "Loading...", fontSize: 18.sp, fontWeight: FontWeight.w400, color: Color(0xff000000).withValues(alpha: 0.6),);
-                        }
-
-                        if(bookController.clubId.value.isNull){
-                          return CustomText(text: "Failed to fetch Name", fontSize: 22.sp, fontWeight: FontWeight.w600, color: Colors.black);
-                        }
-
-                        return CustomText(
-                          text: bookController.clubId.value,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff000000).withValues(alpha: 0.6),
-                        );
-                      }),
-                    ),
-
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
-
+                    SizedBox(height: 75.h),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: CustomText(
-                          text: "Club Label",
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff000000),
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: CustomTextFormFieldWithoutIcon(
-                        controller: pointController.clubLabelController,
-                        hintText: "WeLoveReading",
-                        borderColor: Color(0xff000000).withValues(alpha: 0.20),
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: CustomText(
-                          text: "Type",
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff000000),
-                        ),
-                      ),
-                    ),
-
-                    Row(
-                      children: [
-                        checkBoxBook("Book", () {
-                          controller.updateBookField();
-                          genreController.fetchGenre();
-                        }, controller.isBook),
-                        SizedBox(
-                          width: 16.w,
-                        ),
-                        checkBoxShow("Show", () {
-                          controller.updateShowField();
-                        }, controller.isShow),
-                        SizedBox(
-                          width: 16.w,
-                        ),
-                        checkBoxMovie("Movie", () {
-                          controller.updateMovieField();
-                        }, controller.isMovie),
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
-
-                    Obx(() {
-
-                      debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++++++ ${controller.selectedBookType.value}");
-
-                      return
-
-                        //* If user selected Book
-                        controller.selectedBookType.value.contains("Book") ? searchBook() :
-
-                        //* If user selected show
-                        controller.selectedBookType.value.contains("Show") ? searchShow() :
-
-                        //* If movie
-                        searchVideo();
-                    }),
-
-                    SizedBox(
-                      height: 4.h,
-                    ),
-
-                    //* Club Timeline
-                    Row(
-                      children: [
-                        Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: CustomText(
-                              text: "Club Timeline: ",
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff000000),
-                            )),
-
-                        Obx((){
-                          return Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: CustomText(
-                              text: "${homeController.recentTimeLine.value.toInt()} Day(s)",
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff000000).withValues(alpha: 0.60),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Column(
-                        children: [
-
-                          Obx(() {
-                            final selectedType = controller.selectedBookType.value;
-
-                            double? newValue;
-
-                            if (selectedType.contains("Book")) {
-                              newValue = 30;
-                            } else if (selectedType.contains("Show")) {
-                              newValue = 270;
-                            } else if (selectedType.contains("Movie")) {
-                              newValue = 9;
-                            }
-
-                            //* This will update the observable directly and rebuild everything that depends on it
-                            Future.microtask(() {
-                              if (newValue != null &&
-                                  homeController.recentTimeLine.value != newValue) {
-                                homeController.changeRecentTimeLine(newValue);
-                              }
-                            });
-
-                            return const SizedBox.shrink();
-                          }),
-
-
-                          //* Your slider and red dot overlay stays the same
-                          SizedBox(
-                            height: 30,
-                            child: SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackShape: const RoundedRectSliderTrackShape(),
-                                trackHeight: 4.0,
-                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
-                                overlayShape: SliderComponentShape.noOverlay,
-                                thumbColor: const Color(0xff29605E),
-                                activeTrackColor: const Color(0xff29605E),
-                                inactiveTrackColor: Colors.grey.shade300,
-                              ),
-                              child: LayoutBuilder(
-                                builder: (context, constraints) {
-                                  double sliderMin = 1;
-                                  double sliderMax = 270;
-                                  double sliderWidth = constraints.maxWidth;
-
-                                  return Stack(
-                                    children: [
-                                      //* Slider
-                                      Obx(() => Slider(
-                                        min: sliderMin,
-                                        max: sliderMax,
-                                        value: homeController.recentTimeLine.value,
-                                        onChanged: (value) {
-                                          // You can uncomment this if you want manual slider update
-                                          // homeController.changeRecentTimeLine(value);
-                                        },
-                                      )),
-
-                                      //* Red Dots
-                                      Obx(() => Stack(
-                                        children: homeController.talkPoints.map((point) {
-                                          double percent = (point - sliderMin) / (sliderMax - sliderMin);
-                                          double position = percent * sliderWidth;
-
-                                          return Positioned(
-                                            top: 11,
-                                            left: position - 6,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 10.0),
-                                              child: Container(
-                                                height: 8,
-                                                width: 8,
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      )),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12.0, left: 8),
+                      padding: const EdgeInsets.only(
+                          bottom: 20.0, left: 28, right: 28),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText(
-                              text: "1",
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black),
-                          CustomText(
-                              text: "270",
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black),
+                          Image.asset(
+                            "assets/icons/home_logo.png",
+                            height: 42.93.h,
+                            width: 130.96.w,
+                          ),
                         ],
                       ),
                     ),
+                    SizedBox(height: 8.h),
+                  ],
+                ),
+              ),
 
-                    //* Add Talk Points
-                    GestureDetector(
-                      onTap: () {
-                        pointController.editTextEnabled.value
-                            ? editTalkPointAction(context)
-                            : addTalkPointAction(context);
-                      },
-                      child: Obx(() {
-                        return pointController.editTextEnabled.value
-                            ? CustomText(
-                          text: "+ Edit Talkpoint(s)",
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryColor,
-                        )
-                            : CustomText(
-                          text: "+ Add Talkpoint(s)",
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.primaryColor,
-                        );
-                      }),
-                    ),
+              //* SizedBox
+              SizedBox(
+                height: 16.h,
+              ),
 
+              //* Create Club text field
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back_ios_sharp),
                     SizedBox(
-                      height: 16.h,
+                      width: width / 4.2,
                     ),
-
-                    //* Preferences
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: CustomText(
-                        text: "Preferences",
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff000000),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 8.h,
-                    ),
-
-                    Row(
-                      children: [
-                        checkBoxFemale("Female Only", () {
-                          controller.updateFemaleField();
-                        }, controller.isFemale),
-
-                        SizedBox(
-                          width: 8.w,
-                        ),
-
-                        checkBoxMale("Male Only", () {
-                          controller.updateMaleField();
-                        }, controller.isMale),
-
-                        SizedBox(width: 8.w,),
-
-                        checkBoxMale("Non-Binary Only", () {
-                          controller.updateNonBinaryField();
-                        }, controller.isNonBinary),
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: 24.h,
-                    ),
-
-                    Row(
-                      children: [
-                        ageAndSize(
-                            titleText: "Age",
-                            controller: bookController.ageController),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: Icon(
-                            Icons.add,
-                            color: Color(0xff000000).withValues(alpha: 0.60),
-                          ),
-                        ),
-                        ageAndSize(
-                            titleText: "Size",
-                            controller: bookController.sizeController),
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: 24.h,
-                    ),
-
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: CustomText(
-                        text: "Tags",
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff000000),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
-
-                    //* All tags here
-                    SelectedTagsField(),
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
-
-                    //* Create Club Controller
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Obx(
-                            () => clubController.isLoading.value
-                            ? Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primaryColor,
-                          ),
-                        )
-                            : CustomButton(
-                          text: "Create",
-                          onTap: () async {
-                            bookController.listRefresh();
-                            if(bookController.selectedBooks.isEmpty && bookController.selectedShows.isEmpty && bookController.selectedMovie.isEmpty){
-                              Get.snackbar("Club Book not selected", "Club book is empty");
-                            }else if (int.tryParse(bookController.sizeController.text) != null &&
-                                int.parse(bookController.sizeController.text) > 20) {
-                              Get.snackbar("Limit Exceed","Club size max is 20");
-                            }else{
-                              if(bookController.selectedBooks.isNotEmpty){
-                                //* Book Send from here
-                                Book singleBook =  bookController.selectedBooks.first;
-                                pointController.updateClubId();
-                                bookController.postBookClub(singleBook);
-                                logger.i(bookController.createdClubId);
-                              }else if(bookController.selectedShows.isNotEmpty){
-                                //* Show Send from here
-                                Show singleShow =  bookController.selectedShows.first;
-                                pointController.updateClubId();
-                                bookController.postShowClub(singleShow);
-                                logger.i(bookController.createdClubId);
-                              }else{
-                                //* Movie Send from here
-                                Movie singleMovie =  bookController.selectedMovie.first;
-                                pointController.updateClubId();
-                                bookController.postMovieClub(singleMovie);
-                                logger.i(bookController.createdClubId);
-                              }
-                              changeClubController.updateIndex(1);
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 16.h,
+                    CustomText(
+                      text: "Create Club",
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff000000),
                     ),
                   ],
                 ),
               ),
-            ),
 
-            SizedBox(
-              height: 140.h,
-            ),
-          ],
+              Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: 8,
+                ),
+                width: width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6.0.r),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8, bottom: 8),
+                  child: Column(
+                    children: [
+                      //* Club ID & Private
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomText(
+                            text: "Club ID",
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff000000),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Row(
+                              children: [
+                                CustomText(
+                                  text: "Private",
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xff000000),
+                                ),
+                                SizedBox(
+                                  width: 8.h,
+                                ),
+                                Obx(() {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      controller.updatePrivateField();
+                                    },
+                                    child: Container(
+                                      width: 23.w,
+                                      height: 23.h,
+                                      padding: EdgeInsets.all(2.r),
+                                      decoration: BoxDecoration(
+                                          border: const GradientBoxBorder(
+                                            gradient:
+                                                AppColors.primaryGradientColor,
+                                            width: 2,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(3.68),
+                                          shape: BoxShape.rectangle),
+                                      child: controller.isPrivate.value
+                                          ? Image.asset(
+                                              "assets/icons/check.png")
+                                          : SizedBox(),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+
+                      //* Fetch club ID
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Obx(() {
+                          if (bookController.clubIDLoading.value) {
+                            return Skeletonizer(
+                              child: Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: CustomText(
+                                  text: "Loading...",
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.black.withOpacity(0.6),
+                                ),
+                              ),
+                            );
+                          }
+
+                          if (bookController.clubId.value.isNull) {
+                            return CustomText(
+                                text: "Failed to fetch ID",
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black);
+                          }
+
+                          return CustomText(
+                            text: bookController.clubId.value,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xff000000).withValues(alpha: 0.6),
+                          );
+                        }),
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* Club label text field
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: CustomText(
+                            text: "Club Label",
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff000000),
+                          ),
+                        ),
+                      ),
+
+                      //* Club label textFormField
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: CustomTextFormFieldWithoutIcon(
+                          controller: pointController.clubLabelController,
+                          hintText: "",
+                          borderColor:
+                              Color(0xff000000).withValues(alpha: 0.20),
+                          cursorColor: AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* Type
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: CustomText(
+                            text: "Type",
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff000000),
+                          ),
+                        ),
+                      ),
+
+                      //* Type Book, Show, Movie Checkbox
+                      Row(
+                        children: [
+                          checkBoxBook("Book", () {
+                            controller.updateBookField();
+                            genreController.fetchGenre();
+                          }, controller.isBook),
+                          SizedBox(
+                            width: 16.w,
+                          ),
+                          checkBoxShow("Show", () {
+                            controller.updateShowField();
+                          }, controller.isShow),
+                          SizedBox(
+                            width: 16.w,
+                          ),
+                          checkBoxMovie("Movie", () {
+                            controller.updateMovieField();
+                          }, controller.isMovie),
+                        ],
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* Show the list based on selected type
+                      Obx(() {
+                        debugPrint(
+                            "+++++++++++++++++++++++++++++++++++++++++++++++++++++ ${controller.selectedBookType.value}");
+
+                        return
+                            //* If user selected Book
+                            controller.selectedBookType.value.contains("Book")
+                                ? searchBook()
+                                :
+                                //* If user selected show
+                                controller.selectedBookType.value
+                                        .contains("Show")
+                                    ? searchShow()
+                                    :
+                                    //* If movie
+                                    searchVideo();
+                      }),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 4.h,
+                      ),
+
+                      //* Club Timeline
+                      Row(
+                        children: [
+                          Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: CustomText(
+                                text: "Club Timeline: ",
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff000000),
+                              )),
+                          Obx(() {
+                            return Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: CustomText(
+                                text:
+                                    "${homeController.recentTimeLine.value.toInt()} Day(s)",
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w400,
+                                color:
+                                    Color(0xff000000).withValues(alpha: 0.60),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* Movie, Show, Book
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Column(
+                          children: [
+                            Obx(() {
+                              final selectedType =
+                                  controller.selectedBookType.value;
+
+                              double? newValue;
+
+                              if (selectedType.contains("Book")) {
+                                newValue = 30;
+                              } else if (selectedType.contains("Show")) {
+                                newValue = 270;
+                              } else if (selectedType.contains("Movie")) {
+                                newValue = 9;
+                              }
+
+                              //* This will update the observable directly and rebuild everything that depends on it
+                              Future.microtask(() {
+                                if (newValue != null &&
+                                    homeController.recentTimeLine.value !=
+                                        newValue) {
+                                  homeController.changeRecentTimeLine(newValue);
+                                }
+                              });
+
+                              return const SizedBox.shrink();
+                            }),
+
+                            //* Your slider and red dot overlay stays the same
+                            SizedBox(
+                              height: 30,
+                              child: SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  trackShape:
+                                      const RoundedRectSliderTrackShape(),
+                                  trackHeight: 4.0,
+                                  thumbShape: const RoundSliderThumbShape(
+                                      enabledThumbRadius: 6.0),
+                                  overlayShape: SliderComponentShape.noOverlay,
+                                  thumbColor: const Color(0xff29605E),
+                                  activeTrackColor: const Color(0xff29605E),
+                                  inactiveTrackColor: Colors.grey.shade300,
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    double sliderMin = 1;
+                                    double sliderMax = 270;
+                                    double sliderWidth = constraints.maxWidth;
+
+                                    return Stack(
+                                      children: [
+                                        //* Slider
+                                        Obx(() => Slider(
+                                              min: sliderMin,
+                                              max: sliderMax,
+                                              value: homeController
+                                                  .recentTimeLine.value,
+                                              onChanged: (value) {
+                                                // You can uncomment this if you want manual slider update
+                                                // homeController.changeRecentTimeLine(value);
+                                              },
+                                            )),
+
+                                        //* Red Dots
+                                        Obx(() => Stack(
+                                              children: homeController
+                                                  .talkPoints
+                                                  .map((point) {
+                                                double percent =
+                                                    (point - sliderMin) /
+                                                        (sliderMax - sliderMin);
+                                                double position =
+                                                    percent * sliderWidth;
+
+                                                return Positioned(
+                                                  top: 11,
+                                                  left: position - 6,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10.0),
+                                                    child: Container(
+                                                      height: 8,
+                                                      width: 8,
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            )),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      //* 1 to 270
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12.0, left: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText(
+                                text: "1",
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black),
+                            CustomText(
+                                text: "270",
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black),
+                          ],
+                        ),
+                      ),
+
+                      //* Add Talk Points
+                      GestureDetector(
+                        onTap: () {
+                          pointController.editTextEnabled.value
+                              ? editTalkPointAction(context)
+                              : addTalkPointAction(context);
+                        },
+                        child: Obx(() {
+                          return pointController.editTextEnabled.value
+                              ? CustomText(
+                                  text: "+ Edit Talkpoint(s)",
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.primaryColor,
+                                )
+                              : CustomText(
+                                  text: "+ Add Talkpoint(s)",
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.primaryColor,
+                                );
+                        }),
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* Preferences
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: CustomText(
+                          text: "Preferences",
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff000000),
+                        ),
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 8.h,
+                      ),
+
+                      //* Gender
+                      Row(
+                        children: [
+                          checkBoxFemale("Female Only", () {
+                            controller.updateFemaleField();
+                          }, controller.isFemale),
+                          SizedBox(
+                            width: 8.w,
+                          ),
+                          checkBoxMale("Male Only", () {
+                            controller.updateMaleField();
+                          }, controller.isMale),
+                          SizedBox(
+                            width: 8.w,
+                          ),
+                          checkBoxMale("Non-Binary Only", () {
+                            controller.updateNonBinaryField();
+                          }, controller.isNonBinary),
+                        ],
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 24.h,
+                      ),
+
+                      //* Age & Size
+                      Row(
+                        children: [
+                          ageAndSize(
+                              titleText: "Age",
+                              controller: bookController.ageController),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 16.0, right: 16.0),
+                            child: Icon(
+                              Icons.add,
+                              color: Color(0xff000000).withValues(alpha: 0.60),
+                            ),
+                          ),
+                          ageAndSize(
+                              titleText: "Size",
+                              controller: bookController.sizeController),
+                        ],
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 24.h,
+                      ),
+
+                      //* Tags
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: CustomText(
+                          text: "Tags",
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff000000),
+                        ),
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* All tags here
+                      SelectedTagsField(),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+
+                      //* Create Club Button
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Obx(
+                          () => bookController.isLoading.value
+                              ? Center(
+                                  child: SpinKitWave(
+                                    duration: Duration(seconds: 2),
+                                    size: 15,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                )
+                              : CustomButton(
+                                  text: "Create",
+                              onTap: () async {
+                                bookController.listRefresh();
+
+                                if (bookController.selectedBooks.isEmpty &&
+                                    bookController.selectedShows.isEmpty &&
+                                    bookController.selectedMovie.isEmpty) {
+                                  Get.snackbar("Club Book not selected", "Club book is empty");
+                                  return;
+                                }
+
+                                if (int.tryParse(bookController.sizeController.text) != null &&
+                                    int.parse(bookController.sizeController.text) > 20) {
+                                  Get.snackbar("Limit Exceed", "Club size max is 20");
+                                  return;
+                                }
+
+                                if (pointController.clubLabelController.text.length <= 3) {
+                                  Get.snackbar("Label length too small", "Club Label must be at least 3 characters");
+                                  return;
+                                }
+
+                                if (int.tryParse(bookController.ageController.text) != null &&
+                                    int.parse(bookController.ageController.text) < 14) {
+                                  Get.snackbar("Age restriction", "Age should be 14+ ${bookController.ageController.text}");
+                                  return;
+                                }
+
+                                //* Show loader
+                                bookController.isLoading.value = true;
+
+                                try {
+                                  if (bookController.selectedBooks.isNotEmpty) {
+                                    Book singleBook = bookController.selectedBooks.first;
+                                    pointController.updateClubId();
+                                    await bookController.postBookClub(singleBook);
+                                    logger.i(bookController.createdClubId);
+                                  } else if (bookController.selectedShows.isNotEmpty) {
+                                    Show singleShow = bookController.selectedShows.first;
+                                    pointController.updateClubId();
+                                    await bookController.postShowClub(singleShow);
+                                    logger.i(bookController.createdClubId);
+                                  } else {
+                                    Movie singleMovie = bookController.selectedMovie.first;
+                                    pointController.updateClubId();
+                                    await bookController.postMovieClub(singleMovie);
+                                    logger.i(bookController.createdClubId);
+                                  }
+
+                                  changeClubController.updateIndex(1);
+
+                                } catch (e) {
+                                  logger.e(e);
+                                  Get.snackbar("Error", "Failed to create club");
+                                } finally {
+                                  //* Hide loader
+                                  bookController.isLoading.value = false;
+                                }
+                              }
+
+                          ),
+                        ),
+                      ),
+
+                      //* SizedBox
+                      SizedBox(
+                        height: 16.h,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                height: 140.h,
+              ),
+            ],
+          ),
         ),
-      ),),
+      ),
     );
   }
 
@@ -833,7 +941,6 @@ class CreateClubScreen extends StatelessWidget {
     );
   }
 
-
   //* Age and Size Text Form Field
   Widget ageAndSize({required String titleText, required TextEditingController controller}) {
     return Column(
@@ -856,6 +963,7 @@ class CreateClubScreen extends StatelessWidget {
             padding: EdgeInsets.only(top: 8),
             child: CustomTextFormFieldWithoutIcon(
               controller: controller,
+              cursorColor: AppColors.primaryColor,
               inputType: TextInputType.number,
               borderColor: Color(0xff000000).withValues(alpha: 0.20),
               borderRadius: BorderRadius.circular(6.r),
@@ -986,68 +1094,76 @@ class CreateClubScreen extends StatelessWidget {
                         },
                       )
                     : CustomButton(
-                  text: "Add talkpoints(s)",
-                  onTap: () {
-                    String selectedDateStr = dateController.selectedDate.value;
-                    String selectedType = controller.selectedBookType.value;
+                        text: "Add talkpoints(s)",
+                        onTap: () {
+                          String selectedDateStr =
+                              dateController.selectedDate.value;
+                          String selectedType =
+                              controller.selectedBookType.value;
 
-                    //* Determine the max value based on selected type
-                    int maxValue = 0;
+                          //* Determine the max value based on selected type
+                          int maxValue = 0;
 
-                    if (selectedType.contains("Book")) {
-                      maxValue = 30;
-                    } else if (selectedType.contains("Show")) {
-                      maxValue = 270;
-                    } else if (selectedType.contains("Movie")) {
-                      maxValue = 7;
-                    }
+                          if (selectedType.contains("Book")) {
+                            maxValue = 30;
+                          } else if (selectedType.contains("Show")) {
+                            maxValue = 270;
+                          } else if (selectedType.contains("Movie")) {
+                            maxValue = 7;
+                          }
 
-                    //* Validate if the selected date is within the valid range
-                    bool isValid = pointController.isSelectedDateValid(selectedDateStr, selectedType);
-                    if (!isValid) {
-                      Get.snackbar(
-                        "Invalid Date",
-                        "Selected date must be within ${selectedType.contains("Book") ? "30" : selectedType.contains("Show") ? "270" : "7"} days from today.",
-                        snackPosition: SnackPosition.BOTTOM,
+                          //* Validate if the selected date is within the valid range
+                          bool isValid = pointController.isSelectedDateValid(
+                              selectedDateStr, selectedType);
+                          if (!isValid) {
+                            Get.snackbar(
+                              "Invalid Date",
+                              "Selected date must be within ${selectedType.contains("Book") ? "30" : selectedType.contains("Show") ? "270" : "7"} days from today.",
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                            return;
+                          }
+
+                          //* Convert selected date to DateTime
+                          DateTime selectedDate =
+                              DateFormat("MM-dd-yyyy").parse(selectedDateStr);
+                          DateTime now = DateTime.now();
+
+                          //* Calculate the difference in days between the current date and the selected date
+                          int differenceInDays =
+                              selectedDate.difference(now).inDays;
+
+                          //* Check if the day value is valid and within the allowed range (1 to maxValue)
+                          if (differenceInDays >= 0 &&
+                              differenceInDays <= maxValue) {
+                            //* Add the talk point (using the day as the value)
+
+                            //* One code who is responsible to add the red dots...........
+                            homeController
+                                .addTalkPoint(differenceInDays.toDouble());
+                            Get.back(); //* Close the current screen
+                          } else {
+                            //* Show error if the date is not valid (out of range)
+                            Get.snackbar(
+                              "Invalid Date",
+                              "Selected date is out of range. Please select a valid date within $maxValue days from today.",
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                          }
+
+                          //* Adding talk points here
+                          AddTalkPoints points = AddTalkPoints(
+                            talkPointController.text,
+                            selectedDateStr,
+                          );
+
+                          debugPrint(
+                              "++++++++++++++++++++++++++++++++++++++++++++++++++++++Selected Date: $selectedDateStr");
+
+                          pointController.talkPointList.add(points);
+                          pointController.addTalkPointListOnRxList();
+                        },
                       );
-                      return;
-                    }
-
-                    //* Convert selected date to DateTime
-                    DateTime selectedDate = DateFormat("MM-dd-yyyy").parse(selectedDateStr);
-                    DateTime now = DateTime.now();
-
-                    //* Calculate the difference in days between the current date and the selected date
-                    int differenceInDays = selectedDate.difference(now).inDays;
-
-                    //* Check if the day value is valid and within the allowed range (1 to maxValue)
-                    if (differenceInDays >= 0 && differenceInDays <= maxValue) {
-                      //* Add the talk point (using the day as the value)
-
-                      //* One code who is responsible to add the red dots...........
-                      homeController.addTalkPoint(differenceInDays.toDouble());
-                      Get.back(); //* Close the current screen
-                    } else {
-                      //* Show error if the date is not valid (out of range)
-                      Get.snackbar(
-                        "Invalid Date",
-                        "Selected date is out of range. Please select a valid date within $maxValue days from today.",
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    }
-
-                    //* Adding talk points here
-                    AddTalkPoints points = AddTalkPoints(
-                      talkPointController.text,
-                      selectedDateStr,
-                    );
-
-                    debugPrint("++++++++++++++++++++++++++++++++++++++++++++++++++++++Selected Date: $selectedDateStr");
-
-                    pointController.talkPointList.add(points);
-                    pointController.addTalkPointListOnRxList();
-                  },
-                );
               }),
             ],
           ),
@@ -1116,14 +1232,14 @@ class CreateClubScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   CustomText(
-                                    text: (points.talkPoint != null && points.talkPoint!.length > 8)
+                                    text: (points.talkPoint != null &&
+                                            points.talkPoint!.length > 8)
                                         ? "${points.talkPoint!.substring(0, 8)}...: "
-                                        : "${points.talkPoint}:"?? "",
+                                        : "${points.talkPoint}:" ?? "",
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xff000000),
                                   ),
-
                                   SizedBox(
                                     width: 2.w,
                                   ),
@@ -1137,7 +1253,6 @@ class CreateClubScreen extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-
                                   //* Edit Talk Points
                                   GestureDetector(
                                     onTap: () {
@@ -1222,13 +1337,20 @@ class CreateClubScreen extends StatelessWidget {
                                                                 .talkPointRxList[
                                                             index] =
                                                         AddTalkPoints(
-                                                            talkPointController.text,
-                                                            dateController.selectedDate.value);
+                                                            talkPointController
+                                                                .text,
+                                                            dateController
+                                                                .selectedDate
+                                                                .value);
 
-                                                    homeController.editTalkPoint(index, dateController.selectedDateTime);
+                                                    homeController.editTalkPoint(
+                                                        index,
+                                                        dateController
+                                                            .selectedDateTime);
 
                                                     //* Checking is Date Printing or Not
-                                                    debugPrint("+++++++++++++++++++++++${pointController.talkPointRxList[index]}");
+                                                    debugPrint(
+                                                        "+++++++++++++++++++++++${pointController.talkPointRxList[index]}");
                                                   },
                                                 ),
                                               ],
@@ -1244,11 +1366,9 @@ class CreateClubScreen extends StatelessWidget {
                                     ),
                                   ),
 
-
                                   SizedBox(
                                     width: 8.w,
                                   ),
-
 
                                   //* Delete Talk Points
                                   GestureDetector(
@@ -1290,482 +1410,465 @@ class CreateClubScreen extends StatelessWidget {
   }
 
   //* Selected Book List
-  Widget searchBook(){
-    return bookController.selectedBooks.length != 1 ? Stack(
-      children: [
-        Column(
-          children: [
-            // Search Bar
-            Padding(
-              padding:
-              const EdgeInsets.only(right: 8.0),
-              child: TextField(
-                controller:
-                bookController.searchController,
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      bookController.fetchBookList(
-                        controller.selectedBookType.value
-                            .toUpperCase(),
-                        bookController
-                            .searchController.text,
-                      );
-                    },
-                    icon: Icon(Icons.search),
-                    color: AppColors.primaryColor,
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                ),
-                onChanged: (query) => bookController
-                    .filteredBooks, // Ensure filtering logic
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            //* Selected Books Section
-            Obx(() {
-              if (bookController.isUserClickedToSearch.value) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryColor,
-                  ),
-                );
-              }
-
-              if (bookController.selectedBooks.isEmpty) {
-                return SizedBox();
-              }
-
-              return SizedBox(
-                height: 200, // Adjust as needed
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children: bookController.selectedBooks
-                      .map((book) {
-                    return CustomItem(
-                      padding: EdgeInsets.zero,
-                      containerPadding: EdgeInsets.zero,
-                      title: book.title,
-                      author: book.writer,
-                      imagePath: book.poster,
-                      length: "124", //* Fetch from API
-                      bookNo: book.bookNo.toString(),
-                      publishDate: book.publishDate.toString(),
-                    );
-                  }).toList(),
-                ),
-              );
-            }),
-          ],
-        ),
-
-        // Search Results
-        Obx(() {
-          if (bookController.filteredBooks.isEmpty) {
-            return SizedBox(
-              height: 8.h,
-            );
-          }
-          return SizedBox(
-            height: 300.h,
-            child: ListView.builder(
-              padding: EdgeInsets.only(top: 62),
-              itemCount:
-              bookController.filteredBooks.length,
-              itemBuilder: (context, index) {
-                final book = bookController.filteredBooks[index];
-                return GestureDetector(
-                  onTap: () => bookController.selectBook(book),
-                  child: Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: CustomItem(
-                      padding: EdgeInsets.zero,
-                      containerPadding: EdgeInsets.zero,
-                      title: book.title,
-                      author: book.writer,
-                      imagePath: book.poster,
-                      length: "124", //* Fetch from API
-                      bookNo: book.bookNo.toString(),
-                      publishDate: book.publishDate.toString(),
+  Widget searchBook() {
+    return bookController.selectedBooks.length != 1
+        ? Stack(
+            children: [
+              Column(
+                children: [
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TextField(
+                      cursorColor: AppColors.primaryColor,
+                      controller: bookController.searchController,
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            bookController.fetchBookList(
+                              controller.selectedBookType.value.toUpperCase(),
+                              bookController.searchController.text,
+                            );
+                          },
+                          icon: Icon(Icons.search),
+                          color: AppColors.primaryColor,
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onChanged: (query) => bookController
+                          .filteredBooks, // Ensure filtering logic
                     ),
                   ),
+
+                  const SizedBox(height: 10),
+
+                  //* Selected Books Section
+                  Obx(() {
+                    if (bookController.isUserClickedToSearch.value) {
+                      return Center(
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
+                      );
+                    }
+
+                    if (bookController.selectedBooks.isEmpty) {
+                      return SizedBox();
+                    }
+
+                    return SizedBox(
+                      height: 200, // Adjust as needed
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        children: bookController.selectedBooks.map((book) {
+                          return CustomItem(
+                            padding: EdgeInsets.zero,
+                            containerPadding: EdgeInsets.zero,
+                            title: book.title,
+                            author: book.writer,
+                            imagePath: book.poster,
+                            length: "124",
+                            //* Fetch from API
+                            bookNo: book.bookNo.toString(),
+                            publishDate: book.publishDate.toString(),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+
+              // Search Results
+              Obx(() {
+                if (bookController.filteredBooks.isEmpty) {
+                  return SizedBox(
+                    height: 8.h,
+                  );
+                }
+                return SizedBox(
+                  height: 300.h,
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(top: 62),
+                    itemCount: bookController.filteredBooks.length,
+                    itemBuilder: (context, index) {
+                      final book = bookController.filteredBooks[index];
+                      return GestureDetector(
+                        onTap: () => bookController.selectBook(book),
+                        child: Card(
+                          elevation: 3,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: CustomItem(
+                            padding: EdgeInsets.zero,
+                            containerPadding: EdgeInsets.zero,
+                            title: book.title,
+                            author: book.writer,
+                            imagePath: book.poster,
+                            length: "124",
+                            //* Fetch from API
+                            bookNo: book.bookNo.toString(),
+                            publishDate: book.publishDate.toString(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
-              },
-            ),
-          );
-        })
-      ],
-    ) : Obx(() {
-      if (bookController.selectedBooks.isEmpty) {
-        return SizedBox();
-      }
-      return SizedBox(
-        height: 160, // Adjust as needed
-        child: ListView(
-          padding: EdgeInsets.only(
-              left: 0, right: 0, bottom: 0, top: 8),
-          shrinkWrap: true,
-          children:
-          bookController.selectedBooks.map((book) {
-            return CustomItem(
-              padding: EdgeInsets.zero,
-              containerPadding: EdgeInsets.zero,
-              title: book.title,
-              author: book.writer,
-              imagePath: book.poster,
-              length: "124", //* Fetch from API
-              bookNo: book.bookNo.toString(),
-              publishDate: book.publishDate.toString(),
+              })
+            ],
+          )
+        : Obx(() {
+            if (bookController.selectedBooks.isEmpty) {
+              return SizedBox();
+            }
+            return SizedBox(
+              height: 160, // Adjust as needed
+              child: ListView(
+                padding: EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 8),
+                shrinkWrap: true,
+                children: bookController.selectedBooks.map((book) {
+                  return CustomItem(
+                    padding: EdgeInsets.zero,
+                    containerPadding: EdgeInsets.zero,
+                    title: book.title,
+                    author: book.writer,
+                    imagePath: book.poster,
+                    length: "124",
+                    //* Fetch from API
+                    bookNo: book.bookNo.toString(),
+                    publishDate: book.publishDate.toString(),
+                  );
+                }).toList(),
+              ),
             );
-          }).toList(),
-        ),
-      );
-    });
+          });
   }
 
   //* Selected Show List
-  Widget searchShow(){
-    return bookController.selectedShows.length != 1 ? Stack(
-      children: [
-        Column(
-          children: [
-            // Search Bar
-            Padding(
-              padding:
-              const EdgeInsets.only(right: 8.0),
-              child: TextField(
-                controller:
-                bookController.searchController,
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      bookController.fetchBookList(
-                        controller.selectedBookType.value.toUpperCase(),
-                        bookController.searchController.text,
-                      );
-                    },
-                    icon: Icon(Icons.search),
-                    color: AppColors.primaryColor,
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                ),
-                onChanged: (query) => bookController
-                    .filteredShows, // Ensure filtering logic
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            //* Selected show Section
-            Obx(() {
-              if (bookController.isUserClickedToSearch.value) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryColor,
-                  ),
-                );
-              }
-
-              if (bookController.selectedShows.isEmpty) {
-                return SizedBox();
-              }
-
-              return SizedBox(
-                height: 200, // Adjust as needed
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children: bookController.selectedShows
-                      .map((book) {
-                    return ShowCustomItem(
-                      padding: EdgeInsets.zero,
-                      containerPadding: EdgeInsets.zero,
-                      title: book.title,
-                      genre: book.genre.toString(),
-                      imagePath: book.poster,
-                      season: book.totalSeasons.toString(),
-                      episodes: book.episodes.toString(),
-                      publishDate: book.publishDate,
-                    );
-                  }).toList(),
-                ),
-              );
-            }),
-          ],
-        ),
-
-        // Search Results
-        Obx(() {
-          if (bookController.filteredShows.isEmpty) {
-            return SizedBox(
-              height: 8.h,
-            );
-          }
-          return SizedBox(
-            height: 300.h,
-            child: ListView.builder(
-              padding: EdgeInsets.only(top: 62),
-              itemCount:
-              bookController.filteredShows.length,
-              itemBuilder: (context, index) {
-                final book = bookController.filteredShows[index];
-                return GestureDetector(
-                  onTap: () => bookController.selectShow(book),
-                  child: Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ShowCustomItem(
-                      padding: EdgeInsets.zero,
-                      containerPadding: EdgeInsets.zero,
-                      title: book.title,
-                      genre: book.genre.toString(),
-                      imagePath: book.poster,
-                      season: book.totalSeasons.toString(),
-                      episodes: book.episodes.toString(),
-                      publishDate: book.publishDate,
+  Widget searchShow() {
+    return bookController.selectedShows.length != 1
+        ? Stack(
+            children: [
+              Column(
+                children: [
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TextField(
+                      cursorColor: AppColors.primaryColor,
+                      controller: bookController.searchController,
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            bookController.fetchBookList(
+                              controller.selectedBookType.value.toUpperCase(),
+                              bookController.searchController.text,
+                            );
+                          },
+                          icon: Icon(Icons.search),
+                          color: AppColors.primaryColor,
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onChanged: (query) => bookController
+                          .filteredShows, // Ensure filtering logic
                     ),
                   ),
+
+                  const SizedBox(height: 10),
+
+                  //* Selected show Section
+                  Obx(() {
+                    if (bookController.isUserClickedToSearch.value) {
+                      return Center(
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
+                      );
+                    }
+
+                    if (bookController.selectedShows.isEmpty) {
+                      return SizedBox();
+                    }
+
+                    return SizedBox(
+                      height: 200, // Adjust as needed
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        children: bookController.selectedShows.map((book) {
+                          return ShowCustomItem(
+                            padding: EdgeInsets.zero,
+                            containerPadding: EdgeInsets.zero,
+                            title: book.title,
+                            genre: book.genre.map((g) => g.name).join(', '),
+                            imagePath: book.poster,
+                            season: book.totalSeasons.toString(),
+                            episodes: book.episodes.toString(),
+                            publishDate: book.publishDate,
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+
+              // Search Results
+              Obx(() {
+                if (bookController.filteredShows.isEmpty) {
+                  return SizedBox(
+                    height: 8.h,
+                  );
+                }
+                return SizedBox(
+                  height: 300.h,
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(top: 62),
+                    itemCount: bookController.filteredShows.length,
+                    itemBuilder: (context, index) {
+                      final book = bookController.filteredShows[index];
+                      return GestureDetector(
+                        onTap: () => bookController.selectShow(book),
+                        child: Card(
+                          elevation: 3,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ShowCustomItem(
+                            padding: EdgeInsets.zero,
+                            containerPadding: EdgeInsets.zero,
+                            title: book.title,
+                            genre: book.genre.map((g) => g.name).join(', '),
+                            imagePath: book.poster,
+                            season: book.totalSeasons.toString(),
+                            episodes: book.episodes.toString(),
+                            publishDate: book.publishDate,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
-              },
-            ),
-          );
-        })
-      ],
-    ) : Obx(() {
-      if (bookController.selectedShows.isEmpty) {
-        return SizedBox();
-      }
-      return SizedBox(
-        height: 160, // Adjust as needed
-        child: ListView(
-          padding: EdgeInsets.only(
-              left: 0, right: 0, bottom: 0, top: 8),
-          shrinkWrap: true,
-          children:
-          bookController.selectedShows.map((book) {
-            return ShowCustomItem(
-              padding: EdgeInsets.zero,
-              containerPadding: EdgeInsets.zero,
-              title: book.title,
-              genre: book.genre.toString(),
-              imagePath: book.poster,
-              season: book.totalSeasons.toString(),
-              episodes: book.episodes.toString(),
-              publishDate: book.publishDate,
+              })
+            ],
+          )
+        : Obx(() {
+            if (bookController.selectedShows.isEmpty) {
+              return SizedBox();
+            }
+            return SizedBox(
+              height: 160, // Adjust as needed
+              child: ListView(
+                padding: EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 8),
+                shrinkWrap: true,
+                children: bookController.selectedShows.map((book) {
+                  return ShowCustomItem(
+                    padding: EdgeInsets.zero,
+                    containerPadding: EdgeInsets.zero,
+                    title: book.title,
+                    genre: book.genre.map((g) => g.name).join(', '),
+                    imagePath: book.poster,
+                    season: book.totalSeasons.toString(),
+                    episodes: book.episodes.toString(),
+                    publishDate: book.publishDate,
+                  );
+                }).toList(),
+              ),
             );
-          }).toList(),
-        ),
-      );
-    });
+          });
   }
 
   //* Selected Video List
-  Widget searchVideo(){
-    return bookController.selectedMovie.length != 1 ? Stack(
-      children: [
-        Column(
-          children: [
-            // Search Bar
-            Padding(
-              padding:
-              const EdgeInsets.only(right: 8.0),
-              child: TextField(
-                controller:
-                bookController.searchController,
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      bookController.fetchBookList(
-                        controller.selectedBookType.value
-                            .toUpperCase(),
-                        bookController
-                            .searchController.text,
-                      );
-                    },
-                    icon: Icon(Icons.search),
-                    color: AppColors.primaryColor,
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color(0xff000000)
-                            .withValues(alpha: 0.20)),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                  ),
-                ),
-                onChanged: (query) => bookController
-                    .filteredMovie, // Ensure filtering logic
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            //* Selected Movie Section
-            Obx(() {
-              if (bookController.isUserClickedToSearch.value) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryColor,
-                  ),
-                );
-              }
-
-              if (bookController.selectedBooks.isEmpty) {
-                return SizedBox();
-              }
-
-              return SizedBox(
-                height: 200, //* Adjust as needed
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children: bookController.selectedMovie
-                      .map((book) {
-                    return MovieCustomItem(
-                      padding: EdgeInsets.zero,
-                      containerPadding: EdgeInsets.zero,
-                      title: book.title,
-                      imagePath: book.poster,
-                      length: book.duration,
-                      publishDate: book.publishDate,
-                    );
-                  }).toList(),
-                ),
-              );
-            }),
-          ],
-        ),
-
-        // Search Results
-        Obx(() {
-          if (bookController.filteredMovie.isEmpty) {
-            return SizedBox(
-              height: 8.h,
-            );
-          }
-          return SizedBox(
-            height: 300.h,
-            child: ListView.builder(
-              padding: EdgeInsets.only(top: 62),
-              itemCount:
-              bookController.filteredMovie.length,
-              itemBuilder: (context, index) {
-                final book = bookController.filteredMovie[index];
-                return GestureDetector(
-                  onTap: () => bookController.selectMovie(book),
-                  child: Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: MovieCustomItem(
-                      padding: EdgeInsets.zero,     
-                      containerPadding: EdgeInsets.zero,
-                      title: book.title,
-                      imagePath: book.poster,
-                      length: book.duration,
-                      publishDate: book.publishDate,
+  Widget searchVideo() {
+    return bookController.selectedMovie.length != 1
+        ? Stack(
+            children: [
+              Column(
+                children: [
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TextField(
+                      cursorColor: AppColors.primaryColor,
+                      controller: bookController.searchController,
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            bookController.fetchBookList(
+                              controller.selectedBookType.value.toUpperCase(),
+                              bookController.searchController.text,
+                            );
+                          },
+                          icon: Icon(Icons.search),
+                          color: AppColors.primaryColor,
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color(0xff000000).withValues(alpha: 0.20)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onChanged: (query) => bookController
+                          .filteredMovie, // Ensure filtering logic
                     ),
                   ),
+
+                  const SizedBox(height: 10),
+
+                  //* Selected Movie Section
+                  Obx(() {
+                    if (bookController.isUserClickedToSearch.value) {
+                      return Center(
+                        child: SpinKitWave(
+                          duration: Duration(seconds: 2),
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
+                      );
+                    }
+
+                    if (bookController.selectedBooks.isEmpty) {
+                      return SizedBox();
+                    }
+
+                    return SizedBox(
+                      height: 200, //* Adjust as needed
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        children: bookController.selectedMovie.map((book) {
+                          debugPrint(
+                              "+++++++++++++++++GENRE OF MOVIE+++++++++++++++++${book.genre.toString()}");
+
+                          return MovieCustomItem(
+                            padding: EdgeInsets.zero,
+                            containerPadding: EdgeInsets.zero,
+                            title: book.title,
+                            genre: book.genre.map((g) => g.name).join(', '),
+                            imagePath: book.poster,
+                            length: book.duration,
+                            publishDate: book.publishDate,
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+
+              // Search Results
+              Obx(() {
+                if (bookController.filteredMovie.isEmpty) {
+                  return SizedBox(
+                    height: 8.h,
+                  );
+                }
+                return SizedBox(
+                  height: 300.h,
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(top: 62),
+                    itemCount: bookController.filteredMovie.length,
+                    itemBuilder: (context, index) {
+                      final book = bookController.filteredMovie[index];
+                      return GestureDetector(
+                        onTap: () => bookController.selectMovie(book),
+                        child: Card(
+                          elevation: 3,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: MovieCustomItem(
+                            padding: EdgeInsets.zero,
+                            containerPadding: EdgeInsets.zero,
+                            title: book.title,
+                            imagePath: book.poster,
+                            genre: book.genre.map((g) => g.name).join(', '),
+                            length: book.duration,
+                            publishDate: book.publishDate,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
-              },
-            ),
-          );
-        })
-      ],
-    ) : Obx(() {
-      if (bookController.selectedMovie.isEmpty) {
-        return SizedBox();
-      }
-      return SizedBox(
-        height: 160, // Adjust as needed
-        child: ListView(
-          padding: EdgeInsets.only(
-              left: 0, right: 0, bottom: 0, top: 8),
-          shrinkWrap: true,
-          children:
-          bookController.selectedMovie.map((book) {
-            return MovieCustomItem(
-              padding: EdgeInsets.zero,
-              containerPadding: EdgeInsets.zero,
-              title: book.title,
-              imagePath: book.poster,
-              length: book.duration,
-              publishDate: book.publishDate,
+              })
+            ],
+          )
+        : Obx(() {
+            if (bookController.selectedMovie.isEmpty) {
+              return SizedBox();
+            }
+            return SizedBox(
+              height: 160, // Adjust as needed
+              child: ListView(
+                padding: EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 8),
+                shrinkWrap: true,
+                children: bookController.selectedMovie.map((book) {
+                  return MovieCustomItem(
+                    padding: EdgeInsets.zero,
+                    containerPadding: EdgeInsets.zero,
+                    title: book.title,
+                    imagePath: book.poster,
+                    genre: book.genre.map((g) => g.name).join(', '),
+                    length: book.duration,
+                    publishDate: book.publishDate,
+                  );
+                }).toList(),
+              ),
             );
-          }).toList(),
-        ),
-      );
-    });
+          });
   }
 
-  int whichTypeSelected(){
-    if(controller.selectedBookType.value.contains("Book")){
+  int whichTypeSelected() {
+    if (controller.selectedBookType.value.contains("Book")) {
       return 30;
-    }else if(controller.selectedBookType.value.contains("Show")){
+    } else if (controller.selectedBookType.value.contains("Show")) {
       return 270;
-    }else{
+    } else {
       return 9;
     }
   }
-
 }

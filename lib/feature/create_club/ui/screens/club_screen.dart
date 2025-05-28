@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -12,6 +13,7 @@ import '../../data/controller/change_club_controller.dart';
 import '../../data/controller/club_controller.dart';
 import '../../data/controller/get_created_club_controller.dart';
 import '../../data/controller/post_club_controller.dart';
+import '../../data/controller/status_controller.dart';
 import '../../data/controller/talk_point_controller.dart';
 
 class ClubScreen extends StatelessWidget {
@@ -24,6 +26,8 @@ class ClubScreen extends StatelessWidget {
   final ClubController clubController = Get.put(ClubController());
   final BottomNavController navController = Get.put(BottomNavController());
   final CommentController commentController = Get.put(CommentController());
+  final status = Get.put(StatusController());
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,7 @@ class ClubScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xffEEf0f8),
       body: RefreshIndicator(
+        color: AppColors.primaryColor,
         onRefresh: () async {
           clubController.fetchCreatedClub(bookController.createdClubId);
         },
@@ -84,7 +89,9 @@ class ClubScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Image.asset("assets/images/phone.png", height: 30.h, width: 30.w),
+                          SizedBox(
+                              // "assets/images/phone.png",
+                              height: 30.h, width: 30.w),
                           Image.asset("assets/images/dot_bar.png", height: 20.h, width: 20.w),
                         ],
                       ),
@@ -98,7 +105,13 @@ class ClubScreen extends StatelessWidget {
                   debugPrint("+++++++++++++++CLUB SCREEN+++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
 
                   if (clubController.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+                    return Center(
+                      child: SpinKitWave(
+                        duration: Duration(seconds: 2),
+                        size: 15,
+                        color: AppColors.primaryColor,
+                      ),
+                    );
                   }
 
                   final clubDetail = clubController.clubDetail.value;
@@ -114,8 +127,22 @@ class ClubScreen extends StatelessWidget {
                     );
                   }
 
-                  String totalEpisode = "";
-                  String totalSeason = "";
+                  final post = clubDetail;
+                  final createdAt = post.createdAt;
+                  final Duration diff = DateTime.now().toUtc().difference(createdAt);
+
+                  String difference;
+                  if (diff.inSeconds < 60) {
+                    difference = '${diff.inSeconds}s';
+                  } else if (diff.inMinutes < 60) {
+                    difference = '${diff.inMinutes}m';
+                  } else if (diff.inHours < 24) {
+                    difference = '${diff.inHours}h';
+                  } else if (diff.inDays < 7) {
+                    difference = '${diff.inDays}d';
+                  } else {
+                    difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                  }
 
                   return CustomCreatedBookItem(
                     selectedType: clubDetail.clubMediumType,
@@ -124,40 +151,53 @@ class ClubScreen extends StatelessWidget {
                     title: clubDetail.title,
                     imagePath: clubDetail.poster,
                     clubMember: clubDetail.memberSize,
+                    timeLine: clubDetail.timeLine,
+                    createdDate: difference,
                     season: clubDetail.clubMediumType.contains("SHOW") ? clubDetail.totalSeasons.toString() : null,
                     episodes: clubDetail.clubMediumType.contains("SHOW") ? clubDetail.totalEpisodes.toString() : null,
                     clubLabel: clubDetail.clubLebel,
                     length: clubDetail.clubMediumType.contains("MOVIE") ? 127 : null,
                     sliderMaxLength: clubDetail.clubMediumType.contains("BOOK") ? "30" : clubDetail.clubMediumType.contains("MOVIE") ? "9" : "270",
                     clubCreator: clubDetail.admin?.username ?? "Unknown",
+
                   );
                 }),
 
                 const SizedBox(height: 8),
 
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0, top: 8, bottom: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(),
-                      Row(
-                        children: [
-                          Image.asset("assets/tv/tune.png", height: 20.h, width: 18.w),
-                          SizedBox(width: 16.h),
-                          Image.asset("assets/tv/sort_by.png", height: 20.h, width: 18.w),
-                        ],
-                      ),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(),
+                    Row(
+                      children: [
+                        SizedBox(
+                            // "assets/tv/tune.png",
+                            height: 8.h, width: 18.w),
+                        SizedBox(width: 16.h),
+                        SizedBox(
+                            // "assets/tv/sort_by.png",
+                            height: 8.h, width: 18.w),
+                      ],
+                    ),
+                  ],
                 ),
 
                 Obx(() {
                   final club = clubController.clubDetail.value;
 
                   if (clubController.isLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primaryColor),
+                    return Column(
+                      children: [
+                        SizedBox(height: 200.h,),
+                        Center(
+                          child: SpinKitWave(
+                            duration: Duration(seconds: 2),
+                            size: 15,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      ],
                     );
                   }
 
@@ -188,18 +228,19 @@ class ClubScreen extends StatelessWidget {
                     
                         String difference;
                         if (diff.inSeconds < 60) {
-                          difference = '${diff.inSeconds}s ago';
+                          difference = '${diff.inSeconds}s';
                         } else if (diff.inMinutes < 60) {
-                          difference = '${diff.inMinutes}m ago';
+                          difference = '${diff.inMinutes}m';
                         } else if (diff.inHours < 24) {
-                          difference = '${diff.inHours}h ago';
+                          difference = '${diff.inHours}h';
                         } else if (diff.inDays < 7) {
-                          difference = '${diff.inDays}d ago';
+                          difference = '${diff.inDays}d';
                         } else {
                           difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
                         }
 
                         debugPrint("++++++++++++++++++++++++++++++${post.id}");
+                        debugPrint("+++++++++++++++WHAT IS IT TRUE+++++++++++++++${post.postReadStatus.isRead}");
 
                         return GestureDetector(
                           onTap: (){
@@ -211,10 +252,11 @@ class ClubScreen extends StatelessWidget {
 
                           //"${post.episode},${post.relatedScene}"
                           child: ChapterComments(
+                            id: post.id,
                             userName: post.user.username,
                             comment: post.content,
                             commentCount: "${post.comment.length}",
-                            chapter: clubController.clubDetail.value?.clubMediumType.contains("BOOK") == true ? post.chapter : clubController.clubDetail.value?.clubMediumType.contains("SHOW") == true ? "${post.episode},${post.relatedScene}" : "${post.relatedScene}",
+                            chapter: clubController.clubDetail.value?.clubMediumType.contains("BOOK") == true ? post.chapter : clubController.clubDetail.value?.clubMediumType.contains("SHOW") == true ? "${post.chapter},${post.relatedScene}" : "${post.relatedScene}",
                             index: index,
                             parentID: post.id,
                             type: clubController.clubDetail.value?.clubMediumType,

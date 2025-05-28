@@ -1,17 +1,29 @@
 import 'dart:async';
-
 import 'package:get/get.dart';
-import 'package:phictly/feature/auth/ui/screens/sign_in_screen.dart';
+import '../../../../core/helper/sheared_prefarences_helper.dart';
+import '../../../../routes/app_routes.dart';
 
-class SpalshController extends GetxController {
+class SplashController extends GetxController {
   Timer? timer;
+  SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
 
   @override
   void onInit() {
-    timer = Timer(const Duration(seconds: 3), () {
-      Get.to(()=> SignInScreen());
-    });
     super.onInit();
+    checkLoginStatus();
+  }
+
+  void checkLoginStatus() async {
+    await preferencesHelper.init();
+    String? token = preferencesHelper.getString("userToken");
+
+    timer = Timer(const Duration(seconds: 2), () {
+      if (token != null && token.isNotEmpty) {
+        Get.offAllNamed(AppRoute.navBar);
+      } else {
+        Get.offAllNamed(AppRoute.signIn);
+      }
+    });
   }
 
   @override
@@ -20,3 +32,4 @@ class SpalshController extends GetxController {
     super.onClose();
   }
 }
+

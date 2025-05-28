@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,7 @@ import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/feature/profile/data/controller/logout_controller.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/custom_outline_button.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../data/controller/change_profile_controller.dart';
 
 class SettingScreen extends StatelessWidget {
@@ -218,7 +220,11 @@ class SettingScreen extends StatelessWidget {
                               textFontWeight: FontWeight.w400,
                               borderRadius: 6.r,
                               child: Obx(() => logoutController.isLoading.value
-                                  ? CircularProgressIndicator(color: Colors.white)
+                                  ? SpinKitWave(
+                                    duration: Duration(seconds: 2),
+                                    size: 15,
+                                    color: Colors.white,
+                                  )
                                   : Text("YES", style: GoogleFonts.dmSans(fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white),),),
                             ),
                           ],

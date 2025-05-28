@@ -9,6 +9,7 @@ import '../../../../../core/components/custom_button.dart';
 import '../../../../../core/components/custom_text_field.dart';
 import '../../../../../core/components/custom_text_field_with_suffix.dart';
 import '../../../../../core/utils/app_colors.dart';
+import '../../../../create_club/ui/widgets/selected_tag_fields.dart';
 import '../../../data/controller/change_profile_controller.dart';
 
 class CreateGroupScreen extends StatelessWidget {

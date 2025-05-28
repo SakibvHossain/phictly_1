@@ -7,7 +7,7 @@ import '../../../home/data/controller/home_controller.dart';
 import 'package:get/get.dart';
 
 class TvItems extends StatelessWidget {
-  TvItems({super.key, this.imagePath, this.requestOrJoin, this.totalDuration, this.requestOrJoinImage, required this.noReqOrJoinAvailable, this.title, this.season, this.clubId, this.clubLabel, this.author, this.clubCreator, required this.isPrivate, });
+  TvItems({super.key, this.imagePath, this.requestOrJoin, this.totalDuration, this.requestOrJoinImage, required this.noReqOrJoinAvailable, this.title, this.season, this.clubId, this.clubLabel, this.author, this.clubCreator, required this.isPrivate, this.activeMember, this.maxClubMemberSize, this.clubMediumType, this.movieLength, });
 
   final HomeController controller = Get.put(HomeController());
   final String? imagePath;
@@ -17,16 +17,21 @@ class TvItems extends StatelessWidget {
   final bool noReqOrJoinAvailable;
   final String? title;
   final String? season;
+  final String? movieLength;
+  final int? activeMember;
+  final String? clubMediumType;
   final String? clubId;
   final String? clubLabel;
   final String? author;
   final String? clubCreator;
   final bool isPrivate;
+  final int? maxClubMemberSize;
 
 
 
   @override
   Widget build(BuildContext context) {
+    final max = maxClubMemberSize?.toDouble() ?? 30.0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
@@ -42,18 +47,22 @@ class TvItems extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                      height: 160,
-                      width: 104,
-                      placeholder: (context, url) => Center(
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4.r),
+                      child: CachedNetworkImage(
+                        imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                        height: 160,
+                        width: 104,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: SizedBox(
+                            height: 25,
+                            width: 25,
+                            child: CircularProgressIndicator(color: AppColors.primaryColor,),
+                          ),
                         ),
+                        errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                       ),
-                      errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                     ),
 
                     Column(
@@ -85,10 +94,15 @@ class TvItems extends StatelessWidget {
                             secondText: title ?? "Jane Eyre",
                             secondFontSize: 12),
                         _rowCustomText(
-                            firstText: "Season: ",
-                            firstFontSize: 12,
-                            secondText: author ?? "1",
-                            secondFontSize: 12),
+                          firstText: (clubMediumType?.contains("MOVIE") ?? false)
+                              ? "Length: "
+                              : "Season: ",
+                          firstFontSize: 12,
+                          secondText: (clubMediumType?.toUpperCase().contains("MOVIE") ?? false)
+                              ? (season ?? "1")
+                              : (author ?? "1"),
+                          secondFontSize: 12,
+                        ),
                         _rowCustomText(
                           firstText: "Club Creator: ",
                           firstFontSize: 12,
@@ -99,7 +113,7 @@ class TvItems extends StatelessWidget {
                         _rowCustomText(
                           firstText: "Member Count: ",
                           firstFontSize: 12,
-                          secondText: "14/20",
+                          secondText: "$activeMember/$maxClubMemberSize",
                           secondFontSize: 12,
                         ),
                         Padding(
@@ -121,12 +135,11 @@ class TvItems extends StatelessWidget {
                                 Colors.grey.shade300,
                               ),
                               child: Slider(
-                                min: 1,
-                                max: 30,
-                                value: controller.memberCount.value,
+                                min: 1.0,
+                                max: max,
+                                value: controller.memberCount.value.clamp(1.0, max),
                                 onChanged: (value) {
-                                  controller
-                                      .changeTotalPersonCount(value);
+                                  controller.changeTotalPersonCount(value.clamp(1.0, max));
                                 },
                               ),
                             ),
@@ -198,8 +211,8 @@ class TvItems extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0),
-                        child: Image.asset(
-                          "assets/icons/share.png",
+                        child: SizedBox(
+                          // "assets/icons/share.png",
                           height: 20,
                           width: 20,
                         ),
@@ -251,7 +264,9 @@ class TvItems extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 8),
       child: Text(
-        text,
+        text.length > 20
+            ? '${text.substring(0, 20)}...'
+            : text,
         style: GoogleFonts.dmSans(
           fontSize: fontSize,
           fontWeight: fontWeight,
@@ -269,7 +284,9 @@ class TvItems extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 8),
       child: Text(
-        text,
+        text.length > 20
+            ? '${text.substring(0, 20)}...'
+            : text,
         style: GoogleFonts.dmSans(
             fontSize: fontSize,
             fontWeight: fontWeight,

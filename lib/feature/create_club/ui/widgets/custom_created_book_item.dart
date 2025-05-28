@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/utils/app_colors.dart';
@@ -22,7 +23,7 @@ class CustomCreatedBookItem extends StatelessWidget {
       this.publishDate,
       this.bookNo,
       this.padding,
-      this.containerPadding, this.clubNumber, this.clubLabel, this.clubMember, this.clubCreator, required this.selectedType, this.sliderMaxLength, this.season, this.episodes});
+      this.containerPadding, this.clubNumber, this.clubLabel, this.clubMember, this.clubCreator, required this.selectedType, this.sliderMaxLength, this.season, this.episodes, this.timeLine, this.createdDate});
 
   final TalkPointController pointController = Get.put(TalkPointController());
   final TextEditingController talkPointController = TextEditingController();
@@ -39,8 +40,10 @@ class CustomCreatedBookItem extends StatelessWidget {
   final String? clubCreator;
   final String? season;
   final String? episodes;
+  final int? timeLine;
   final String? clubLabel;
   final int? clubMember;
+  final String? createdDate;
   final String selectedType;
   final String? publishDate;
   final String? sliderMaxLength;
@@ -64,18 +67,26 @@ class CustomCreatedBookItem extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-              child: CachedNetworkImage(
-                imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                height: 160,
-                width: 104,
-                placeholder: (context, url) => Center(
-                  child: SizedBox(
-                    height: 25,
-                    width: 25,
-                    child: CircularProgressIndicator(color: AppColors.primaryColor,),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4.r),
+                child: CachedNetworkImage(
+                  imageUrl: imagePath ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                  height: 160,
+                  width: 104,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(
+                    child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      child: SpinKitWave(
+                        duration: Duration(seconds: 2),
+                        size: 15,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
                   ),
+                  errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
                 ),
-                errorWidget: (context, url, error) => Image.asset("assets/images/placeholder_image.png", fit: BoxFit.cover,),
               ),
             ),
 
@@ -114,8 +125,10 @@ class CustomCreatedBookItem extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Image.asset("assets/icons/share.png", height: 20.h, width: 17.w,),
-                          CustomText(text: "  15d", fontSize: 14.sp, fontWeight: FontWeight.w400, color: Color(0xff000000).withValues(alpha: 0.60),),
+                          SizedBox(
+                            // "assets/icons/share.png",
+                            height: 20.h, width: 17.w,),
+                          CustomText(text: "  $createdDate", fontSize: 14.sp, fontWeight: FontWeight.w400, color: Color(0xff000000).withValues(alpha: 0.60),),
                         ],
                       ),
                     ],
@@ -198,7 +211,7 @@ class CustomCreatedBookItem extends StatelessWidget {
                   _rowCustomText(
                     firstText: "Club Timeline: ",
                     firstFontSize: 12,
-                    secondText: "30 Day(s)",
+                    secondText: "$timeLine Day(s)",
                     secondFontSize: 12,
                   ),
 
@@ -284,14 +297,14 @@ class CustomCreatedBookItem extends StatelessWidget {
                           editTalkPointAction(context);
                         },
 
-                        child: CustomText(                                text: "+ Edit Talkpoint(s)",
+                        child: CustomText(text: "+ Edit Talkpoint(s)",
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           color: AppColors.primaryColor,),
                       ),
 
                       _customText(
-                          text: "$sliderMaxLength" ?? "30",
+                          text: "$timeLine" ?? "30",
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: Colors.black),

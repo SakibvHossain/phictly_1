@@ -107,6 +107,8 @@ class PostClubController extends GetxController{
     DateFormat format = DateFormat("MM-dd-yyyy");
     final Logger logger = Logger();
 
+    debugPrint("+++++++++++++++++++++++++++THIS IS GENRE+++++++++++++++++++++++++++++++++${singleBook.genre.map((g) => g.toJson()).toList()}");
+
     Map<String, dynamic> inputClubData = {
       "clubId": clubId.value,
       "clubLebel": talkPointController.clubLabelController.text,
@@ -184,7 +186,7 @@ class PostClubController extends GetxController{
       "clubLebel": talkPointController.clubLabelController.text,
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
-      "timeLine": 30,
+      "timeLine": 270,
       "preference": changeClubController.selectedGenderType.toUpperCase(),
       "age": int.tryParse(ageController.text) ?? 0,
       "memberSize": int.tryParse(sizeController.text) ?? 0,
@@ -255,7 +257,7 @@ class PostClubController extends GetxController{
       "clubLebel": talkPointController.clubLabelController.text,
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
-      "timeLine": 30,
+      "timeLine": 9,
       "preference": changeClubController.selectedGenderType.toUpperCase(),
       "age": int.tryParse(ageController.text) ?? 0,
       "memberSize": int.tryParse(sizeController.text) ?? 0,
@@ -288,6 +290,8 @@ class PostClubController extends GetxController{
 
           //* Fetch created club ID
           clubController.fetchCreatedClub(club.id);
+
+
           createdClubId = club.id;
         } else {
           Get.snackbar("Error", "Unexpected data format received");

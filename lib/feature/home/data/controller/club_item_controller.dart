@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
@@ -15,14 +19,23 @@ class ClubItemController extends GetxController {
   RxBool isLoading = false.obs;
   final Logger logger = Logger();
 
+
+
   //* Trending Clubs
   Future<void> fetchTrendingClubs() async {
     await preferencesHelper.init();
+    trendingDataList.clear();
 
     try {
       isTrendingDataLoading.value = true;
 
-      await Future.delayed(Duration(milliseconds: 200),);
+      if (!await hasInternetConnection()) {
+        debugPrint("🚫 No Internet Detected");
+        showNoConnectionDialog();
+        return;
+      }
+
+      await Future.delayed(Duration(milliseconds: 200));
 
       String url = Utils.baseUrl + Utils.trendingOrRecent;
       final response = await NetworkCaller().getRequest(
@@ -31,10 +44,6 @@ class ClubItemController extends GetxController {
       );
 
       if (response.isSuccess) {
-        // Get.snackbar(
-        //   "Success",
-        //   "Trending data fetched successfully.",
-        // );
 
         var trendingItemData = response.responseData['trending'];
 
@@ -47,10 +56,6 @@ class ClubItemController extends GetxController {
         debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trendingItemData");
       } else {
         logger.e("API call failed with message: ${response.responseData}");
-        Get.snackbar(
-          "Error",
-          "Check Internet connection.",
-        );
       }
     } catch (e) {
       debugPrint("Error: $e");
@@ -68,11 +73,12 @@ class ClubItemController extends GetxController {
   //* Recent Clubs
   Future<void> fetchRecentClubs() async {
     await preferencesHelper.init();
+    recentDataList.clear();
 
     try {
       isRecentDataLoading.value = true;
 
-      await Future.delayed(Duration(milliseconds: 200),);
+      await Future.delayed(Duration(milliseconds: 200));
 
       String url = Utils.baseUrl + Utils.trendingOrRecent;
       final response = await NetworkCaller().getRequest(
@@ -81,22 +87,17 @@ class ClubItemController extends GetxController {
       );
 
       if (response.isSuccess) {
-
         var recentItemData = response.responseData['recent'];
 
-        for(var recent in recentItemData){
+        for (var recent in recentItemData) {
           recentDataList.add(ClubModel.fromJson(recent));
-          debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $recent");
+          debugPrint("+++ Trending data: $recent");
         }
 
         logger.d("Full API Response: ${response.responseData}");
-        debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Recent Data: $recentItemData");
+        debugPrint("+++ Recent Data: $recentItemData");
       } else {
         logger.e("API call failed with message: ${response.responseData}");
-        Get.snackbar(
-          "Error",
-          "Check Internet connection.",
-        );
       }
     } catch (e) {
       debugPrint("Error: $e");
@@ -104,11 +105,79 @@ class ClubItemController extends GetxController {
       Get.snackbar(
         "Error",
         "An unexpected error occurred. Please try again later.",
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
       );
     } finally {
       isRecentDataLoading.value = false;
       debugPrint("Recent Data List: ${recentDataList.length}");
     }
+  }
+
+
+  var selectedClubIndex = (-1).obs;
+
+  void toggleClubIndex(int index) {
+    if (selectedClubIndex.value == index) {
+      selectedClubIndex.value = -1; // Collapse
+    } else {
+      selectedClubIndex.value = index; // Expand selected
+    }
+  }
+
+  Future<bool> hasInternetConnection() async {
+    try {
+      final result = await HttpClient().getUrl(Uri.parse('https://www.google.com'))
+          .then((request) => request.close());
+
+      return result.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void showNoConnectionDialog() {
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Center(
+          child: Text(
+            "No Connection",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Please check your internet connectivity",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Divider(height: 1),
+          ],
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        actionsPadding: EdgeInsets.zero,
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(Get.context!).pop();
+            },
+            child: Text(
+              "OK",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

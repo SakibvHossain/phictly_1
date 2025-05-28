@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
@@ -29,6 +30,8 @@ class CreatePostMovieScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
       body: RefreshIndicator(
+          color: AppColors.primaryColor,
+          backgroundColor: AppColors.primaryColor,
           onRefresh: () async {
             bookController.fetchClubId();
           },
@@ -145,6 +148,7 @@ class CreatePostMovieScreen extends StatelessWidget {
                           borderColor:
                           Color(0xff000000).withValues(alpha: 0.20),
                           borderRadius: BorderRadius.circular(10.r),
+                          inputType: TextInputType.number,
                           hintText: "00:00:00",
                           textStyle: GoogleFonts.dmSans(
                             fontSize: 17.sp,
@@ -161,26 +165,33 @@ class CreatePostMovieScreen extends StatelessWidget {
                         Obx(
                               () => commentController.isLoading.value
                               ? Center(
-                            child: CircularProgressIndicator(
+                            child: SpinKitWave(
+                              duration: Duration(seconds: 2),
+                              size: 15,
                               color: AppColors.primaryColor,
                             ),
                           )
                               : CustomButton(
                             text: "Post",
-                            onTap: () async {
-                              commentController.postMovieClubContent();
-                              clubController.fetchCreatedClub(
-                                  bookController.createdClubId);
-                              await Future.delayed(
-                                Duration(milliseconds: 300),
-                              );
-                              changeClubController.updateIndex(1);
-                            },
+                                onTap: () async {
+                                  final input = commentController.movieSceneTextController.text.trim();
+                                  final timeRegex = RegExp(r'^([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d$');
+
+                                  if (!timeRegex.hasMatch(input)) {
+                                    Get.snackbar("Invalid Format", "Please enter time as HH:mm:ss (e.g. 00:15:30)");
+                                    return;
+                                  }
+
+                                  commentController.postMovieClubContent();
+                                  clubController.fetchCreatedClub(bookController.createdClubId);
+                                  await Future.delayed(Duration(milliseconds: 300));
+                                  changeClubController.updateIndex(1);
+                                },
                           ),
                         ),
 
                         SizedBox(
-                          height: 8.h,
+                          height: 100.h,
                         ),
                       ],
                     ),

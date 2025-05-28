@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -18,9 +19,12 @@ class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
   final SignInController controller = Get.put(SignInController());
-  final ChangeProfileController changeProfileController = Get.put(ChangeProfileController());
-  final navController =  Get.find<BottomNavController>();
-
+  final ChangeProfileController changeProfileController =
+      Get.put(ChangeProfileController());
+  final navController = Get.find<BottomNavController>();
+//If you give them you requirement then proper plan and design. If everything done.
+//
+// Then there will be no delay
   @override
   Widget build(BuildContext context) {
     final signInKey = GlobalKey<FormState>();
@@ -90,6 +94,7 @@ class SignInScreen extends StatelessWidget {
                             controller: controller.emailController,
                             validator: validateEmail,
                             hintText: "email",
+                            cursorColor: AppColors.primaryColor,
                             focusNode: controller.emailFocusNode,
                             nextFocus: controller.passwordFocusNode,
                             prefixIcon: Icons.email,
@@ -103,6 +108,7 @@ class SignInScreen extends StatelessWidget {
                               hintText: "password",
                               validator: validatePassword,
                               prefixIcon: Icons.lock,
+                              cursorColor: AppColors.primaryColor,
                               suffixIcon: controller.isEyeOpen.value
                                   ? Icons.visibility
                                   : Icons.visibility_off,
@@ -117,7 +123,9 @@ class SignInScreen extends StatelessWidget {
                           Obx(
                             () => controller.isLoading.value
                                 ? Center(
-                                    child: CircularProgressIndicator(
+                                    child: SpinKitWave(
+                                      duration: Duration(seconds: 2),
+                                      size: 15,
                                       color: AppColors.primaryColor,
                                     ),
                                   )
@@ -125,8 +133,11 @@ class SignInScreen extends StatelessWidget {
                                     text: "Sign in",
                                     onTap: () async {
                                       if (signInKey.currentState!.validate()) {
-                                        debugPrint("+++++++++++++++++++++++++++++++++++++++++ Change Profile Controller: ${changeProfileController.currentIndex.value}");
-                                        debugPrint("+++++++++++++++++++++++++++++++++++++++++ Change Nav Controller: ${navController.currentIndex.value}");
+                                        debugPrint(
+                                            "+++++++++++++++++++++++++++++++++++++++++ Change Profile Controller: ${changeProfileController.currentIndex.value}");
+                                        debugPrint(
+                                            "+++++++++++++++++++++++++++++++++++++++++ Change Nav Controller: ${navController.currentIndex.value}");
+                                        changeProfileController.updateIndex(0);
                                         await controller.logIn();
                                       }
                                     },

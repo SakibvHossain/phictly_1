@@ -67,12 +67,16 @@ class CommentDetail extends StatelessWidget {
                               fontSize: 18.sp,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryColor),
-                          CustomText(
+
+                          (chapter.trim().isEmpty || chapter == "null")
+                              ? SizedBox.shrink()
+                              : CustomText(
                             text: chapter ?? "Chapter 2",
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w700,
                             color: Color(0xff000000),
                           ),
+
                           SizedBox(
                             width: 10,
                           ),
@@ -108,10 +112,13 @@ class CommentDetail extends StatelessWidget {
                     SizedBox(),
                     Row(
                       children: [
-                        Icon(
-                          Icons.share,
-                          color: AppColors.primaryColor,
-                        ),
+                        // Icon(
+                        //   Icons.share,
+                        //   color: AppColors.primaryColor,
+                        // ),
+
+                        SizedBox(),
+
                         SizedBox(
                           width: 16.w,
                         ),
@@ -166,13 +173,13 @@ class CommentDetail extends StatelessWidget {
                       String difference;
 
                       if (diff.inSeconds < 60) {
-                        difference = '${diff.inSeconds}s ago';
+                        difference = '${diff.inSeconds}s';
                       } else if (diff.inMinutes < 60) {
-                        difference = '${diff.inMinutes}m ago';
+                        difference = '${diff.inMinutes}m';
                       } else if (diff.inHours < 24) {
-                        difference = '${diff.inHours}h ago';
+                        difference = '${diff.inHours}h';
                       } else if (diff.inDays < 7) {
-                        difference = '${diff.inDays}d ago';
+                        difference = '${diff.inDays}d';
                       } else {
                         difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
                       }
@@ -187,7 +194,7 @@ class CommentDetail extends StatelessWidget {
                         userName: clubController.clubDetail.value!.post[index ?? 0].comment[commentIndex].user.username,
                         comment: clubController.clubDetail.value!.post[index ?? 0].comment[commentIndex].content,
                         commentCount: "1m",
-                        chapter: "Chapter 1",
+                        chapter: clubController.clubDetail.value!.post[index ?? 0].chapter,
                         chapterCreatedTime: difference,
                         index: index,
                       ),
@@ -213,7 +220,9 @@ class CommentDetail extends StatelessWidget {
                   top: 10,
                   left: 9.5,
                   right: 0,
-                  child: CustomText(
+                  child: (chapter.trim().isEmpty || chapter == "null")
+                      ? SizedBox.shrink()
+                      : CustomText(
                     text: returnBanner() ?? "CH2",
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
