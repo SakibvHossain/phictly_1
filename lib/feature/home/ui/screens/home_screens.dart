@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:phictly/feature/home/ui/screens/notification_list_screen.dart';
 import 'package:phictly/feature/home/ui/widgets/recent_item.dart';
 import 'package:phictly/feature/home/ui/widgets/trending_item.dart';
+import 'package:phictly/feature/message/data/controller/chat_controller.dart';
 
 import '../../../message/ui/screens/chat_screen.dart';
 import '../../data/controller/notification_controller.dart';
@@ -22,6 +23,7 @@ class HomeScreens extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
   final changeHomeController = Get.find<ChangeHomeController>();
   final ClubItemController clubItemController = Get.put(ClubItemController());
+  final chatController = Get.find<ChatController>();
   final Logger logger = Logger();
   final NotificationController notificationController =
       Get.put(NotificationController());
@@ -64,10 +66,16 @@ class HomeScreens extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Image.asset(
-                                    "assets/icons/home_logo.png",
-                                    height: 42.93.h,
-                                    width: 130.96.w,
+                                  InkWell(
+
+                              onTap:(){
+                                chatController.joinApp();
+                            },
+                                    child: Image.asset(
+                                      "assets/icons/home_logo.png",
+                                      height: 42.93.h,
+                                      width: 130.96.w,
+                                    ),
                                   ),
                                   Row(
                                     children: [
@@ -87,30 +95,41 @@ class HomeScreens extends StatelessWidget {
                                       GestureDetector(
                                         onTap: () {
                                           // Navigate first
-                                          Get.to(() => NotificationListScreen());
+                                          Get.to(
+                                              () => NotificationListScreen());
 
                                           // Then clear the badge count (don't clear the list)
                                           // notificationController.notificationCount.value = 0;
                                         },
                                         child: Stack(
                                           children: [
-                                            Icon(Icons.notifications, size: 25, color: Colors.white),
-                                            Obx(() => notificationController.notificationCount.value > 0
+                                            Icon(Icons.notifications,
+                                                size: 25, color: Colors.white),
+                                            Obx(() => notificationController
+                                                        .notificationCount
+                                                        .value >
+                                                    0
                                                 ? Positioned(
-                                              top: 0,
-                                              right: 0,
-                                              child: Container(
-                                                height: 16,
-                                                width: 16,
-                                                decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                                                child: Center(
-                                                  child: Text(
-                                                    '${notificationController.notificationCount.value}',
-                                                    style: TextStyle(color: Colors.white, fontSize: 10),
-                                                  ),
-                                                ),
-                                              ),
-                                            )
+                                                    top: 0,
+                                                    right: 0,
+                                                    child: Container(
+                                                      height: 16,
+                                                      width: 16,
+                                                      decoration: BoxDecoration(
+                                                          color: Colors.red,
+                                                          shape:
+                                                              BoxShape.circle),
+                                                      child: Center(
+                                                        child: Text(
+                                                          '${notificationController.notificationCount.value}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 10),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
                                                 : SizedBox()),
                                           ],
                                         ),
@@ -250,8 +269,7 @@ class HomeScreens extends StatelessWidget {
                                 onTap: () {
                                   Get.to(
                                     () => ChatScreen(
-                                      currentUserId: '682f10a44bccafa6c6201038',
-                                      friendId: '682b05d2b91e319dde13901b',
+                                      receiverId: '67a898f5b1a7f29886ea1a24',
                                     ),
                                   );
                                 },
@@ -266,8 +284,7 @@ class HomeScreens extends StatelessWidget {
                                 onTap: () {
                                   Get.to(
                                     () => ChatScreen(
-                                      currentUserId: '682b05d2b91e319dde13901b',
-                                      friendId: '682f10a44bccafa6c6201038',
+                                      receiverId: "682b05d2b91e319dde13901b",
                                     ),
                                   );
                                 },

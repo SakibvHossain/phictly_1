@@ -13,7 +13,6 @@ import 'package:get/get.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
 import '../../data/controller/join_club_controller.dart';
 
-
 class RecentItem extends StatelessWidget {
   RecentItem({super.key});
 
@@ -22,7 +21,6 @@ class RecentItem extends StatelessWidget {
   final ClubItemController clubItemController = Get.put(ClubItemController());
   final joinClubController = Get.put(JoinClubController());
   final Logger logger = Logger();
-
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +58,7 @@ class RecentItem extends StatelessWidget {
               itemCount: clubItemController.recentDataList.length,
               itemBuilder: (context, index) {
                 ClubModel recentClubs =
-                clubItemController.recentDataList[index];
+                    clubItemController.recentDataList[index];
 
                 //* Time & Date
                 DateTime? createdAt = recentClubs.startDate != null
@@ -69,7 +67,8 @@ class RecentItem extends StatelessWidget {
 
                 String difference = "";
                 if (createdAt != null) {
-                  final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
+                  final Duration diff =
+                      DateTime.now().toUtc().difference(createdAt.toUtc());
 
                   if (diff.inSeconds < 60) {
                     difference = '${diff.inSeconds}s';
@@ -81,7 +80,7 @@ class RecentItem extends StatelessWidget {
                     difference = '${diff.inDays}d';
                   } else {
                     difference =
-                    '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
                   }
                 } else {
                   difference = "Unknown time";
@@ -93,7 +92,7 @@ class RecentItem extends StatelessWidget {
                     children: [
                       Container(
                         padding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8.0),
@@ -124,9 +123,9 @@ class RecentItem extends StatelessWidget {
                                     ),
                                     errorWidget: (context, url, error) =>
                                         Image.asset(
-                                          "assets/images/placeholder_image.png",
-                                          fit: BoxFit.cover,
-                                        ),
+                                      "assets/images/placeholder_image.png",
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                                 Column(
@@ -156,8 +155,8 @@ class RecentItem extends StatelessWidget {
                                       firstText: "Club Creator: ",
                                       firstFontSize: 12,
                                       secondText:
-                                      "${recentClubs.admin?.username}" ??
-                                          "${recentClubs.writer}",
+                                          "${recentClubs.admin?.username}" ??
+                                              "${recentClubs.writer}",
                                       secondFontSize: 12,
                                       secondColor: Color(0xff29605E),
                                     ),
@@ -174,19 +173,19 @@ class RecentItem extends StatelessWidget {
                                         height: 15,
                                         child: SliderTheme(
                                           data:
-                                          SliderTheme.of(context).copyWith(
+                                              SliderTheme.of(context).copyWith(
                                             trackShape:
-                                            const RoundedRectSliderTrackShape(),
+                                                const RoundedRectSliderTrackShape(),
                                             trackHeight: 2.0,
                                             thumbShape:
-                                            const RoundSliderThumbShape(
-                                                enabledThumbRadius: 1.0),
+                                                const RoundSliderThumbShape(
+                                                    enabledThumbRadius: 1.0),
                                             overlayShape:
-                                            SliderComponentShape.noOverlay,
+                                                SliderComponentShape.noOverlay,
                                             thumbColor: Color(0xff29605E),
                                             activeTrackColor: Color(0xff29605E),
                                             inactiveTrackColor:
-                                            Colors.grey.shade300,
+                                                Colors.grey.shade300,
                                           ),
                                           child: Slider(
                                             min: 1,
@@ -205,46 +204,46 @@ class RecentItem extends StatelessWidget {
                                       firstText: "Timeline: ",
                                       firstFontSize: 12,
                                       secondText:
-                                      "${recentClubs.timeLine} day(s)",
+                                          "${recentClubs.timeLine} day(s)",
                                       secondFontSize: 12,
                                     ),
 
                                     //* Fully functional Slider
                                     Padding(
                                       padding:
-                                      const EdgeInsets.only(right: 8.0),
+                                          const EdgeInsets.only(right: 8.0),
                                       child: SizedBox(
                                         height: 15,
                                         child: SliderTheme(
                                           data:
-                                          SliderTheme.of(context).copyWith(
+                                              SliderTheme.of(context).copyWith(
                                             trackShape:
-                                            const RoundedRectSliderTrackShape(),
+                                                const RoundedRectSliderTrackShape(),
                                             trackHeight: 2.0,
                                             thumbShape:
-                                            const RoundSliderThumbShape(
-                                                enabledThumbRadius: 5.0),
+                                                const RoundSliderThumbShape(
+                                                    enabledThumbRadius: 5.0),
                                             overlayShape:
-                                            SliderComponentShape.noOverlay,
+                                                SliderComponentShape.noOverlay,
                                             thumbColor: Color(0xff29605E),
                                             activeTrackColor: Color(0xff29605E),
                                             inactiveTrackColor:
-                                            Colors.grey.shade300,
+                                                Colors.grey.shade300,
                                           ),
                                           child: LayoutBuilder(
                                             builder: (context, constraints) {
                                               double sliderMin = 1;
                                               double sliderMax = recentClubs
-                                                  .clubMediumType
-                                                  ?.contains("BOOK") ==
-                                                  true
+                                                          .clubMediumType
+                                                          ?.contains("BOOK") ==
+                                                      true
                                                   ? 30
                                                   : (recentClubs.clubMediumType
-                                                  ?.contains(
-                                                  "SHOW") ==
-                                                  true
-                                                  ? 270
-                                                  : 9);
+                                                              ?.contains(
+                                                                  "SHOW") ==
+                                                          true
+                                                      ? 270
+                                                      : 9);
 
                                               double sliderWidth =
                                                   constraints.maxWidth;
@@ -257,11 +256,11 @@ class RecentItem extends StatelessWidget {
                                                   talkPoint.isNotEmpty) {
                                                 talkPointValue =
                                                     talkPoint.map((date) {
-                                                      Duration diff =
+                                                  Duration diff =
                                                       date.difference(now);
-                                                      return diff.inDays
-                                                          .toDouble(); //* Convert day difference to double
-                                                    }).toList();
+                                                  return diff.inDays
+                                                      .toDouble(); //* Convert day difference to double
+                                                }).toList();
                                               }
 
                                               debugPrint(
@@ -293,9 +292,9 @@ class RecentItem extends StatelessWidget {
                                                         height: 8,
                                                         width: 8,
                                                         decoration:
-                                                        const BoxDecoration(
+                                                            const BoxDecoration(
                                                           shape:
-                                                          BoxShape.circle,
+                                                              BoxShape.circle,
                                                           color: Colors.red,
                                                         ),
                                                       ),
@@ -328,12 +327,11 @@ class RecentItem extends StatelessWidget {
                                 ),
                               ],
                             ),
-
                             SizedBox(
                               height: 160,
                               child: Column(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -344,7 +342,7 @@ class RecentItem extends StatelessWidget {
                                       ),
                                       SizedBox(width: 4),
                                       Image.asset(
-                                         "assets/icons/share.png",
+                                        "assets/icons/share.png",
                                         height: 20,
                                         width: 20,
                                       ),
@@ -353,9 +351,11 @@ class RecentItem extends StatelessWidget {
                                   Column(
                                     children: [
                                       GestureDetector(
-                                        onTap: (){
-                                          joinClubController.clubId = recentClubs.id!;
-                                          joinClubController.joinPrivateClub(recentClubs.id ?? "");
+                                        onTap: () {
+                                          joinClubController.clubId =
+                                              recentClubs.id!;
+                                          joinClubController.joinPrivateClub(
+                                              recentClubs.id ?? "");
                                         },
                                         child: Image.asset(
                                           "assets/icons/request_icon.png",
@@ -394,9 +394,9 @@ class RecentItem extends StatelessWidget {
   //* Single Text
   Widget _customText(
       {required String text,
-        double? fontSize,
-        FontWeight? fontWeight,
-        Color? color}) {
+      double? fontSize,
+      FontWeight? fontWeight,
+      Color? color}) {
     return Padding(
       padding: EdgeInsets.only(left: 8),
       child: Text(
@@ -413,11 +413,11 @@ class RecentItem extends StatelessWidget {
   //* Row Texts
   Widget _rowCustomText(
       {required String firstText,
-        required String secondText,
-        double? firstFontSize,
-        double? secondFontSize,
-        int? secondTextSubStringLength,
-        Color? secondColor}) {
+      required String secondText,
+      double? firstFontSize,
+      double? secondFontSize,
+      int? secondTextSubStringLength,
+      Color? secondColor}) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: Row(

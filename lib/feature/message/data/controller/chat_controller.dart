@@ -1,71 +1,181 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../service/web_socket_service.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
+import 'package:phictly/core/network_caller/service/service.dart';
+import 'package:web_socket_channel/io.dart';
+import '../../../../core/network_caller/utils/utils.dart';
+import '../model/chat_model.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 
 class ChatController extends GetxController {
-  final WebSocketService _webSocket = WebSocketService();
-
-  RxList<ChatMessage> messages = <ChatMessage>[].obs;
-
+  SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
+  RxBool isLoading = false.obs;
+  ScrollController scrollController = ScrollController();
+  RxString roomId = "".obs;
+  RxString userId = "".obs;
   late String currentUserId;
   late String friendId;
 
   ChatUser get user => ChatUser(id: currentUserId);
 
-  Future<void> init(String myId, String otherUserId) async {
-    currentUserId = myId;
-    friendId = otherUserId;
+  final RxList<Message> allMessages = <Message>[].obs;
 
-    final roomId = getRoomId(currentUserId, friendId);
-    print("Initializing ChatController for room: $roomId");
+  IOWebSocketChannel? _channel;
 
-    await _webSocket.connect();
-    _webSocket.joinPrivateChat(friendId);
-
-    _webSocket.onMessage = (data) {
-      print("Received data in controller: $data");
-
-      if (data['type'] == 'receivePrivateMessage') {
-        final msg = data['message'];
-
-        // ✅ Only show if not sent by current user
-        if (msg['senderId'] != currentUserId) {
-          messages.insert(
-            0,
-            ChatMessage(
-              text: msg['content'],
-              user: ChatUser(id: msg['senderId']),
-              createdAt: DateTime.now(),
-            ),
-          );
-        }
-      }
-    };
-  }
-
-  void sendMessage(String content) {
-    print("Sending message from $currentUserId to $friendId: $content");
-
-    // ✅ Show message instantly on sender side
-    final message = ChatMessage(
-      text: content,
-      user: ChatUser(id: currentUserId),
-      createdAt: DateTime.now(),
-    );
-
-    messages.insert(0, message);
-    _webSocket.sendPrivateMessage(currentUserId, friendId, content);
-  }
-
+  RxBool isConnected = false.obs;
   @override
-  void onClose() {
-    print("ChatController for $currentUserId closed");
-    _webSocket.close();
-    super.onClose();
+  void onInit() {
+    super.onInit();
+
+    Future.wait([
+      connect(),
+    ]);
+    joinApp();
   }
 
-  String getRoomId(String user1, String user2) {
-    final sorted = [user1, user2]..sort();
-    return sorted.join("_");
+  Future<void> connect() async {
+    await preferencesHelper.init();
+    String? token = preferencesHelper.getString("userToken");
+    debugPrint("======---===>>>>>>token while connecting: $token");
+
+    if (token != null) {
+      try {
+        _channel = IOWebSocketChannel.connect(
+          Uri.parse('ws://10.0.20.15:5006'),
+          headers: {"x-token": token},
+        );
+        isConnected.value = true;
+
+        _channel!.stream.listen(
+          (message) {
+            debugPrint("message========>>>>>>: $message");
+            _handleMessage(message);
+          },
+          onError: (error) {
+            debugPrint('WebSocket Error: $error');
+            isConnected.value = false;
+            reconnect();
+          },
+          onDone: () {
+            debugPrint('WebSocket connection closed');
+            isConnected.value = false;
+          },
+        );
+      } catch (e) {
+        debugPrint('WebSocket connection failed: $e');
+        isConnected.value = false;
+        reconnect();
+      }
+    } else {
+      debugPrint("=========<><-----><>$token null value token");
+    }
+  }
+
+  void _handleMessage(String message) {
+    final decodedMessage = jsonDecode(message);
+    final type = decodedMessage['type'];
+
+    switch (type) {
+      case 'receivePrivateMessage':
+        break;
+
+      case 'joinApp':
+        debugPrint("==================${decodedMessage['message']}");
+        break;
+      case 'joinSuccess':
+        roomId.value = decodedMessage['chatroomId'];
+        debugPrint("+++++======$roomId");
+        break;
+
+      case 'sendPrivateMessage':
+        break;
+      case 'conversationList':
+        break;
+      case 'authSuccess':
+        String user = decodedMessage['userId'];
+        debugPrint("======userid===========$user");
+        userId.value = user;
+        break;
+      default:
+        debugPrint("======Unhandled message type: $type");
+    }
+  }
+
+  void joinApp() {
+    debugPrint("=================api called");
+    final data = {"type":"joinApp"};
+    final join = jsonEncode(data);
+    _channel!.sink.add(join);
+
+    debugPrint("=========sdf========api called");
+  }
+
+  void joinPrivateChat(String userId2) {
+    debugPrint("Joining private chat with room: $userId2");
+    final joinPrivate =
+        jsonEncode({"type": "joinPrivateChat", "user2Id": userId2});
+    _channel!.sink.add(joinPrivate);
+  }
+
+  void sendPrivateMessage(String senderId, String receiverId, String content) {
+    debugPrint("Sending private message: $content");
+    final message = jsonEncode({
+      "type": "sendPrivateMessage",
+      "senderId": senderId,
+      "receiverId": receiverId,
+      "content": content,
+    });
+    _channel!.sink.add(message);
+  }
+
+  void close() {
+    if (_channel != null) {
+      _channel?.sink.close();
+      isConnected.value = false;
+    }
+  }
+
+  void reconnect() {
+    if (_channel == null ||
+        _channel!.closeCode == null ||
+        _channel!.closeCode != 1000) {
+      debugPrint("Reconnecting...");
+
+      connect();
+    }
+  }
+
+  Future<void> getMesseages(String id) async {
+    await preferencesHelper.init();
+    String? token = preferencesHelper.getString('userToken');
+
+    if (token != null) {
+      try {
+        isLoading.value = true;
+
+        final response = await NetworkCaller().getRequest(
+          "${Utils.baseUrl}/chat/get-single-message/$id",
+          token: token,
+        );
+
+        if (response.isSuccess) {
+          final List<dynamic> resultList = response.responseData;
+          allMessages.clear();
+          allMessages
+              .addAll(resultList.map((e) => Message.fromJson(e)).toList());
+          debugPrint("=====data=========${allMessages.length}");
+        } else {
+          debugPrint("=============Request failed: ${response.responseData}");
+        }
+      } catch (e) {
+        debugPrint("================Error fetching messages: $e");
+      } finally {
+        isLoading.value = false;
+      }
+    } else {
+      debugPrint("Token is null");
+    }
   }
 }
