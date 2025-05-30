@@ -29,7 +29,7 @@ class SignUpScreen extends StatelessWidget {
   final ChangeProfileController changeProfileController =
       Get.put(ChangeProfileController());
   final navController = Get.find<BottomNavController>();
-  final List<String> genderList = ["Male", "Female", "Nonbinary"];
+  final List<String> genderList = ["Male", "Female", "Non_binary"];
   final List<String> locationList = [
     "United States",
     "Canada",
@@ -217,7 +217,7 @@ class SignUpScreen extends StatelessWidget {
                           CustomTextField(
                             controller: controller.dateController,
                             validator: dateValidation,
-                            hintText: "Select Date",
+                            hintText: "Age",
                             prefixIcon: Icons.calendar_month,
                             inputType: TextInputType.number,
                           ),

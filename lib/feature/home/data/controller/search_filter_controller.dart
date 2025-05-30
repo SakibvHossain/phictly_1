@@ -43,7 +43,7 @@ class SearchFilterController extends GetxController {
       logger.i(responseData);
 
       if (responseData is List) {
-        Get.snackbar("Yes", "Its list");
+        //Get.snackbar("Yes", "Its list");
         clubResponse.value = responseData.map((e) => Result.fromJson(e)).toList() ;
       } else {
         Get.snackbar("Error", "Unexpected response format");

@@ -219,80 +219,80 @@ class HomeScreens extends StatelessWidget {
                         ),
                       ),
 
-                      GestureDetector(
-                        child: Container(
-                          margin: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.all(8),
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                "assets/images/social_feed_profile_1.png",
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            title: RichText(
-                              text: TextSpan(
-                                  style: TextStyle(color: Colors.black),
-                                  children: [
-                                    TextSpan(
-                                      text: "tynishaobey19 ",
-                                      style: GoogleFonts.dmSans(
-                                          color: AppColors.primaryColor,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16.sp),
-                                    ),
-                                    TextSpan(
-                                        text:
-                                            "Just added Serpent and Dove to her favorite",
-                                        style: GoogleFonts.dmSans(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16.sp))
-                                  ]),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // GestureDetector(
+                      //   child: Container(
+                      //     margin: EdgeInsets.all(8),
+                      //     decoration: BoxDecoration(
+                      //       color: Colors.white,
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //     child: ListTile(
+                      //       contentPadding: EdgeInsets.all(8),
+                      //       leading: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //         child: Image.asset(
+                      //           "assets/images/social_feed_profile_1.png",
+                      //           fit: BoxFit.cover,
+                      //         ),
+                      //       ),
+                      //       title: RichText(
+                      //         text: TextSpan(
+                      //             style: TextStyle(color: Colors.black),
+                      //             children: [
+                      //               TextSpan(
+                      //                 text: "tynishaobey19 ",
+                      //                 style: GoogleFonts.dmSans(
+                      //                     color: AppColors.primaryColor,
+                      //                     fontWeight: FontWeight.w600,
+                      //                     fontSize: 16.sp),
+                      //               ),
+                      //               TextSpan(
+                      //                   text:
+                      //                       "Just added Serpent and Dove to her favorite",
+                      //                   style: GoogleFonts.dmSans(
+                      //                       color: Colors.black,
+                      //                       fontWeight: FontWeight.w400,
+                      //                       fontSize: 16.sp))
+                      //             ]),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
 
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: CustomButton(
-                                text: "User 1",
-                                onTap: () {
-                                  Get.to(
-                                    () => ChatScreen(
-                                      receiverId: '6836dc1ed96f19f15cef310e',
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 24,
-                            ),
-                            Flexible(
-                              child: CustomButton(
-                                text: "User 2",
-                                onTap: () {
-                                  Get.to(
-                                    () => ChatScreen(
-                                      receiverId: "6836dbead96f19f15cef310d",
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(8.0),
+                      //   child: Row(
+                      //     children: [
+                      //       Flexible(
+                      //         child: CustomButton(
+                      //           text: "User 1",
+                      //           onTap: () {
+                      //             Get.to(
+                      //               () => ChatScreen(
+                      //                 receiverId: '6836dc1ed96f19f15cef310e',
+                      //               ),
+                      //             );
+                      //           },
+                      //         ),
+                      //       ),
+                      //       SizedBox(
+                      //         width: 24,
+                      //       ),
+                      //       Flexible(
+                      //         child: CustomButton(
+                      //           text: "User 2",
+                      //           onTap: () {
+                      //             Get.to(
+                      //               () => ChatScreen(
+                      //                 receiverId: "6836dbead96f19f15cef310d",
+                      //               ),
+                      //             );
+                      //           },
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
                       //* Space
                       SizedBox(

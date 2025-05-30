@@ -123,7 +123,8 @@ class TrendingItem extends StatelessWidget {
 
             return Obx(() {
               final trendingClubs = clubItemController.trendingDataList[index];
-              final isExpanded = clubItemController.selectedClubIndex.value == index;
+              final isExpanded =
+                  clubItemController.selectedClubIndex.value == index;
 
               return GestureDetector(
                 onTap: () {
@@ -189,14 +190,16 @@ class TrendingItem extends StatelessWidget {
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () async {
-                                  if (status!=null) {
-                                    if(status.contains("ACCPECT")){
+                                  if (status != null) {
+                                    if (status.contains("ACCPECT")) {
                                       navController.updateIndex(2);
                                       changeClubController.updateIndex(1);
-                                      clubController.fetchCreatedClub(trending.id ?? "");
+                                      clubController
+                                          .fetchCreatedClub(trending.id ?? "");
                                     }
                                   } else {
-                                    debugPrint("+++++++++++++++Private Club++++++++++++++++++");
+                                    debugPrint(
+                                        "+++++++++++++++Private Club++++++++++++++++++");
                                   }
                                 },
                                 child: Column(
@@ -268,7 +271,8 @@ class TrendingItem extends StatelessWidget {
                                                   max: maxValue,
                                                   value: sliderController
                                                       .value.value
-                                                      .clamp(minValue, maxValue),
+                                                      .clamp(
+                                                          minValue, maxValue),
                                                   onChanged: (val) {
                                                     debugPrint(
                                                         "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
@@ -302,9 +306,11 @@ class TrendingItem extends StatelessWidget {
                                                 trackHeight: 2.0,
                                                 thumbShape:
                                                     const RoundSliderThumbShape(
-                                                        enabledThumbRadius: 5.0),
-                                                overlayShape: SliderComponentShape
-                                                    .noOverlay,
+                                                        enabledThumbRadius:
+                                                            5.0),
+                                                overlayShape:
+                                                    SliderComponentShape
+                                                        .noOverlay,
                                                 thumbColor:
                                                     const Color(0xff29605E),
                                                 activeTrackColor:
@@ -401,18 +407,31 @@ class TrendingItem extends StatelessWidget {
                                                   behavior:
                                                       HitTestBehavior.opaque,
                                                   onTap: () async {
-                                                    if (trending.id == null || trending.type == null) return;
+                                                    if (trending.id == null ||
+                                                        trending.type == null)
+                                                      return;
 
-                                                    if (trending.type!.contains("PRIVATE")) {
-                                                      await joinClubController.joinPrivateClub(trending.id!);
+                                                    if (trending.type!
+                                                        .contains("PRIVATE")) {
+                                                      await joinClubController
+                                                          .joinPrivateClub(
+                                                              trending.id!);
                                                     } else {
-                                                      await joinClubController.joinPublicClub(trending.id!);
-                                                      navController.updateIndex(2);
-                                                      changeClubController.updateIndex(1);
-                                                      clubController.fetchCreatedClub(trending.id ?? "");
+                                                      await joinClubController
+                                                          .joinPublicClub(
+                                                              trending.id!);
+                                                      navController
+                                                          .updateIndex(2);
+                                                      changeClubController
+                                                          .updateIndex(1);
+                                                      clubController
+                                                          .fetchCreatedClub(
+                                                              trending.id ??
+                                                                  "");
                                                     }
 
-                                                    await clubItemController.fetchTrendingClubs();
+                                                    await clubItemController
+                                                        .fetchTrendingClubs();
                                                   },
                                                   child: Image.asset(
                                                     "assets/icons/join_read_icon.png",
