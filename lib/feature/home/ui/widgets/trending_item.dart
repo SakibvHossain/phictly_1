@@ -12,8 +12,6 @@ import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
 import 'package:phictly/feature/home/data/controller/home_controller.dart';
 import 'package:phictly/feature/home/data/controller/slider_controller.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
-import '../../../../core/components/custom_button.dart';
-import '../../../../core/components/custom_outline_button.dart';
 import '../../../create_club/data/controller/change_club_controller.dart';
 import '../../../create_club/data/controller/club_controller.dart';
 import '../../data/controller/bottom_nav_controller.dart';
@@ -40,7 +38,7 @@ class TrendingItem extends StatelessWidget {
   //* Trending Item
   Widget _buildTrendingItem() {
     return SizedBox(
-      height: 180,
+      height: 180.h,
       child: Obx(() {
         if (clubItemController.isTrendingDataLoading.value) {
           return const Center(
@@ -131,6 +129,8 @@ class TrendingItem extends StatelessWidget {
                 onTap: () {
                   // sliderController.updateSlider(minValue, minValue, sliderValue);
                   clubItemController.toggleClubIndex(index);
+                  debugPrint(
+                      "+++++++++++++++++++++++++++++Club Poster Toggled: ${trendingClubs.poster}+++++++++++++++++++++++++++++");
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),

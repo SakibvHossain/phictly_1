@@ -13,10 +13,7 @@ class AppRoute {
   static const String signIn = '/signIn';
 
 
-  static String getInitial() => splash;
-  static String getSignUp() => signUp;
-  static String getSignInScreen() => signIn;
-  static String getHomeScreen() => navBar;
+
 
 
   static final route = [
