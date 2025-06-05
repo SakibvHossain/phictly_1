@@ -4,7 +4,6 @@ import 'package:logger/logger.dart';
 import 'package:phictly/feature/home/data/model/search_club_model.dart';
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
-import '../../../../core/network_caller/utils/utils.dart';
 
 class SearchFilterController extends GetxController {
   final SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
@@ -27,28 +26,24 @@ class SearchFilterController extends GetxController {
     );
   }
 
+
+
   Future<void> fetchClubByName() async {
     await preferencesHelper.init();
-
     try {
       isClubDataAvailable.value = true;
-      String url = Utils.baseUrl + Utils.searchAllClubs(searchFilterController.text.trim());
+      logger.i("==================================== http://69.62.71.168:5006/api/v1/club?page=1&limit=35&searchQuery=${searchFilterController.text}");
       final response = await NetworkCaller().getRequest(
-        url,
+        "http://69.62.71.168:5006/api/v1/club?page=1&limit=35&searchQuery=${searchFilterController.text}",
         token: preferencesHelper.getString('userToken'),
       );
-
       var responseData = response.responseData;
-
       logger.i(responseData);
-
       if (responseData is List) {
-        Get.snackbar("Yes", "Its list");
         clubResponse.value = responseData.map((e) => Result.fromJson(e)).toList() ;
       } else {
         Get.snackbar("Error", "Unexpected response format");
       }
-
     } catch (e) {
       logger.e("Exception: $e");
       Get.snackbar("Error", "An unexpected error occurred.");
@@ -56,6 +51,4 @@ class SearchFilterController extends GetxController {
       isClubDataAvailable.value = false;
     }
   }
-
-
 }

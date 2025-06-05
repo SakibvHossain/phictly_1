@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_text.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/home/data/controller/change_home_controller.dart';
 import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
@@ -26,9 +27,10 @@ class RecentItem extends StatelessWidget {
   final clubItemController = Get.put(ClubItemController());
   final changeClubController = Get.put(ChangeClubController());
   final navController = Get.put(BottomNavController());
-  final clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
   final joinClubController = Get.put(JoinClubController());
   final logger = Logger();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -189,9 +191,13 @@ class RecentItem extends StatelessWidget {
                                 onTap: () async {
                                   if (status!=null) {
                                     if(status.contains("ACCPECT")){
-                                      navController.updateIndex(2);
-                                      changeClubController.updateIndex(1);
+                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${recent.id}");
+                                      sharedPreference.setString("selectedClubId", recent.id ?? "");
+                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
                                       clubController.fetchCreatedClub(recent.id ?? "");
+                                      clubController.areYouFromHome.value = true;
+                                      navController.updateIndex(2);
+                                      changeClubController.updateIndex(6);
                                     }
                                   } else {
                                     debugPrint("+++++++++++++++Private Club++++++++++++++++++");
@@ -214,11 +220,31 @@ class RecentItem extends StatelessWidget {
                                         firstFontSize: 12,
                                         secondText: "${trendingClubs.title}",
                                         secondFontSize: 12),
-                                    _rowCustomText(
+
+                                    trendingClubs.writer == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
                                         firstText: "Author: ",
                                         firstFontSize: 12,
                                         secondText: "${trendingClubs.writer}",
                                         secondFontSize: 12),
+
+                                    trendingClubs.totalSeasons == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                        firstText: "Season: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.totalSeasons}",
+                                        secondFontSize: 12),
+
+                                    trendingClubs.totalEpisodes == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                        firstText: "Episode: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.totalEpisodes}",
+                                        secondFontSize: 12),
+
                                     _rowCustomText(
                                       firstText: "Club Creator: ",
                                       firstFontSize: 12,
@@ -234,8 +260,9 @@ class RecentItem extends StatelessWidget {
                                       secondText: "${trendingClubs.memberSize}",
                                       secondFontSize: 12,
                                     ),
-                                    Flexible(
-                                      flex: 3,
+                                    SizedBox(
+                                      width:
+                                      300.w,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             right: 55, left: 6),

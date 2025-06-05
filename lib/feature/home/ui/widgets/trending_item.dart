@@ -14,6 +14,7 @@ import 'package:phictly/feature/home/data/controller/slider_controller.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
 import '../../../../core/components/custom_button.dart';
 import '../../../../core/components/custom_outline_button.dart';
+import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../create_club/data/controller/change_club_controller.dart';
 import '../../../create_club/data/controller/club_controller.dart';
 import '../../data/controller/bottom_nav_controller.dart';
@@ -28,9 +29,10 @@ class TrendingItem extends StatelessWidget {
   final clubItemController = Get.put(ClubItemController());
   final changeClubController = Get.put(ChangeClubController());
   final navController = Get.put(BottomNavController());
-  final clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
   final joinClubController = Get.put(JoinClubController());
   final logger = Logger();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,7 @@ class TrendingItem extends StatelessWidget {
                 text: "No trending data found",
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
-                color: Color(0xff000000)),
+                color: Color(0xff000000),),
           );
         }
 
@@ -66,7 +68,9 @@ class TrendingItem extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: clubItemController.trendingDataList.length,
           itemBuilder: (context, index) {
-            ClubModel trending = clubItemController.trendingDataList[index];
+            var trending = clubItemController.trendingDataList[index];
+
+            debugPrint("======-----=========Club id ${trending.id}");
 
             final status =
                 (trending.clubMember != null && trending.clubMember!.isNotEmpty)
@@ -129,7 +133,6 @@ class TrendingItem extends StatelessWidget {
 
               return GestureDetector(
                 onTap: () {
-                  // sliderController.updateSlider(minValue, minValue, sliderValue);
                   clubItemController.toggleClubIndex(index);
                 },
                 child: AnimatedContainer(
@@ -137,7 +140,7 @@ class TrendingItem extends StatelessWidget {
                   width: isExpanded ? 340 : 120,
                   margin: EdgeInsets.only(left: 4, right: 4),
                   padding:
-                      EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
+                  EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
                   // No right padding here
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -146,42 +149,41 @@ class TrendingItem extends StatelessWidget {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
                         blurRadius: 5,
-                      )
-                    ],
+                      ),
+                    ], //6837217f46a1809602fc717f
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: CachedNetworkImage(
-                            imageUrl: trendingClubs.poster ??
-                                "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                            height: 160,
-                            width: 100,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
-                              child: SizedBox(
-                                height: 25,
-                                width: 25,
-                                child: SpinKitWave(
-                                  duration: Duration(seconds: 2),
-                                  size: 15,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              "assets/images/placeholder_image.png",
-                              fit: BoxFit.cover,
-                            ),
+                  Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: CachedNetworkImage(
+                      imageUrl: trendingClubs.poster ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                      height: 160,
+                      width: 100,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: SpinKitWave(
+                            duration: Duration(seconds: 2),
+                            size: 15,
+                            color: AppColors.primaryColor,
                           ),
                         ),
                       ),
-                      if (isExpanded) SizedBox(width: 4),
+                      errorWidget: (context, url, error) => Image.asset(
+                        "assets/images/placeholder_image.png",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                      if (isExpanded) SizedBox(width: 4.w),
                       if (isExpanded)
                         Expanded(
                           child: Stack(
@@ -191,9 +193,13 @@ class TrendingItem extends StatelessWidget {
                                 onTap: () async {
                                   if (status!=null) {
                                     if(status.contains("ACCPECT")){
+                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${trendingClubs.id}");
+                                      clubController.areYouFromHome.value = true;
+                                      sharedPreference.setString("selectedClubId", trendingClubs.id ?? "");
+                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
+                                      clubController.fetchCreatedClub(trendingClubs.id ?? "");
                                       navController.updateIndex(2);
-                                      changeClubController.updateIndex(1);
-                                      clubController.fetchCreatedClub(trending.id ?? "");
+                                      changeClubController.updateIndex(6);
                                     }
                                   } else {
                                     debugPrint("+++++++++++++++Private Club++++++++++++++++++");
@@ -216,17 +222,36 @@ class TrendingItem extends StatelessWidget {
                                         firstFontSize: 12,
                                         secondText: "${trendingClubs.title}",
                                         secondFontSize: 12),
-                                    _rowCustomText(
-                                        firstText: "Author: ",
+                                    trendingClubs.writer == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                      firstText: "Author: ",
+                                      firstFontSize: 12,
+                                      secondText: "${trendingClubs.writer}",
+                                      secondFontSize: 12,
+                                    ),
+
+                                    trendingClubs.totalSeasons == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                        firstText: "Season: ",
                                         firstFontSize: 12,
-                                        secondText: "${trendingClubs.writer}",
+                                        secondText: "${trendingClubs.totalSeasons}",
                                         secondFontSize: 12),
+
+                                    trendingClubs.totalEpisodes == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                        firstText: "Episode: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.totalEpisodes}",
+                                        secondFontSize: 12),
+
                                     _rowCustomText(
                                       firstText: "Club Creator: ",
                                       firstFontSize: 12,
-                                      secondText:
-                                          "${trendingClubs.admin?.username}" ??
-                                              "${trendingClubs.writer}",
+                                      secondText: "${trendingClubs.admin?.username}" ??
+                                          "${trendingClubs.writer}",
                                       secondFontSize: 12,
                                       secondColor: Color(0xff29605E),
                                     ),
@@ -244,46 +269,45 @@ class TrendingItem extends StatelessWidget {
                                         child: SizedBox(
                                           height: 15,
                                           child: Obx(() => SliderTheme(
-                                                data: SliderTheme.of(context)
-                                                    .copyWith(
-                                                  trackShape:
-                                                      const RoundedRectSliderTrackShape(),
-                                                  trackHeight: 2.0,
-                                                  thumbShape:
-                                                      const RoundSliderThumbShape(
-                                                          enabledThumbRadius:
-                                                              1.0),
-                                                  overlayShape:
-                                                      SliderComponentShape
-                                                          .noOverlay,
-                                                  thumbColor:
-                                                      const Color(0xff29605E),
-                                                  activeTrackColor:
-                                                      const Color(0xff29605E),
-                                                  inactiveTrackColor:
-                                                      Colors.grey.shade300,
-                                                ),
-                                                child: Slider(
-                                                  min: 0.0,
-                                                  max: maxValue,
-                                                  value: sliderController
-                                                      .value.value
-                                                      .clamp(minValue, maxValue),
-                                                  onChanged: (val) {
-                                                    debugPrint(
-                                                        "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
-                                                    // sliderController.value.value = val;
-                                                  },
-                                                ),
-                                              )),
+                                            data: SliderTheme.of(context)
+                                                .copyWith(
+                                              trackShape:
+                                              const RoundedRectSliderTrackShape(),
+                                              trackHeight: 2.0,
+                                              thumbShape:
+                                              const RoundSliderThumbShape(
+                                                  enabledThumbRadius:
+                                                  1.0),
+                                              overlayShape:
+                                              SliderComponentShape
+                                                  .noOverlay,
+                                              thumbColor:
+                                              const Color(0xff29605E),
+                                              activeTrackColor:
+                                              const Color(0xff29605E),
+                                              inactiveTrackColor:
+                                              Colors.grey.shade300,
+                                            ),
+                                            child: Slider(
+                                              min: 0.0,
+                                              max: maxValue,
+                                              value: sliderController
+                                                  .value.value
+                                                  .clamp(minValue, maxValue),
+                                              onChanged: (val) {
+                                                debugPrint(
+                                                    "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
+                                                // sliderController.value.value = val;
+                                              },
+                                            ),
+                                          )),
                                         ),
                                       ),
                                     ),
                                     _rowCustomText(
                                       firstText: "Timeline: ",
                                       firstFontSize: 12,
-                                      secondText:
-                                          "${trendingClubs.timeLine} day(s)",
+                                      secondText: "${trendingClubs.timeLine} day(s)",
                                       secondFontSize: 12,
                                     ),
                                     Flexible(
@@ -294,23 +318,23 @@ class TrendingItem extends StatelessWidget {
                                         child: SizedBox(
                                           height: 15,
                                           child: Obx(
-                                            () => SliderTheme(
+                                                () => SliderTheme(
                                               data: SliderTheme.of(context)
                                                   .copyWith(
                                                 trackShape:
-                                                    const RoundedRectSliderTrackShape(),
+                                                const RoundedRectSliderTrackShape(),
                                                 trackHeight: 2.0,
                                                 thumbShape:
-                                                    const RoundSliderThumbShape(
-                                                        enabledThumbRadius: 5.0),
+                                                const RoundSliderThumbShape(
+                                                    enabledThumbRadius: 5.0),
                                                 overlayShape: SliderComponentShape
                                                     .noOverlay,
                                                 thumbColor:
-                                                    const Color(0xff29605E),
+                                                const Color(0xff29605E),
                                                 activeTrackColor:
-                                                    const Color(0xff29605E),
+                                                const Color(0xff29605E),
                                                 inactiveTrackColor:
-                                                    Colors.grey.shade300,
+                                                Colors.grey.shade300,
                                               ),
                                               child: Slider(
                                                 min: 0.0,
@@ -335,7 +359,7 @@ class TrendingItem extends StatelessWidget {
                                         fit: FlexFit.loose,
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             Flexible(
                                               flex: 2,
@@ -351,7 +375,7 @@ class TrendingItem extends StatelessWidget {
                                               fit: FlexFit.tight,
                                               child: _customText(
                                                   text:
-                                                      "${trendingClubs.timeLine}",
+                                                  "${trendingClubs.timeLine}",
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w700,
                                                   color: Colors.black),
@@ -367,19 +391,18 @@ class TrendingItem extends StatelessWidget {
                                 bottom: 0,
                                 right: 6,
                                 child: SizedBox(
-                                  height: 160,
+                                  height: 190.h,
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Row(
                                         children: [
                                           SizedBox(
                                             // "assets/icons/bag_icon.png",
-                                            height: 20,
-                                            width: 20,
+                                            height: 20.h,
+                                            width: 20.w,
                                           ),
-                                          SizedBox(width: 4),
+                                          SizedBox(width: 4.w),
                                           Image.asset(
                                             "assets/icons/share.png",
                                             height: 20,
@@ -396,48 +419,45 @@ class TrendingItem extends StatelessWidget {
                                       Column(
                                         children: [
                                           (status == null ||
-                                                  status == "DELETED")
+                                              status == "DELETED")
                                               ? GestureDetector(
-                                                  behavior:
-                                                      HitTestBehavior.opaque,
-                                                  onTap: () async {
-                                                    if (trending.id == null || trending.type == null) return;
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () async {
+                                              if (trending.id == null || trending.type == null) return;
 
-                                                    if (trending.type!.contains("PRIVATE")) {
-                                                      await joinClubController.joinPrivateClub(trending.id!);
-                                                    } else {
-                                                      await joinClubController.joinPublicClub(trending.id!);
-                                                      navController.updateIndex(2);
-                                                      changeClubController.updateIndex(1);
-                                                      clubController.fetchCreatedClub(trending.id ?? "");
-                                                    }
-
-                                                    await clubItemController.fetchTrendingClubs();
-                                                  },
-                                                  child: Image.asset(
-                                                    "assets/icons/join_read_icon.png",
-                                                    height: 28.16,
-                                                    width: 28.52,
-                                                  ),
-                                                )
+                                              if (trending.type!.contains("PRIVATE")) {
+                                                await joinClubController.joinPrivateClub(trending.id!);
+                                              } else {
+                                                await joinClubController.joinPublicClub(trending.id!);
+                                                navController.updateIndex(2);
+                                                changeClubController.updateIndex(1);
+                                                clubController.fetchCreatedClub(trending.id ?? "");
+                                              }
+                                              await clubItemController.fetchTrendingClubs();
+                                            },
+                                            child: Image.asset(
+                                              "assets/icons/join_read_icon.png",
+                                              height: 28.16,
+                                              width: 28.52,
+                                            ),
+                                          )
                                               : (status == "PENDING")
-                                                  ? GestureDetector(
-                                                      behavior: HitTestBehavior
-                                                          .opaque,
-                                                      onTap: () async {
-                                                        // joinClubController.joinPrivateClub(
-                                                        //     trending.id ?? "");
-                                                      },
-                                                      child: Image.asset(
-                                                        "assets/icons/request_icon.png",
-                                                        height: 28.16,
-                                                        width: 28.52,
-                                                      ),
-                                                    )
-                                                  : SizedBox(
-                                                      height: 28.16,
-                                                      width: 28.52,
-                                                    ),
+                                              ? GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () async {
+                                              // joinClubController.joinPrivateClub(
+                                              //     trending.id ?? "");
+                                            },
+                                            child: Image.asset(
+                                              "assets/icons/request_icon.png",
+                                              height: 28.16,
+                                              width: 28.52,
+                                            ),
+                                          )
+                                              : SizedBox(
+                                            height: 28.16,
+                                            width: 28.52,
+                                          ),
 
                                           // buildStatusIcon(status!, trending.id ?? ""),
                                           buildStatusText(status),
@@ -448,7 +468,7 @@ class TrendingItem extends StatelessWidget {
                                           _customText(
                                               text: difference,
                                               color:
-                                                  Colors.black.withOpacity(0.6),
+                                              Colors.black.withOpacity(0.6),
                                               fontSize: 9.78,
                                               fontWeight: FontWeight.w400),
                                         ],
@@ -462,14 +482,20 @@ class TrendingItem extends StatelessWidget {
                         ),
                     ],
                   ),
+
+
                 ),
               );
             });
+
           },
         );
       }),
     );
   }
+  /*
+
+   */
 
   //* Row Texts
   Widget _rowCustomText({

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:iconly/iconly.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_text_field.dart';
@@ -16,7 +16,6 @@ import '../../../../core/utils/image_path.dart';
 import '../../../../core/validation/password_validation.dart';
 import '../../../book/data/controller/date_controller.dart';
 import '../../../home/data/controller/bottom_nav_controller.dart';
-import '../../../home/data/controller/change_home_controller.dart';
 import '../../../profile/data/controller/change_profile_controller.dart';
 import '../widget/dropdown_gender.dart';
 import '../widget/dropdown_location.dart';
@@ -217,7 +216,7 @@ class SignUpScreen extends StatelessWidget {
                           CustomTextField(
                             controller: controller.dateController,
                             validator: dateValidation,
-                            hintText: "Select Date",
+                            hintText: "Enter Age",
                             prefixIcon: Icons.calendar_month,
                             inputType: TextInputType.number,
                           ),

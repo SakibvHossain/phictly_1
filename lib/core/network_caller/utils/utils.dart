@@ -20,6 +20,9 @@ class Utils {
   static String updateProfile = "/auth/profile";
   static String statusUpdate(String id) => "/post/post-status-update/$id";
   static String clubStatusUpdate = "/club/join-status-update";
+  static String favoriteGenre = "/genre/favourite-genre";
+  static String fetchAllMyClubs = "/club/get-all-my-club";
+  static String createFavoriteGenre = "/profile/favarite-genre";
   static String privateClubJoinRequest(String id) => "/club/joining-private/$id";
   static String publicClubJoinRequest(String id) => "/club/joining-public/$id";
   static String searchAllClubs(String queryValue) => "/club?page=1&limit=35&searchQuery=$queryValue";

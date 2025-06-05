@@ -18,7 +18,7 @@ class CommentController extends GetxController {
   final DropdownController dropdownController = Get.put(DropdownController());
   final PostClubController bookController = Get.put(PostClubController());
   final TextEditingController replyController = TextEditingController();
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
 
   //* Post Show fields
   final TextEditingController showContentTextController = TextEditingController();
@@ -61,22 +61,13 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 201) {
-        Get.snackbar(
-          "Success",
-          "Successfully Club created.",
-        );
-
         logger.i(response.responseData);
-
-
         var json = response.responseData;
 
         if (json is List) {
           postResultList.clear(); // Optional: if you want to reset list
           postResultList.addAll(json.map((item) => PostResult.fromJson(item)).toList());
-
-          Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
-
+          // Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
           for (var post in postResultList) {
             debugPrint("Post: ${post.chapter}, ${post.content}, ${post.type}");
           }
@@ -84,14 +75,11 @@ class CommentController extends GetxController {
         } else if (json is Map<String, dynamic>) {
           PostResult singlePost = PostResult.fromJson(json);
           postResultList.add(singlePost);
-
-          Get.snackbar("Success", "Successfully added 1 post.");
+          // Get.snackbar("Success", "Successfully added 1 post.");
           debugPrint("Post: ${singlePost.chapter}, ${singlePost.content}, ${singlePost.type}");
         } else {
           Get.snackbar("Error", "Unexpected data format received");
         }
-
-
       } else {
         Get.snackbar(
           "Failed",
@@ -104,6 +92,70 @@ class CommentController extends GetxController {
       debugPrint("Error: $e");
       logger.e(e.toString());
     } finally {
+      postController.clear();
+      isLoading.value = false;
+    }
+  }
+
+  //* Post on Book Club
+  Future<void> postHomeBookClubContent() async{
+    preferencesHelper.init();
+    isLoading.value = true;
+    final Logger logger = Logger();
+
+    final clubID = preferencesHelper.getString("selectedClubId");
+
+    Map<String, dynamic> inputClubData = {
+      "chapter": dropdownController.selectedChapter.value,
+      "type": clubController.clubDetail.value?.clubMediumType,
+      "clubId": clubID,
+      "content": postController.text
+    };
+
+    try{
+      await preferencesHelper.init();
+
+      String url = Utils.baseUrl + Utils.createPost;
+
+      final response = await NetworkCaller().postRequest(
+        url,
+        body: inputClubData,
+        token: preferencesHelper.getString('userToken'),
+      );
+
+      if (response.statusCode == 201) {
+        logger.i(response.responseData);
+        var json = response.responseData;
+
+        if (json is List) {
+          postResultList.clear(); // Optional: if you want to reset list
+          postResultList.addAll(json.map((item) => PostResult.fromJson(item)).toList());
+          // Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
+          for (var post in postResultList) {
+            debugPrint("Post: ${post.chapter}, ${post.content}, ${post.type}");
+          }
+
+        } else if (json is Map<String, dynamic>) {
+          PostResult singlePost = PostResult.fromJson(json);
+          postResultList.add(singlePost);
+          // Get.snackbar("Success", "Successfully added 1 post.");
+          debugPrint("Post: ${singlePost.chapter}, ${singlePost.content}, ${singlePost.type}");
+        } else {
+          Get.snackbar("Error", "Unexpected data format received");
+        }
+      } else {
+        Get.snackbar(
+          "Failed",
+          response.errorMessage,
+        );
+        logger.w(response.responseData);
+      }
+
+    }catch (e) {
+      debugPrint("Error: $e");
+      logger.e(e.toString());
+    } finally {
+      postController.clear();
       isLoading.value = false;
     }
   }
@@ -132,22 +184,13 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 201) {
-        Get.snackbar(
-          "Success",
-          "Successfully Club created.",
-        );
-
         logger.i(response.responseData);
-
-
         var json = response.responseData;
 
         if (json is List) {
           postResultList.clear(); // Optional: if you want to reset list
           postResultList.addAll(json.map((item) => PostResult.fromJson(item)).toList());
-
-          Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
-
+          // Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
           for (var post in postResultList) {
             debugPrint("Post: ${post.chapter}, ${post.content}, ${post.type}");
           }
@@ -155,8 +198,70 @@ class CommentController extends GetxController {
         } else if (json is Map<String, dynamic>) {
           PostResult singlePost = PostResult.fromJson(json);
           postResultList.add(singlePost);
+          // Get.snackbar("Success", "Successfully added 1 post.");
+          debugPrint("Post: ${singlePost.chapter}, ${singlePost.content}, ${singlePost.type}");
+        } else {
+          Get.snackbar("Error", "Unexpected data format received");
+        }
 
-          Get.snackbar("Success", "Successfully added 1 post.");
+
+      } else {
+        Get.snackbar(
+          "Failed",
+          response.errorMessage,
+        );
+        logger.w(response.responseData);
+      }
+
+    }catch (e) {
+      debugPrint("Error: $e");
+      logger.e(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> postHomeMovieClubContent() async{
+    preferencesHelper.init();
+    isLoading.value = true;
+    final Logger logger = Logger();
+
+    final clubID = preferencesHelper.getString("selectedClubId");
+
+    Map<String, dynamic> inputClubData = {
+      "relatedScene": movieSceneTextController.text,
+      "type": clubController.clubDetail.value?.clubMediumType,
+      "clubId": clubID,
+      "content": movieContentTextController.text
+    };
+
+    try{
+      await preferencesHelper.init();
+
+      String url = Utils.baseUrl + Utils.createPost;
+
+      final response = await NetworkCaller().postRequest(
+        url,
+        body: inputClubData,
+        token: preferencesHelper.getString('userToken'),
+      );
+
+      if (response.statusCode == 201) {
+        logger.i(response.responseData);
+        var json = response.responseData;
+
+        if (json is List) {
+          postResultList.clear(); // Optional: if you want to reset list
+          postResultList.addAll(json.map((item) => PostResult.fromJson(item)).toList());
+          // Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
+          for (var post in postResultList) {
+            debugPrint("Post: ${post.chapter}, ${post.content}, ${post.type}");
+          }
+
+        } else if (json is Map<String, dynamic>) {
+          PostResult singlePost = PostResult.fromJson(json);
+          postResultList.add(singlePost);
+          // Get.snackbar("Success", "Successfully added 1 post.");
           debugPrint("Post: ${singlePost.chapter}, ${singlePost.content}, ${singlePost.type}");
         } else {
           Get.snackbar("Error", "Unexpected data format received");
@@ -204,22 +309,13 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 201) {
-        Get.snackbar(
-          "Success",
-          "Successfully Club created.",
-        );
-
         logger.i(response.responseData);
-
-
         var json = response.responseData;
 
         if (json is List) {
           postResultList.clear();
           postResultList.addAll(json.map((item) => PostResult.fromJson(item)).toList());
-
-          Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
-
+          // Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
           for (var post in postResultList) {
             debugPrint("Post: ${post.chapter}, ${post.content}, ${post.type}");
           }
@@ -227,14 +323,72 @@ class CommentController extends GetxController {
         } else if (json is Map<String, dynamic>) {
           PostResult singlePost = PostResult.fromJson(json);
           postResultList.add(singlePost);
-
-          Get.snackbar("Success", "Successfully added 1 post.");
+          // Get.snackbar("Success", "Successfully added 1 post.");
           debugPrint("Post: ${singlePost.chapter}, ${singlePost.content}, ${singlePost.type}");
         } else {
           Get.snackbar("Error", "Unexpected data format received");
         }
+      } else {
+        Get.snackbar(
+          "Failed",
+          response.errorMessage,
+        );
+        logger.w(response.responseData);
+      }
 
+    }catch (e) {
+      debugPrint("Error: $e");
+      logger.e(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
+  Future<void> postHomeShowClubContent() async{
+    preferencesHelper.init();
+    isLoading.value = true;
+    final Logger logger = Logger();
+    final clubID = preferencesHelper.getString("selectedClubId");
+
+    Map<String, dynamic> inputClubData = {
+      "relatedScene": showSceneTextController.text,
+      "type": clubController.clubDetail.value?.clubMediumType,
+      "chapter": showEpisodeController.selectedChapter.value,
+      "clubId": clubID,
+      "content": showContentTextController.text
+    };
+
+    try{
+      await preferencesHelper.init();
+
+      String url = Utils.baseUrl + Utils.createPost;
+
+      final response = await NetworkCaller().postRequest(
+        url,
+        body: inputClubData,
+        token: preferencesHelper.getString('userToken'),
+      );
+
+      if (response.statusCode == 201) {
+        logger.i(response.responseData);
+        var json = response.responseData;
+
+        if (json is List) {
+          postResultList.clear();
+          postResultList.addAll(json.map((item) => PostResult.fromJson(item)).toList());
+          // Get.snackbar("Success", "Successfully added ${postResultList.length} post(s).");
+          for (var post in postResultList) {
+            debugPrint("Post: ${post.chapter}, ${post.content}, ${post.type}");
+          }
+
+        } else if (json is Map<String, dynamic>) {
+          PostResult singlePost = PostResult.fromJson(json);
+          postResultList.add(singlePost);
+          // Get.snackbar("Success", "Successfully added 1 post.");
+          debugPrint("Post: ${singlePost.chapter}, ${singlePost.content}, ${singlePost.type}");
+        } else {
+          Get.snackbar("Error", "Unexpected data format received");
+        }
       } else {
         Get.snackbar(
           "Failed",
@@ -275,15 +429,7 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 201) {
-        Get.snackbar(
-          "Success",
-          "Successfully Club created.",
-        );
-
         logger.i(response.responseData);
-
-
-
       } else {
         Get.snackbar(
           "Failed",

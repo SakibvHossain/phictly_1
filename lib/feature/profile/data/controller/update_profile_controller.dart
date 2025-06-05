@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
@@ -17,7 +19,6 @@ class UpdateProfileController extends GetxController {
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
 
-
   var isLoading = false.obs;
   var isLoadingReply = false.obs;
   final Logger logger = Logger();
@@ -28,7 +29,7 @@ class UpdateProfileController extends GetxController {
   Rx<File?> pickedCoverImage = Rx<File?>(null);
 
   //* Update Profile Club
-  Future<void> postClubContent() async{
+  Future<void> postClubContent() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
@@ -36,11 +37,11 @@ class UpdateProfileController extends GetxController {
     Map<String, dynamic> inputClubData = {
       "bio": bioController.text,
       "username": userNameController.text,
-      "coverPhoto": pickedImage.value.toString(),
-      "avatar": pickedCoverImage.value.toString(),
+      "coverPhoto": pickedCoverImage.value.toString(),
+      "avatar": pickedImage.value.toString(),
     };
 
-    try{
+    try {
       await preferencesHelper.init();
 
       String url = Utils.baseUrl + Utils.updateProfile;
@@ -60,15 +61,15 @@ class UpdateProfileController extends GetxController {
         );
         logger.w(response.responseData);
       }
-
-    }catch (e) {
+    } catch (e) {
       debugPrint("Error: $e");
       logger.e(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
-  Future<void> postCoverImage() async{
+
+  Future<void> postCoverImage() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
@@ -77,36 +78,51 @@ class UpdateProfileController extends GetxController {
       "coverPhoto": pickedCoverImage.value.toString(),
     };
 
-    try{
+    try {
       await preferencesHelper.init();
-
+      var token = preferencesHelper.getString("userToken");
       String url = Utils.baseUrl + Utils.updateProfile;
 
-      final response = await NetworkCaller().patchRequest(
-        url,
-        body: inputClubData,
-        token: preferencesHelper.getString('userToken'),
+      var request = http.MultipartRequest('PUT', Uri.parse(url));
+
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+
+      request.fields['bodyData'] = jsonEncode(inputClubData);
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'coverPhoto',
+          pickedCoverImage.value.toString(),
+        ),
       );
 
-      if (response.isSuccess) {
-        logger.i(response.responseData);
+      var streamedResponse = await request.send();
 
+      var response = await http.Response.fromStream(streamedResponse);
+
+      // final response = await NetworkCaller().patchRequest(
+      //   url,
+      //   body: inputClubData,
+      //   token: preferencesHelper.getString('userToken'),
+      // );
+
+      if (response.statusCode == 200) {
+        logger.i(response.body);
       } else {
-        Get.snackbar(
-          "Failed",
-          response.errorMessage,
-        );
-        logger.w(response.responseData);
+        logger.w(response.body);
+        logger.w(response.headers);
       }
-
-    }catch (e) {
+    } catch (e) {
       debugPrint("Error: $e");
       logger.e(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
-  Future<void> postProfileImage() async{
+
+  Future<void> postProfileImage() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
@@ -115,7 +131,7 @@ class UpdateProfileController extends GetxController {
       "avatar": pickedImage.value.toString(),
     };
 
-    try{
+    try {
       await preferencesHelper.init();
 
       String url = Utils.baseUrl + Utils.updateProfile;
@@ -128,7 +144,6 @@ class UpdateProfileController extends GetxController {
 
       if (response.isSuccess) {
         logger.i(response.responseData);
-
       } else {
         Get.snackbar(
           "Failed",
@@ -136,15 +151,15 @@ class UpdateProfileController extends GetxController {
         );
         logger.w(response.responseData);
       }
-
-    }catch (e) {
+    } catch (e) {
       debugPrint("Error: $e");
       logger.e(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
-  Future<void> postBio() async{
+
+  Future<void> postBio() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
@@ -153,7 +168,7 @@ class UpdateProfileController extends GetxController {
       "bio": bioController.text,
     };
 
-    try{
+    try {
       await preferencesHelper.init();
 
       String url = Utils.baseUrl + Utils.updateProfile;
@@ -173,15 +188,15 @@ class UpdateProfileController extends GetxController {
         );
         logger.w(response.responseData);
       }
-
-    }catch (e) {
+    } catch (e) {
       debugPrint("Error: $e");
       logger.e(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
-  Future<void> postUsername() async{
+
+  Future<void> postUsername() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
@@ -190,7 +205,7 @@ class UpdateProfileController extends GetxController {
       "username": userNameController.text,
     };
 
-    try{
+    try {
       await preferencesHelper.init();
 
       String url = Utils.baseUrl + Utils.updateProfile;
@@ -210,8 +225,7 @@ class UpdateProfileController extends GetxController {
         );
         logger.w(response.responseData);
       }
-
-    }catch (e) {
+    } catch (e) {
       debugPrint("Error: $e");
       logger.e(e.toString());
     } finally {

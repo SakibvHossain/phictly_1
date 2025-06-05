@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text_form_field_without_icon.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
 import 'package:phictly/feature/create_club/data/controller/comment_controller.dart';
@@ -23,7 +24,8 @@ class CreatePostScreen extends StatelessWidget {
       Get.put(ChangeClubController());
   final PostClubController bookController = Get.put(PostClubController());
   final CommentController commentController = Get.put(CommentController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -169,13 +171,23 @@ class CreatePostScreen extends StatelessWidget {
                               : CustomButton(
                                   text: "Post",
                                   onTap: () async {
-                                    commentController.postBookClubContent();
-                                    clubController.fetchCreatedClub(
-                                        bookController.createdClubId);
-                                    await Future.delayed(
-                                      Duration(milliseconds: 300),
-                                    );
-                                    changeClubController.updateIndex(1);
+                                    if(clubController.areYouFromHome.value){
+                                      final clubID = sharedPreference.getString("selectedClubId");
+                                      commentController.postHomeBookClubContent();
+                                      clubController.fetchCreatedClub(clubID ?? "");
+                                      await Future.delayed(
+                                        Duration(milliseconds: 300),
+                                      );
+                                      changeClubController.updateIndex(6);
+                                    }else{
+                                      commentController.postBookClubContent();
+                                      clubController.fetchCreatedClub(
+                                          bookController.createdClubId);
+                                      await Future.delayed(
+                                        Duration(milliseconds: 300),
+                                      );
+                                      changeClubController.updateIndex(1);
+                                    }
                                   },
                                 ),
                         ),

@@ -31,7 +31,7 @@ class Reply extends StatelessWidget {
 
   final ChangeClubController changeClubController = Get.put(ChangeClubController());
   final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
-  final ClubController club = Get.put(ClubController());
+  final club = Get.find<ClubController>();
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +100,18 @@ class Reply extends StatelessWidget {
                       SizedBox(
                         width: 16.w,
                       ),
+
+                      //* NO issue here
                       GestureDetector(
                         onTap: (){
-                          changeClubController.updateIndex(3);
+                          // if(club.areYouFromHome.value){
+                          //   changeClubController.updateIndex(6);
+                          // }else{
+                          //   changeClubController.updateIndex(3);
+                          // }
                         },
-                        child: Icon(
-                          Icons.reply_outlined,
-                          color: AppColors.primaryColor,
+                        child: SizedBox(
+                          height: 16.h, width: 16.w,
                         ),
                       ),
                     ],

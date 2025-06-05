@@ -1,34 +1,48 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:phictly/feature/profile/data/controller/profile_genre_controller.dart';
+
 import '../../../../core/helper/sheared_prefarences_helper.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';
 
-class StatusController extends GetxController {
+class CreateFavoriteGenreController extends GetxController {
   SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
+  final genreController = Get.put(ProfileGenreController());
+
 
   var isLoading = false.obs;
-  var isLoadingReply = false.obs;
   final Logger logger = Logger();
 
-  //* Post on Book Club
-  Future<void> updateStatus(String id) async{
+  //* Update Profile Club
+  Future<void> createFavoriteGenre() async{
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
 
+    Map<String, dynamic> inputClubData = {
+      "genreIds": genreController.selectedTagIds,
+    };
+
     try{
       await preferencesHelper.init();
-      String url = Utils.baseUrl + Utils.statusUpdate(id);
+
+      String url = Utils.baseUrl + Utils.createFavoriteGenre;
+
       final response = await NetworkCaller().postRequest(
         url,
-        body: {},
+        body: inputClubData,
         token: preferencesHelper.getString('userToken'),
       );
-      if (response.statusCode == 201) {
+
+      if (response.isSuccess) {
         logger.i(response.responseData);
-        var json = response.responseData;
+
       } else {
         Get.snackbar(
           "Failed",

@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
-import 'package:phictly/core/components/custom_text_field_with_suffix.dart';
 import 'package:phictly/core/utils/app_colors.dart';
-import 'package:phictly/feature/create_club/data/controller/genre_controller.dart';
+import 'package:phictly/feature/profile/data/controller/create_favorite_genre_controller.dart';
+import 'package:phictly/feature/profile/data/controller/fetch_favorite_genre_controller.dart';
+import 'package:phictly/feature/profile/data/controller/profile_data_controller.dart';
+import 'package:phictly/feature/profile/data/controller/profile_genre_controller.dart';
 import '../../../../../core/components/custom_text.dart';
 import '../../../data/controller/change_profile_controller.dart';
 
 class GenresScreen extends StatelessWidget {
   GenresScreen({super.key});
 
-  final List<String> genres = [
-    "Young Adult", "Romance", "Mystery", "Historical Fiction", "Manga", "Fantasy",
-    "Thriller", "Christian", "Urban", "Sci-Fi", "Fantasy", "Comedy", "Action", "Adventure",
-    "Fiction", "Non-Fiction", "Cooking", "Graphic Novels", "Christian", "History",
-    "Webtoons", "Reality", "Autobiography", "Documentary", "Poetry", "Sitcoms", "LGBTQ+", "DiY"
-  ];
-
-  final ChangeProfileController screenController =
-  Get.put(ChangeProfileController());
-
-  final GenreController genreController = Get.put(GenreController());
+  final createGenreController = Get.put(CreateFavoriteGenreController());
+  final fetchFavoriteGenre = Get.put(FetchFavoriteGenreController());
+  final profileDataController = Get.put(ProfileDataController());
+  final screenController = Get.put(ChangeProfileController());
+  final genreController = Get.put(ProfileGenreController());
+  final controller = Get.put(ChangeProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -111,41 +109,79 @@ class GenresScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
 
-                  // Ensure Flexible to avoid layout issues
-                  Flexible(
-                    child: SingleChildScrollView(
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: genres.map((tag) {
-                          return Obx(() {
-                            bool isSelected = genreController.selectedTags.contains(tag);
-                            return GestureDetector(
-                              onTap: () => genreController.toggleTag(tag),
-                              child: Chip(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24.r)
-                                ),
-                                side: BorderSide(color: Colors.transparent),
-                                label: Text(tag,
+                  //* Ensure Flexible to avoid layout issues
+                  Obx(() {
+                    final genre = fetchFavoriteGenre.favoriteGenre;
+
+                    if (fetchFavoriteGenre.isFavoriteGenreLoading.value) {
+                      return Center(
+                        child: SpinKitWave(
+                          color: AppColors.primaryColor,
+                          size: 15,
+                        ),
+                      );
+                    }
+
+                    return Flexible(
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: genre.map((tag) {
+                            return Obx(() {
+                              bool isSelected = genreController.selectedTagIds
+                                  .contains(tag.id);
+                              return GestureDetector(
+                                onTap: () => genreController.toggleTag(
+                                    title: tag.title, id: tag.id),
+                                child: Chip(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24.r),
+                                  ),
+                                  side: BorderSide(color: Colors.transparent),
+                                  label: Text(
+                                    tag.title,
                                     style: GoogleFonts.dmSans(
-                                        color: isSelected ? Colors.white : Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w400)),
-                                backgroundColor:
-                                isSelected ? Colors.teal : Color(0xffEEF0F8),
-                              ),
-                            );
-                          });
-                        }).toList(),
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  backgroundColor: isSelected
+                                      ? Colors.teal
+                                      : Color(0xffEEF0F8),
+                                ),
+                              );
+                            });
+                          }).toList(),
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
 
                   SizedBox(height: 16.h),
-                  CustomButton(text: "Save", borderRadius: 6.r),
+                  Obx(
+                    () => createGenreController.isLoading.value
+                        ? Center(
+                            child: SpinKitWave(
+                              color: AppColors.primaryColor,
+                              size: 15,
+                            ),
+                          )
+                        : CustomButton(
+                            text: "Save",
+                            onTap: () async {
+                              await createGenreController.createFavoriteGenre();
+                              controller.currentIndex(0);
+                              profileDataController.fetchProfileDetails();
+                            },
+                            borderRadius: 6.r,
+                          ),
+                  ),
                 ],
               ),
             )
-
           ],
         ),
       ),

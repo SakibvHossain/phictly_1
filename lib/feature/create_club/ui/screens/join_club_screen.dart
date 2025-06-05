@@ -3,13 +3,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phictly/core/components/custom_text.dart';
-import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/create_club/data/controller/comment_controller.dart';
 import 'package:phictly/feature/create_club/ui/screens/create_post_screen.dart';
 import 'package:phictly/feature/create_club/ui/widgets/chapter_comments.dart';
 import 'package:phictly/feature/create_club/ui/widgets/custom_created_book_item.dart';
 import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
+import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../data/controller/change_club_controller.dart';
 import '../../data/controller/club_controller.dart';
 import '../../data/controller/get_created_club_controller.dart';
@@ -17,20 +17,17 @@ import '../../data/controller/post_club_controller.dart';
 import '../../data/controller/status_controller.dart';
 import '../../data/controller/talk_point_controller.dart';
 
-class ClubScreen extends StatelessWidget {
-  ClubScreen({super.key});
+class JoinClubScreen extends StatelessWidget {
+  JoinClubScreen({super.key});
 
   final TalkPointController pointController = Get.put(TalkPointController());
-  final  changeClubController =
-      Get.put(ChangeClubController());
-  final  bookController = Get.put(PostClubController());
-  final GetCreatedClubController getCreatedClubController =
-      Get.put(GetCreatedClubController());
+  final ChangeClubController changeClubController = Get.put(ChangeClubController());
+  final GetCreatedClubController getCreatedClubController = Get.put(GetCreatedClubController());
   final clubController = Get.find<ClubController>();
-  final navController = Get.put(BottomNavController());
-  final commentController = Get.put(CommentController());
+  final BottomNavController navController = Get.put(BottomNavController());
+  final CommentController commentController = Get.put(CommentController());
   final status = Get.put(StatusController());
-  final sharedPreference = Get.put(SharedPreferencesHelper());
+  final sharedPreference = SharedPreferencesHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +36,9 @@ class ClubScreen extends StatelessWidget {
       body: RefreshIndicator(
         color: AppColors.primaryColor,
         onRefresh: () async {
-          final clubID = sharedPreference.getString("selectedClubId");
-          if(clubController.areYouFromHome.value){
-            clubController.fetchCreatedClub(clubID ?? "");
-          }else{
-            clubController.fetchCreatedClub(bookController.createdClubId);
-          }
+          final value = sharedPreference.getString("selectedClubId");
+          debugPrint("+________________________________________+++${clubController.selectedClubId.value}");
+          clubController.fetchCreatedClub(value ?? "");
         },
         child: Stack(
           children: [
@@ -53,7 +47,9 @@ class ClubScreen extends StatelessWidget {
                 // Your AppBar Container
                 Container(
                   width: double.infinity,
-                  decoration: const BoxDecoration(color: Color(0xff29605E)),
+                  decoration: const BoxDecoration(
+                    color: Color(0xff29605E),
+                  ),
                   child: Column(
                     children: [
                       SizedBox(height: 75.h),
@@ -88,8 +84,7 @@ class ClubScreen extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          bookController.fetchClubId();
-                          bookController.selectedBooks.clear();
+                          clubController.areYouFromHome.value = false;
                           navController.updateIndex(0);
                           changeClubController.updateIndex(0);
                           pointController.talkPoints.clear();
@@ -101,10 +96,7 @@ class ClubScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          SizedBox(
-                              // "assets/images/phone.png",
-                              height: 30.h,
-                              width: 30.w),
+                          SizedBox(height: 30.h, width: 30.w),
                           Image.asset("assets/images/dot_bar.png",
                               height: 20.h, width: 20.w),
                         ],
@@ -117,7 +109,6 @@ class ClubScreen extends StatelessWidget {
                 Obx(() {
                   debugPrint(
                       "+++++++++++++++CLUB SCREEN+++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
-
                   if (clubController.isLoading.value) {
                     return Center(
                       child: SpinKitWave(
@@ -253,8 +244,8 @@ class ClubScreen extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       itemCount: club.post.length,
                       itemBuilder: (context, index) {
-
                         final post = club.post[index];
+                        debugPrint("=============post id ${post.id}");
                         final createdAt = clubController
                             .clubDetail.value!.post[index].createdAt;
                         final Duration diff =
@@ -279,10 +270,10 @@ class ClubScreen extends StatelessWidget {
                             "+++++++++++++++WHAT IS IT TRUE+++++++++++++++${post.postReadStatus!.isRead}");
 
                         return GestureDetector(
-                          onTap: () {
-                            clubController
-                                .fetchCreatedClub(bookController.createdClubId);
-                            // ChapterCommentDetails(postId: post.id, postIndex: index,);  I don't know why this function returns null damn it
+                          onTap: () async {
+                            final clubId = sharedPreference.getString("selectedClubId");
+                            Future.delayed(Duration(milliseconds: 300));
+                            clubController.fetchCreatedClub(clubId ?? "");
                             clubController.selectedIndex = index;
                             changeClubController.updateIndex(2);
                             debugPrint("=============Eororror======<><><><>${post.user.id} ${post.user.avatar}");
@@ -303,19 +294,16 @@ class ClubScreen extends StatelessWidget {
                                 ? post.chapter
                                 : clubController
                                             .clubDetail.value?.clubMediumType
-                                            .contains("SHOW") ==
-                                        true
+                                            .contains("SHOW") == true
                                     ? "${post.chapter},${post.relatedScene}"
                                     : "${post.relatedScene}",
                             index: index,
                             parentID: post.id,
-                            type:
-                                clubController.clubDetail.value?.clubMediumType,
+                            type: clubController.clubDetail.value?.clubMediumType,
                             chapterCreatedTime: difference,
                             chapterBannerText: clubController
                                         .clubDetail.value?.clubMediumType
-                                        .contains("BOOK") ==
-                                    true
+                                        .contains("BOOK") == true
                                 ? post.chapter
                                 : post.episode,
                             isTextVisible: post.postReadStatus!.isRead,
@@ -338,8 +326,9 @@ class ClubScreen extends StatelessWidget {
               right: 24,
               child: GestureDetector(
                 onTap: () {
+                  final clubId = sharedPreference.getString("selectedClubId");
                   CreatePostScreen(
-                    clubId: clubController.clubDetail.value?.id,
+                    clubId: clubId,
                     bookType: clubController.clubDetail.value?.clubMediumType,
                   );
                   debugPrint("You have pressed!!!!!!!");

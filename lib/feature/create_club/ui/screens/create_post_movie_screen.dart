@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text_form_field_without_icon.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
 import 'package:phictly/feature/create_club/data/controller/comment_controller.dart';
@@ -22,7 +23,8 @@ class CreatePostMovieScreen extends StatelessWidget {
   final ChangeClubController changeClubController = Get.put(ChangeClubController());
   final PostClubController bookController = Get.put(PostClubController());
   final CommentController commentController = Get.put(CommentController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +150,6 @@ class CreatePostMovieScreen extends StatelessWidget {
                           borderColor:
                           Color(0xff000000).withValues(alpha: 0.20),
                           borderRadius: BorderRadius.circular(10.r),
-                          inputType: TextInputType.number,
                           hintText: "00:00:00",
                           textStyle: GoogleFonts.dmSans(
                             fontSize: 17.sp,
@@ -182,10 +183,19 @@ class CreatePostMovieScreen extends StatelessWidget {
                                     return;
                                   }
 
-                                  commentController.postMovieClubContent();
-                                  clubController.fetchCreatedClub(bookController.createdClubId);
-                                  await Future.delayed(Duration(milliseconds: 300));
-                                  changeClubController.updateIndex(1);
+                                  if(clubController.areYouFromHome.value){
+                                    final clubID = sharedPreference.getString("selectedClubId");
+                                    commentController.postHomeMovieClubContent();
+                                    clubController.fetchCreatedClub(clubID ?? "");
+                                    await Future.delayed(Duration(milliseconds: 300));
+                                    changeClubController.updateIndex(6);
+                                  }else{
+                                    commentController.postMovieClubContent();
+                                    clubController.fetchCreatedClub(bookController.createdClubId);
+                                    await Future.delayed(Duration(milliseconds: 300));
+                                    changeClubController.updateIndex(1);
+                                  }
+                                  //final clubID = sharedPreference.getString("selectedClubId");
                                 },
                           ),
                         ),

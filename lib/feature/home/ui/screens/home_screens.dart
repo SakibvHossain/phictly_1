@@ -1,21 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:logger/logger.dart';
-import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/home/data/controller/change_home_controller.dart';
 import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
 import 'package:phictly/feature/home/data/controller/home_controller.dart';
-import 'package:get/get.dart';
 import 'package:phictly/feature/home/ui/screens/notification_list_screen.dart';
 import 'package:phictly/feature/home/ui/widgets/recent_item.dart';
 import 'package:phictly/feature/home/ui/widgets/trending_item.dart';
 import 'package:phictly/feature/message/data/controller/chat_controller.dart';
-
-import '../../../message/ui/screens/chat_screen.dart';
 import '../../data/controller/notification_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:get/get.dart';
 
 class HomeScreens extends StatelessWidget {
   HomeScreens({super.key});
@@ -219,82 +215,48 @@ class HomeScreens extends StatelessWidget {
                         ),
                       ),
 
-                      GestureDetector(
-                        child: Container(
-                          margin: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.all(8),
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                "assets/images/social_feed_profile_1.png",
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            title: RichText(
-                              text: TextSpan(
-                                  style: TextStyle(color: Colors.black),
-                                  children: [
-                                    TextSpan(
-                                      text: "tynishaobey19 ",
-                                      style: GoogleFonts.dmSans(
-                                          color: AppColors.primaryColor,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16.sp),
-                                    ),
-                                    TextSpan(
-                                        text:
-                                            "Just added Serpent and Dove to her favorite",
-                                        style: GoogleFonts.dmSans(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16.sp))
-                                  ]),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: CustomButton(
-                                text: "User 1",
-                                onTap: () {
-                                  Get.to(
-                                    () => ChatScreen(
-                                      receiverId: '6836dc1ed96f19f15cef310e',
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 24,
-                            ),
-                            Flexible(
-                              child: CustomButton(
-                                text: "User 2",
-                                onTap: () {
-                                  Get.to(
-                                    () => ChatScreen(
-                                      receiverId: "6836dbead96f19f15cef310d",
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // GestureDetector(
+                      //   child: Container(
+                      //     margin: EdgeInsets.all(8),
+                      //     decoration: BoxDecoration(
+                      //       color: Colors.white,
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //     child: ListTile(
+                      //       contentPadding: EdgeInsets.all(8),
+                      //       leading: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //         child: Image.asset(
+                      //           "assets/images/social_feed_profile_1.png",
+                      //           fit: BoxFit.cover,
+                      //         ),
+                      //       ),
+                      //       title: RichText(
+                      //         text: TextSpan(
+                      //             style: TextStyle(color: Colors.black),
+                      //             children: [
+                      //               TextSpan(
+                      //                 text: "tynishaobey19 ",
+                      //                 style: GoogleFonts.dmSans(
+                      //                     color: AppColors.primaryColor,
+                      //                     fontWeight: FontWeight.w600,
+                      //                     fontSize: 16.sp),
+                      //               ),
+                      //               TextSpan(
+                      //                   text:
+                      //                       "Just added Serpent and Dove to her favorite",
+                      //                   style: GoogleFonts.dmSans(
+                      //                       color: Colors.black,
+                      //                       fontWeight: FontWeight.w400,
+                      //                       fontSize: 16.sp))
+                      //             ]),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
 
                       //* Space
+
                       SizedBox(
                         height: 105,
                       ),
@@ -309,5 +271,3 @@ class HomeScreens extends StatelessWidget {
     );
   }
 }
-
-//68346306135f632ff37830c8

@@ -129,8 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 final text = message.content;
                                 final fileUrl = "";
 
-                                final isSentByMe =
-                                    senderId != widget.receiverId;
+                                final isSentByMe = senderId != widget.receiverId;
 
                                 return Align(
                                   alignment: isSentByMe
@@ -142,22 +141,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                         ? MainAxisAlignment.end
                                         : MainAxisAlignment.start,
                                     children: [
-                                      isSentByMe
-                                          ? SizedBox()
-                                          : Align(
-                                              alignment: Alignment.bottomLeft,
-                                              child: CircleAvatar(
-                                                backgroundImage:
-                                                    CachedNetworkImageProvider(
-                                                        widget.image ?? ""),
-                                              ),
-                                            ),
-                                      SizedBox(
-                                        width: 5.w,
-                                      ),
                                       Container(
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 4.h),
+                                        margin: EdgeInsets.symmetric(vertical: 4.h),
                                         child: Row(
                                           mainAxisAlignment: isSentByMe
                                               ? MainAxisAlignment.end

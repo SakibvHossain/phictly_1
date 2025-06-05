@@ -17,8 +17,6 @@ import '../../../profile/data/controller/change_profile_controller.dart';
 
 class SignInController extends GetxController{
   var isEyeOpen = false.obs;
-
-  // Create FocusNodes for each field
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode passwordFocusNode = FocusNode();
   final FocusNode nextFocusNode = FocusNode();
@@ -99,12 +97,15 @@ class SignInController extends GetxController{
       } else if (response.statusCode == 401 &&
           response.responseData['message'] == 'Invalid credentials') {
         Get.snackbar("Warning", "Invalid Credential");
+        isLoading.value = false;
       } else if (response.statusCode == 404) {
         Get.snackbar("Invalid Credential", "User not found",
             colorText: Colors.white, backgroundColor: Colors.red);
+        isLoading.value = false;
       } else {
         Get.snackbar("Warning", "Please Check your internet Connection!",
             colorText: Colors.white, backgroundColor: Colors.red);
+        isLoading.value = false;
       }
     } catch (e) {
       debugPrint("Error: $e");

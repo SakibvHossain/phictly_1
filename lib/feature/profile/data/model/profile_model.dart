@@ -1,4 +1,3 @@
-// Import JSON support
 import 'dart:convert';
 
 ProfileResponse profileResponseFromJson(String str) =>
@@ -18,12 +17,11 @@ class ProfileResponse {
     required this.result,
   });
 
-  factory ProfileResponse.fromJson(Map<String, dynamic> json) =>
-      ProfileResponse(
-        success: json["success"] ?? false,
-        message: json["message"] ?? '',
-        result: Result.fromJson(json["result"] ?? {}),
-      );
+  factory ProfileResponse.fromJson(Map<String, dynamic> json) => ProfileResponse(
+    success: json["success"] ?? false,
+    message: json["message"] ?? '',
+    result: Result.fromJson(json["result"] ?? {}),
+  );
 
   Map<String, dynamic> toJson() => {
     "success": success,
@@ -38,7 +36,7 @@ class Result {
   final String? avatar;
   final String? coverPhoto;
   final String? bio;
-  final List<dynamic> userGenre;
+  final List<UserGenre> userGenre;
   final Count count;
   final List<Record> record;
 
@@ -59,10 +57,10 @@ class Result {
     avatar: json["avatar"],
     coverPhoto: json["coverPhoto"],
     bio: json["bio"],
-    userGenre: List<dynamic>.from(json["userGenre"] ?? []),
+    userGenre: List<UserGenre>.from(
+        (json["userGenre"] ?? []).map((x) => UserGenre.fromJson(x))),
     count: Count.fromJson(json["_count"] ?? {}),
-    record: List<Record>.from(
-        (json["record"] ?? []).map((x) => Record.fromJson(x))),
+    record: List<Record>.from((json["record"] ?? []).map((x) => Record.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -71,9 +69,43 @@ class Result {
     "avatar": avatar,
     "coverPhoto": coverPhoto,
     "bio": bio,
-    "userGenre": List<dynamic>.from(userGenre),
+    "userGenre": List<dynamic>.from(userGenre.map((x) => x.toJson())),
     "_count": count.toJson(),
     "record": List<dynamic>.from(record.map((x) => x.toJson())),
+  };
+}
+
+class UserGenre {
+  final FavouriteGenre favouriteGenre;
+
+  UserGenre({required this.favouriteGenre});
+
+  factory UserGenre.fromJson(Map<String, dynamic> json) => UserGenre(
+    favouriteGenre: FavouriteGenre.fromJson(json["favouriteGenre"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "favouriteGenre": favouriteGenre.toJson(),
+  };
+}
+
+class FavouriteGenre {
+  final String id;
+  final String title;
+
+  FavouriteGenre({
+    required this.id,
+    required this.title,
+  });
+
+  factory FavouriteGenre.fromJson(Map<String, dynamic> json) => FavouriteGenre(
+    id: json["id"] ?? '',
+    title: json["title"] ?? '',
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "title": title,
   };
 }
 
@@ -117,15 +149,11 @@ class Record {
   });
 
   factory Record.fromJson(Map<String, dynamic> json) => Record(
-    activeRead: json["activeRead"] != null
-        ? ActiveRead.fromJson(json["activeRead"])
-        : null,
-    lastRead: json["lastRead"] != null
-        ? ActiveRead.fromJson(json["lastRead"])
-        : null,
-    lastWatched: json["lastWatched"] != null
-        ? ActiveRead.fromJson(json["lastWatched"])
-        : null,
+    activeRead:
+    json["activeRead"] != null ? ActiveRead.fromJson(json["activeRead"]) : null,
+    lastRead: json["lastRead"] != null ? ActiveRead.fromJson(json["lastRead"]) : null,
+    lastWatched:
+    json["lastWatched"] != null ? ActiveRead.fromJson(json["lastWatched"]) : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -137,148 +165,95 @@ class Record {
 
 class ActiveRead {
   final String id;
-  final String clubId;
   final String clubLebel;
-  final String title;
-  final String poster;
-  final String? writer;
-  final dynamic totalSeasons;
-  final dynamic totalEpisodes;
-  final dynamic length;
-  final int rating;
-  final dynamic publishDate;
-  final dynamic bookNo;
-  final String imdbId;
+  final String clubId;
+  final int memberSize;
   final String clubMediumType;
-  final String type;
   final DateTime startDate;
   final DateTime endDate;
+  final List<DateTime> talkPoint;
   final int timeLine;
-  final String? preference;
-  final int memberSize;
-  final int? age;
-  final List<DateTime>? talkPoint;
-  final String? adminId;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
+  final String poster;
+  final String title;
+  final String? writer;
+  final String type;
   final Admin? admin;
-  final Count? count;
   final List<dynamic>? clubMember;
+  final Count? count;
 
   ActiveRead({
     required this.id,
-    required this.clubId,
     required this.clubLebel,
-    required this.title,
-    required this.poster,
-    this.writer,
-    this.totalSeasons,
-    this.totalEpisodes,
-    this.length,
-    this.rating = 0,
-    this.publishDate,
-    this.bookNo,
-    this.imdbId = '',
+    required this.clubId,
+    required this.memberSize,
     required this.clubMediumType,
-    required this.type,
     required this.startDate,
     required this.endDate,
+    required this.talkPoint,
     required this.timeLine,
-    this.preference,
-    this.age,
-    this.memberSize = 0,
-    this.talkPoint,
-    this.adminId,
-    this.createdAt,
-    this.updatedAt,
+    required this.poster,
+    required this.title,
+    this.writer,
+    required this.type,
     this.admin,
-    this.count,
     this.clubMember,
+    this.count,
   });
 
   factory ActiveRead.fromJson(Map<String, dynamic> json) => ActiveRead(
     id: json["id"] ?? '',
-    clubId: json["clubId"] ?? '',
     clubLebel: json["clubLebel"] ?? '',
-    title: json["title"] ?? '',
-    poster: json["poster"] ?? '',
-    writer: json["writer"],
-    totalSeasons: json["totalSeasons"],
-    totalEpisodes: json["totalEpisodes"],
-    length: json["length"],
-    rating: json["rating"] ?? 0,
-    publishDate: json["publishDate"],
-    bookNo: json["book_No"],
-    imdbId: json["imdbID"] ?? '',
+    clubId: json["clubId"] ?? '',
+    memberSize: json["memberSize"] ?? 0,
     clubMediumType: json["clubMediumType"] ?? '',
-    type: json["type"] ?? '',
     startDate: DateTime.parse(json["startDate"]),
     endDate: DateTime.parse(json["endDate"]),
+    talkPoint: List<DateTime>.from(
+        (json["talkPoint"] ?? []).map((x) => DateTime.parse(x))),
     timeLine: json["timeLine"] ?? 0,
-    preference: json["preference"],
-    age: json["age"],
-    memberSize: json["memberSize"] ?? 0,
-    talkPoint: json["talkPoint"] == null
-        ? null
-        : List<DateTime>.from(
-        json["talkPoint"].map((x) => DateTime.parse(x))),
-    adminId: json["adminId"],
-    createdAt: json["createdAt"] != null
-        ? DateTime.parse(json["createdAt"])
-        : null,
-    updatedAt: json["updatedAt"] != null
-        ? DateTime.parse(json["updatedAt"])
-        : null,
+    poster: json["poster"] ?? '',
+    title: json["title"] ?? '',
+    writer: json["writer"],
+    type: json["type"] ?? '',
     admin: json["admin"] != null ? Admin.fromJson(json["admin"]) : null,
+    clubMember: json["clubMember"] != null
+        ? List<dynamic>.from(json["clubMember"])
+        : null,
     count: json["_count"] != null ? Count.fromJson(json["_count"]) : null,
-    clubMember: json["clubMember"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "clubId": clubId,
     "clubLebel": clubLebel,
-    "title": title,
-    "poster": poster,
-    "writer": writer,
-    "totalSeasons": totalSeasons,
-    "totalEpisodes": totalEpisodes,
-    "length": length,
-    "rating": rating,
-    "publishDate": publishDate,
-    "book_No": bookNo,
-    "imdbID": imdbId,
+    "clubId": clubId,
+    "memberSize": memberSize,
     "clubMediumType": clubMediumType,
-    "type": type,
     "startDate": startDate.toIso8601String(),
     "endDate": endDate.toIso8601String(),
+    "talkPoint": List<dynamic>.from(talkPoint.map((x) => x.toIso8601String())),
     "timeLine": timeLine,
-    "preference": preference,
-    "age": age,
-    "memberSize": memberSize,
-    "talkPoint": talkPoint?.map((x) => x.toIso8601String()).toList(),
-    "adminId": adminId,
-    "createdAt": createdAt?.toIso8601String(),
-    "updatedAt": updatedAt?.toIso8601String(),
+    "poster": poster,
+    "title": title,
+    "writer": writer,
+    "type": type,
     "admin": admin?.toJson(),
-    "_count": count?.toJson(),
     "clubMember": clubMember,
+    "_count": count?.toJson(),
   };
 }
 
 class Admin {
   final String username;
-  final String avatar;
+  final String? avatar;
 
   Admin({
     required this.username,
-    required this.avatar,
+    this.avatar,
   });
 
   factory Admin.fromJson(Map<String, dynamic> json) => Admin(
     username: json["username"] ?? '',
-    avatar: json["avatar"] ?? '',
+    avatar: json["avatar"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -286,3 +261,4 @@ class Admin {
     "avatar": avatar,
   };
 }
+

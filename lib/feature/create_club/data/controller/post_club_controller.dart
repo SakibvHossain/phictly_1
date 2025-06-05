@@ -24,7 +24,7 @@ class PostClubController extends GetxController{
   final TextEditingController ageController = TextEditingController();
   final TextEditingController sizeController = TextEditingController();
   final TagsController bookGenreController = Get.put(TagsController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
 
 
   RxList<Book> searchedBookList = <Book>[].obs;
@@ -186,7 +186,7 @@ class PostClubController extends GetxController{
       "clubLebel": talkPointController.clubLabelController.text,
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
-      "timeLine": 270,
+      "timeLine": 30,
       "preference": changeClubController.selectedGenderType.toUpperCase(),
       "age": int.tryParse(ageController.text) ?? 0,
       "memberSize": int.tryParse(sizeController.text) ?? 0,
@@ -257,7 +257,7 @@ class PostClubController extends GetxController{
       "clubLebel": talkPointController.clubLabelController.text,
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
-      "timeLine": 9,
+      "timeLine": 30,
       "preference": changeClubController.selectedGenderType.toUpperCase(),
       "age": int.tryParse(ageController.text) ?? 0,
       "memberSize": int.tryParse(sizeController.text) ?? 0,
@@ -339,12 +339,6 @@ class PostClubController extends GetxController{
 
         if (data != null && data["clubId"] != null) {
           clubId.value = data["clubId"].toString();
-
-          Get.snackbar(
-            "Success",
-            "Club ID fetched successfully.",
-          );
-
           logger.d("Fetched Club ID: ${clubId.value}");
         } else {
           Get.snackbar(
@@ -352,7 +346,6 @@ class PostClubController extends GetxController{
             "Club ID not found in response.",
           );
         }
-
         logger.d("Full API Response: ${response.responseData}");
 
          debugPrint("++++++++++++++++++++++++++++++++++++============= Club Value ${clubId.value}");

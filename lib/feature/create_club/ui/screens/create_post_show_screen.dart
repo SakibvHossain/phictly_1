@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text_form_field_without_icon.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
 import 'package:phictly/feature/create_club/data/controller/comment_controller.dart';
@@ -23,6 +24,7 @@ class CreatePostShowScreen extends StatelessWidget {
   final PostClubController bookController = Get.put(PostClubController());
   final CommentController commentController = Get.put(CommentController());
   final ClubController clubController = Get.put(ClubController());
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -200,13 +202,24 @@ class CreatePostShowScreen extends StatelessWidget {
                               : CustomButton(
                             text: "Post",
                             onTap: () async {
-                              commentController.postShowClubContent();
-                              clubController.fetchCreatedClub(
-                                  bookController.createdClubId);
-                              await Future.delayed(
-                                Duration(milliseconds: 300),
-                              );
-                              changeClubController.updateIndex(1);
+                              if(clubController.areYouFromHome.value){
+                                final clubID = sharedPreference.getString("selectedClubId");
+                                commentController.postShowClubContent();
+                                clubController.fetchCreatedClub(
+                                    clubID ?? "");
+                                await Future.delayed(
+                                  Duration(milliseconds: 300),
+                                );
+                                changeClubController.updateIndex(6);
+                              }else{
+                                commentController.postShowClubContent();
+                                clubController.fetchCreatedClub(
+                                    bookController.createdClubId);
+                                await Future.delayed(
+                                  Duration(milliseconds: 300),
+                                );
+                                changeClubController.updateIndex(1);
+                              }
                             },
                           ),
                         ),

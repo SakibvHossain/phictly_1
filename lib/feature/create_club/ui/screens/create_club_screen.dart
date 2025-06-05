@@ -51,7 +51,7 @@ class CreateClubScreen extends StatelessWidget {
   final BookGenreController genreController = Get.put(BookGenreController());
   final GetCreatedClubController getCreatedClubController =
       Get.put(GetCreatedClubController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
   final TagsController tagsController = Get.put(TagsController());
   final Logger logger = Logger();
 
@@ -125,6 +125,8 @@ class CreateClubScreen extends StatelessWidget {
               SizedBox(
                 height: 16.h,
               ),
+
+
 
               //* Create Club text field
               Padding(
@@ -395,9 +397,9 @@ class CreateClubScreen extends StatelessWidget {
                               if (selectedType.contains("Book")) {
                                 newValue = 30;
                               } else if (selectedType.contains("Show")) {
-                                newValue = 270;
+                                newValue = 30;
                               } else if (selectedType.contains("Movie")) {
-                                newValue = 9;
+                                newValue = 30;
                               }
 
                               //* This will update the observable directly and rebuild everything that depends on it
@@ -430,7 +432,7 @@ class CreateClubScreen extends StatelessWidget {
                                 child: LayoutBuilder(
                                   builder: (context, constraints) {
                                     double sliderMin = 1;
-                                    double sliderMax = 270;
+                                    double sliderMax = 30;
                                     double sliderWidth = constraints.maxWidth;
 
                                     return Stack(
@@ -500,7 +502,7 @@ class CreateClubScreen extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black),
                             CustomText(
-                                text: "270",
+                                text: "30",
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black),
@@ -1016,14 +1018,16 @@ class CreateClubScreen extends StatelessWidget {
     );
   }
 
-  //* Add Talk Points
+
   void addTalkPointAction(BuildContext context) {
     Get.dialog(
       Dialog(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(6.r)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6.r),
+          ),
           height: 265,
           width: 410.w,
           child: Column(
@@ -1049,16 +1053,13 @@ class CreateClubScreen extends StatelessWidget {
                 ],
               ),
 
-              SizedBox(
-                height: 24.h,
-              ),
+              SizedBox(height: 24.h),
 
               //* Talk Point Text Field
               CustomTextFormFieldWithoutIcon(
                 controller: talkPointController,
                 hintText: "Add talk Point",
-                //Todo: Add list
-                borderColor: Color(0xff000000).withValues(alpha: 0.20),
+                borderColor: Color(0xff000000).withAlpha(50),
                 borderRadius: BorderRadius.circular(6.r),
                 style: GoogleFonts.dmSans(
                   fontSize: 15.sp,
@@ -1067,103 +1068,84 @@ class CreateClubScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(
-                height: 14.h,
-              ),
+              SizedBox(height: 14.h),
 
               //* Select Date
               dateFormField(dateController, context),
 
-              SizedBox(
-                height: 32.h,
-              ),
+              SizedBox(height: 32.h),
 
               Obx(() {
                 return pointController.editTextEnabled.value
                     ? CustomButton(
-                        text: "Edit talkpoints(s)",
-                        onTap: () {
-                          Get.back();
-                          AddTalkPoints points = AddTalkPoints(
-                              "TalkPoint ${pointController.talkPointList.length + 1}",
-                              dateController.selectedDate.value);
-
-                          //* Checking is Date Printing or Not
-                          debugPrint(
-                              "+++++++++++++++++++++++${dateController.selectedDate.value}");
-                        },
-                      )
+                  text: "Edit talkpoints(s)",
+                  onTap: () {
+                    Get.back();
+                    AddTalkPoints points = AddTalkPoints(
+                      "TalkPoint ${pointController.talkPointList.length + 1}",
+                      dateController.selectedDate.value,
+                    );
+                    debugPrint("Date for editing: ${dateController.selectedDate.value}");
+                  },
+                )
                     : CustomButton(
-                        text: "Add talkpoints(s)",
-                        onTap: () {
-                          String selectedDateStr =
-                              dateController.selectedDate.value;
-                          String selectedType =
-                              controller.selectedBookType.value;
+                  text: "Add talkpoints(s)",
+                  onTap: () {
+                    String selectedDateStr = dateController.selectedDate.value;
+                    String selectedType = controller.selectedBookType.value;
 
-                          //* Determine the max value based on selected type
-                          int maxValue = 0;
+                    int maxValue = 30;
 
-                          if (selectedType.contains("Book")) {
-                            maxValue = 30;
-                          } else if (selectedType.contains("Show")) {
-                            maxValue = 270;
-                          } else if (selectedType.contains("Movie")) {
-                            maxValue = 7;
-                          }
+                    if (selectedType == "Book") {
+                      maxValue = 30;
+                    } else if (selectedType == "Show") {
+                      maxValue = 270;
+                    } else if (selectedType == "Movie") {
+                      maxValue = 9;
+                    }
 
-                          //* Validate if the selected date is within the valid range
-                          bool isValid = pointController.isSelectedDateValid(
-                              selectedDateStr, selectedType);
-                          if (!isValid) {
-                            Get.snackbar(
-                              "Invalid Date",
-                              "Selected date must be within ${selectedType.contains("Book") ? "30" : selectedType.contains("Show") ? "270" : "7"} days from today.",
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
-                            return;
-                          }
 
-                          //* Convert selected date to DateTime
-                          DateTime selectedDate =
-                              DateFormat("MM-dd-yyyy").parse(selectedDateStr);
-                          DateTime now = DateTime.now();
-
-                          //* Calculate the difference in days between the current date and the selected date
-                          int differenceInDays =
-                              selectedDate.difference(now).inDays;
-
-                          //* Check if the day value is valid and within the allowed range (1 to maxValue)
-                          if (differenceInDays >= 0 &&
-                              differenceInDays <= maxValue) {
-                            //* Add the talk point (using the day as the value)
-
-                            //* One code who is responsible to add the red dots...........
-                            homeController
-                                .addTalkPoint(differenceInDays.toDouble());
-                            Get.back(); //* Close the current screen
-                          } else {
-                            //* Show error if the date is not valid (out of range)
-                            Get.snackbar(
-                              "Invalid Date",
-                              "Selected date is out of range. Please select a valid date within $maxValue days from today.",
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
-                          }
-
-                          //* Adding talk points here
-                          AddTalkPoints points = AddTalkPoints(
-                            talkPointController.text,
-                            selectedDateStr,
-                          );
-
-                          debugPrint(
-                              "++++++++++++++++++++++++++++++++++++++++++++++++++++++Selected Date: $selectedDateStr");
-
-                          pointController.talkPointList.add(points);
-                          pointController.addTalkPointListOnRxList();
-                        },
+                    bool isValid = pointController.isSelectedDateValid(
+                        selectedDateStr, selectedType);
+                    if (!isValid) {
+                      Get.snackbar(
+                        "Invalid Date",
+                        "Selected date must be within $maxValue days from today.",
+                        snackPosition: SnackPosition.BOTTOM,
                       );
+                      return;
+                    }
+
+                    // Fix time mismatch by zeroing the time part
+                    DateTime selectedDate = DateFormat("MM-dd-yyyy").parse(selectedDateStr);
+                    DateTime now = DateTime.now();
+                    DateTime today = DateTime(now.year, now.month, now.day);
+
+                    int differenceInDays = selectedDate.difference(today).inDays;
+
+                    if (differenceInDays >= 0 && differenceInDays <= maxValue) {
+                      homeController.addTalkPoint(differenceInDays.toDouble());
+                      Get.back();
+                    } else {
+                      Get.snackbar(
+                        "Invalid Date",
+                        "Selected date is out of range. Please select a valid date within $maxValue days from today.",
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+
+                    // Add the talk point
+                    AddTalkPoints points = AddTalkPoints(
+                      talkPointController.text,
+                      selectedDateStr,
+                    );
+                    debugPrint("Selected Date: $selectedDateStr");
+
+                    pointController.talkPointList.add(points);
+                    pointController.addTalkPointListOnRxList();
+                  },
+                );
               }),
             ],
           ),
@@ -1171,6 +1153,7 @@ class CreateClubScreen extends StatelessWidget {
       ),
     );
   }
+
 
   //* Edit Talk Points
   void editTalkPointAction(BuildContext context) {

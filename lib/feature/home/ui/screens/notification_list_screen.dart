@@ -35,7 +35,11 @@ class NotificationListScreen extends StatelessWidget {
       itemCount: notificationController.notifications.length,
       itemBuilder: (context, index) {
         var notification = notificationController.notifications[index];
-        return Padding(
+        final isJoinRequest = (notification['message'] ?? '')
+            .toLowerCase()
+            .contains('want to join your club');
+
+        Widget itemContent = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
           child: Container(
             padding: const EdgeInsets.all(12),
@@ -60,8 +64,7 @@ class NotificationListScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: AppColors.primaryColor.withAlpha(30),
                   ),
-                  child:
-                      Icon(Icons.notifications, color: AppColors.primaryColor),
+                  child: Icon(Icons.notifications, color: AppColors.primaryColor),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
@@ -76,18 +79,17 @@ class NotificationListScreen extends StatelessWidget {
                         overflow: TextOverflow.visible,
                       ),
                       SizedBox(height: 8.h),
-
-                      // ✅ Only show if it's a join request
-                      if ((notification['message'] ?? '')
-                          .toLowerCase()
-                          .contains('want to join your club'))
+                      if (isJoinRequest)
                         Row(
                           children: [
                             ElevatedButton(
                               onPressed: () async {
                                 notificationController.removeNotification(index,
                                     deleteFromPrefs: false);
-                                await joinClubController.acceptPrivateClubRequest(notification['clubId']!, notification['userId']!);
+                                await joinClubController.acceptPrivateClubRequest(
+                                  notification['clubId']!,
+                                  notification['userId']!,
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryColor,
@@ -97,10 +99,7 @@ class NotificationListScreen extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 6),
                               ),
-                              child: Text(
-                                "Accept",
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              child: Text("Accept", style: TextStyle(color: Colors.white)),
                             ),
                             SizedBox(width: 8.w),
                             OutlinedButton(
@@ -116,10 +115,7 @@ class NotificationListScreen extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 6),
                               ),
-                              child: Text(
-                                "Decline",
-                                style: TextStyle(color: Colors.red),
-                              ),
+                              child: Text("Decline", style: TextStyle(color: Colors.red)),
                             ),
                           ],
                         ),
@@ -129,6 +125,30 @@ class NotificationListScreen extends StatelessWidget {
               ],
             ),
           ),
+        );
+
+        // Only wrap in Dismissible if it's not a join request
+        return isJoinRequest
+            ? itemContent
+            : Dismissible(
+          key: Key(notification['message'] ?? '$index'),
+          direction: DismissDirection.endToStart,
+          background: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              alignment: Alignment.centerRight,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(Icons.delete, color: Colors.white),
+            ),
+          ),
+          onDismissed: (direction) {
+            notificationController.removeNotification(index, deleteFromPrefs: true);
+          },
+          child: itemContent,
         );
       },
     );

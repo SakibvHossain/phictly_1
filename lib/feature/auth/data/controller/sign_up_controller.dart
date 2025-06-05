@@ -95,6 +95,7 @@ class SignUpController extends GetxController{
           backgroundColor: const Color(0xffF44336),
           colorText: Colors.white,
         );
+        isLoading.value = false;
       } else {
         Get.snackbar(
           "Error",
@@ -102,10 +103,12 @@ class SignUpController extends GetxController{
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
+        isLoading.value = false;
       }
     } catch (e) {
       debugPrint("Signup Error: $e");
       Get.snackbar("Exception", "An error occurred: $e");
+      isLoading.value = false;
     } finally {
       bottomNavController.updateIndex(0);
       homeController.updateIndex(0);

@@ -1,7 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,12 +13,17 @@ import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_outline_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_title_text.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_data_controller.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import '../../../create_club/data/controller/change_club_controller.dart';
+import '../../../create_club/data/controller/club_controller.dart';
+import '../../../home/data/controller/bottom_nav_controller.dart';
+import '../../data/controller/fetch_my_club_controller.dart';
 
 class ProgressController extends GetxController {
   ValueNotifier<double> progressNotifier =
@@ -31,6 +35,12 @@ class ProfileScreen extends StatelessWidget {
   final controller = Get.find<ChangeProfileController>();
   final profileController = Get.put(ProfileController());
   final profileDataController = Get.put(ProfileDataController());
+  final fetchMyClubController = Get.put(FetchMyClubController());
+  final changeClubController = Get.put(ChangeClubController());
+  final navController = Get.put(BottomNavController());
+  final clubController = Get.find<ClubController>();
+  final sharedPreferencesHelper = Get.put(SharedPreferencesHelper());
+
   final Logger logger = Logger();
   ProfileScreen({super.key});
 
@@ -100,12 +110,8 @@ class ProfileScreen extends StatelessWidget {
 
                   //* Background Image
                   Obx(() {
-                    final profile =
-                        profileDataController.profileResponse.value;
-
-                    if (profile == null ||
-                        profile.coverPhoto == null ||
-                        profile.coverPhoto!.isEmpty) {
+                    final profile = profileDataController.profileResponse.value;
+                    if (profile == null || profile.coverPhoto == null || profile.coverPhoto!.isEmpty) {
                       return Image.asset(
                         "assets/images/udesign_portfolio_placeholder.jpg",
                         height: 200.h,
@@ -113,7 +119,7 @@ class ProfileScreen extends StatelessWidget {
                         fit: BoxFit.cover,
                       );
                     }
-
+//683839f9113cd2787b6c0c99
                     final coverPath = profile.coverPhoto!
                         .replaceFirst("File: '", "")
                         .replaceFirst("'", "");
@@ -143,7 +149,8 @@ class ProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          fetchMyClubController.fetchAllMyClubs();
                           controller.updateIndex(1);
                           profileController.updateTabIndex(0);
                         },
@@ -238,37 +245,6 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
 
-                  /*
-                  Skeletonizer(child: statItem("22", "Clubs"))
-
-                  Obx((){
-                        final profile = profileDataController.profileResponse.value;
-
-                        if(profileDataController.isProfileDetailsAvailable.value){
-                          return Skeletonizer(
-                            child: CustomText(
-                              text: "Sakib X Hossain",
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          );
-                        }
-
-                        if(profile == null){
-                          return CustomText(text: "Failed to fetch Name", fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black);
-                        }
-
-                        return CustomText(
-                          text: profile.username ?? "username",
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        );
-                      })
-
-                   */
-
                   SizedBox(
                     height: 12.h,
                   ),
@@ -326,16 +302,12 @@ class ProfileScreen extends StatelessWidget {
                           );
                         }
 
-                        if (profile == null) {
-                          return CustomText(
-                              text: "Failed to fetch Name",
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black);
+                        if (profile?.username == null) {
+                          return SizedBox.shrink();
                         }
 
                         return CustomText(
-                          text: profile.username ?? "username",
+                          text: profile?.username ?? "username",
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
@@ -368,16 +340,12 @@ class ProfileScreen extends StatelessWidget {
                       );
                     }
 
-                    if (profile == null) {
+                    if (profile?.bio == null) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Align(
                             alignment: AlignmentDirectional.centerStart,
-                            child: CustomText(
-                                text: "Failed to fetch Name",
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black)),
+                            child: SizedBox.shrink()),
                       );
                     }
 
@@ -386,12 +354,10 @@ class ProfileScreen extends StatelessWidget {
                       child: Align(
                         alignment: AlignmentDirectional.centerStart,
                         child: CustomText(
-                          text: profile.bio ??
-                              "A word after a word after a word is power.",
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black.withOpacity(0.6),
-                        ),
+                            text: "${profile?.bio}",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
                       ),
                     );
                   }),
@@ -468,7 +434,9 @@ class ProfileScreen extends StatelessWidget {
                                 ],
                               ),
                               child: Obx((){
-                                final lastWatch = profileDataController.profileResponse.value?.userGenre;
+                                final genreList = profileDataController.profileResponse.value?.userGenre;
+
+                                debugPrint("++++++++++++++++++++++++++++++++++++++++++++++++++++$genreList");
 
                                 if (profileDataController.isProfileDetailsAvailable.value) {
                                   return Center(
@@ -481,7 +449,7 @@ class ProfileScreen extends StatelessWidget {
                                 }
 
                                 //* Handle null or empty record list
-                                if (lastWatch == null || lastWatch.isEmpty) {
+                                if (genreList == null || genreList.isEmpty) {
                                   return Center(
                                     child: CustomText(
                                       text: "Genre Empty",
@@ -495,12 +463,16 @@ class ProfileScreen extends StatelessWidget {
                                 return ListView.builder(
                                   padding: EdgeInsets.symmetric(vertical: 8),
                                   physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: genres.length,
+                                  itemCount: genreList.length,
                                   itemBuilder: (context, index) {
+                                    final genreName = genreList[index].favouriteGenre.title;
+
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
                                       child: CustomText(
-                                        text: genres[index],
+                                        text: genreName.length > 16
+                                            ? "${genreName.substring(0, 16)}..."
+                                            : genreName,
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w400,
                                         color: Colors.black,
@@ -664,22 +636,31 @@ class ProfileScreen extends StatelessWidget {
                     }
 
                     //* If all good, show the book item
-                    return CustomBookItem(
-                      clubId: "${activeRead[0].activeRead?.clubId}",
-                      clubLabel: "${activeRead[0].activeRead?.clubLebel}",
-                      imagePath: "${activeRead[0].activeRead?.poster}" ??
-                          "assets/images/book_2.png",
-                      requestOrJoinImage: "assets/icons/join_read_icon.png",
-                      noReqOrJoinAvailable: true,
-                      author: "${activeRead[0].activeRead?.writer}",
-                      memberCount: "${activeRead[0].activeRead?.memberSize}",
-                      totalDuration: difference,
-                      requestOrJoin: "Join Read",
-                      clubCreator: "${activeRead[0].activeRead?.admin?.username}",
-                      timeLine: "${activeRead[0].activeRead?.timeLine}",
-                      isPublic: "${activeRead[0].activeRead?.type}",
-                      clubType: "${activeRead[0].activeRead?.clubMediumType}",
-                      talkPoint: talkPoint,
+                    return GestureDetector(
+                      onTap: (){
+                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${activeRead[2].activeRead?.id ?? ""}");
+                        clubController.areYouFromHome.value = true;
+                        sharedPreferencesHelper.setString("selectedClubId", activeRead[2].activeRead?.id ?? "");
+                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
+                        clubController.fetchCreatedClub(activeRead[2].activeRead?.id ?? "");
+                        navController.updateIndex(2);
+                        changeClubController.updateIndex(6);
+                      },
+                      child: CustomBookItem(
+                        clubId: "${activeRead[0].activeRead?.clubId}",
+                        clubLabel: "${activeRead[0].activeRead?.clubLebel}",
+                        imagePath: "${activeRead[0].activeRead?.poster}" ??
+                            "assets/images/book_2.png",
+                        noReqOrJoinAvailable: true,
+                        author: "${activeRead[0].activeRead?.writer}",
+                        memberCount: "${activeRead[0].activeRead?.memberSize}",
+                        totalDuration: difference,
+                        clubCreator: "${activeRead[0].activeRead?.admin?.username}",
+                        timeLine: "${activeRead[0].activeRead?.timeLine}",
+                        isPublic: "${activeRead[0].activeRead?.type}",
+                        clubType: "${activeRead[0].activeRead?.clubMediumType}",
+                        talkPoint: talkPoint,
+                      ),
                     );
                   }),
 
@@ -739,22 +720,31 @@ class ProfileScreen extends StatelessWidget {
                     }
 
                     //* If all good, show the book item
-                    return CustomBookItem(
-                      clubId: "${lastRead[1].lastRead?.clubId}",
-                      clubLabel: "${lastRead[1].lastRead?.clubLebel}",
-                      imagePath: "${lastRead[1].lastRead?.poster}" ??
-                          "assets/images/book_2.png",
-                      requestOrJoinImage: "assets/icons/join_read_icon.png",
-                      noReqOrJoinAvailable: false,
-                      author: "${lastRead[1].lastRead?.writer}",
-                      memberCount: "${lastRead[1].lastRead?.memberSize}",
-                      requestOrJoin: "Join Read",
-                      totalDuration: difference,
-                      clubCreator: "${lastRead[1].lastRead?.admin?.username}",
-                      timeLine: "${lastRead[1].lastRead?.timeLine}",
-                      isPublic: "${lastRead[1].lastRead?.type}",
-                      clubType: "${lastRead[1].lastRead?.clubMediumType}",
-                      talkPoint: talkPoint,
+                    return GestureDetector(
+                      onTap: (){
+                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${lastRead[2].lastRead?.id ?? ""}");
+                        clubController.areYouFromHome.value = true;
+                        sharedPreferencesHelper.setString("selectedClubId", lastRead[2].lastRead?.id ?? "");
+                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
+                        clubController.fetchCreatedClub(lastRead[2].lastRead?.id ?? "");
+                        navController.updateIndex(2);
+                        changeClubController.updateIndex(6);
+                      },
+                      child: CustomBookItem(
+                        clubId: "${lastRead[1].lastRead?.clubId}",
+                        clubLabel: "${lastRead[1].lastRead?.clubLebel}",
+                        imagePath: "${lastRead[1].lastRead?.poster}" ??
+                            "assets/images/book_2.png",
+                        noReqOrJoinAvailable: false,
+                        author: "${lastRead[1].lastRead?.writer}",
+                        memberCount: "${lastRead[1].lastRead?.memberSize}",
+                        totalDuration: difference,
+                        clubCreator: "${lastRead[1].lastRead?.admin?.username}",
+                        timeLine: "${lastRead[1].lastRead?.timeLine}",
+                        isPublic: "${lastRead[1].lastRead?.type}",
+                        clubType: "${lastRead[1].lastRead?.clubMediumType}",
+                        talkPoint: talkPoint,
+                      ),
                     );
                   }),
 
@@ -820,23 +810,32 @@ class ProfileScreen extends StatelessWidget {
                     }
 
                     //* If all good, show the book item
-                    return CustomBookItem(
-                      clubId: "${lastWatch[2].lastWatched?.clubId}",
-                      clubLabel: "${lastWatch[2].lastWatched?.clubLebel}",
-                      imagePath: "${lastWatch[2].lastWatched?.poster}" ??
-                          "assets/images/book_2.png",
-                      requestOrJoinImage: "assets/icons/join_read_icon.png",
-                      noReqOrJoinAvailable: false,
-                      author: "${lastWatch[2].lastWatched?.writer}",
-                      memberCount: "${lastWatch[2].lastWatched?.memberSize}",
-                      requestOrJoin: "Join Read",
-                      totalDuration: difference,
-                      clubCreator: "${lastWatch[2].lastWatched?.admin?.username}",
-                      timeLine: "${lastWatch[2].lastWatched?.timeLine}",
-                      isPublic: "${lastWatch[2].lastWatched?.type}",
-                      clubType: "${lastWatch[2].lastWatched?.clubMediumType}",
-                      totalSeason: "5",
-                      talkPoint: talkPoint,
+                    return GestureDetector(
+                      onTap: (){
+                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${lastWatch[2].lastWatched?.id ?? ""}");
+                        clubController.areYouFromHome.value = true;
+                        sharedPreferencesHelper.setString("selectedClubId", lastWatch[2].lastWatched?.id ?? "");
+                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
+                        clubController.fetchCreatedClub(lastWatch[2].lastWatched?.id ?? "");
+                        navController.updateIndex(2);
+                        changeClubController.updateIndex(6);
+                      },
+                      child: CustomBookItem(
+                        clubId: "${lastWatch[2].lastWatched?.clubId}",
+                        clubLabel: "${lastWatch[2].lastWatched?.clubLebel}",
+                        imagePath: "${lastWatch[2].lastWatched?.poster}" ??
+                            "assets/images/book_2.png",
+                        noReqOrJoinAvailable: false,
+                        author: "${lastWatch[2].lastWatched?.writer}",
+                        memberCount: "${lastWatch[2].lastWatched?.memberSize}",
+                        totalDuration: difference,
+                        clubCreator: "${lastWatch[2].lastWatched?.admin?.username}",
+                        timeLine: "${lastWatch[2].lastWatched?.timeLine}",
+                        isPublic: "${lastWatch[2].lastWatched?.type}",
+                        clubType: "${lastWatch[2].lastWatched?.clubMediumType}",
+                        totalSeason: "5",
+                        talkPoint: talkPoint,
+                      ),
                     );
                   }),
 

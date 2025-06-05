@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -16,11 +17,10 @@ import '../profile_screen.dart';
 class EditProfileScreen extends StatelessWidget {
   EditProfileScreen({super.key});
 
-  final ChangeProfileController controller = Get.put(ChangeProfileController());
-  final UpdateProfileController profileController = Get.put(UpdateProfileController());
-  final ProgressController progressController = Get.put(ProgressController());
-  final ProfileDataController profileDataController = Get.put(ProfileDataController());
-
+  final controller = Get.put(ChangeProfileController());
+  final profileController = Get.put(UpdateProfileController());
+  final progressController = Get.put(ProgressController());
+  final profileDataController = Get.put(ProfileDataController());
 
   @override
   Widget build(BuildContext context) {
@@ -155,58 +155,76 @@ class EditProfileScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Fantasy",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Mystery",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Horror",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Thriller",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    controller.updateIndex(11);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: CustomText(
+                                Obx(() {
+                                  final genreList = profileDataController.profileResponse.value?.userGenre;
+
+                                  if (profileDataController.isProfileDetailsAvailable.value) {
+                                    return Center(
+                                      child: SpinKitWave(
+                                        duration: Duration(seconds: 2),
+                                        size: 15,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    );
+                                  }
+
+                                  if (genreList == null || genreList.isEmpty) {
+                                    return Center(
+                                      child: CustomText(
+                                        text: "Genre Empty",
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                      ),
+                                    );
+                                  }
+
+                                  return Flexible(
+                                    flex: 3,
+                                    child: ListView.builder(
+                                      padding: EdgeInsets.symmetric(vertical: 2),
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: genreList.length,
+                                      itemBuilder: (context, index) {
+                                        final genreName = genreList[index].favouriteGenre.title;
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8.0,),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(bottom: 4.0),
+                                            child: CustomText(
+                                              text: genreName.length > 16
+                                                  ? "${genreName.substring(0, 16)}..."
+                                                  : genreName,
+                                              fontSize: 15.sp,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }),
+                                Flexible(
+                                  flex: 1,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      controller.updateIndex(11);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: CustomText(
                                         text: "+ Add Genre",
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w400,
-                                        color: AppColors.primaryColor),
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
+
                           )
                         ],
                       ),
@@ -260,7 +278,7 @@ class EditProfileScreen extends StatelessWidget {
                                   ],
                                 ),
                                 Positioned(
-                                  bottom: 20,
+                                  bottom: 25,
                                   right: 5,
                                   child: ValueListenableBuilder<double>(
                                     valueListenable:
@@ -326,8 +344,10 @@ class EditProfileScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: profileController.isLoading.value
                         ? Center(
-                            child: CircularProgressIndicator(
-                                color: AppColors.primaryColor),
+                            child: SpinKitWave(
+                              color: AppColors.primaryColor,
+                              size: 15,
+                            ),
                           )
                         : CustomButton(
                             onTap: () async {

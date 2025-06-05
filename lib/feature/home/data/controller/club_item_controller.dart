@@ -18,7 +18,6 @@ class ClubItemController extends GetxController {
   final Logger logger = Logger();
 
 
-
   //* Trending Clubs
   Future<void> fetchTrendingClubs() async {
     await preferencesHelper.init();
@@ -42,14 +41,11 @@ class ClubItemController extends GetxController {
       );
 
       if (response.isSuccess) {
-
         var trendingItemData = response.responseData['trending'];
-
         for(var trending in trendingItemData){
           trendingDataList.add(ClubModel.fromJson(trending));
           debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trending");
         }
-
         logger.d("Full API Response: ${response.responseData}");
         debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trendingItemData");
       } else {
@@ -116,9 +112,9 @@ class ClubItemController extends GetxController {
 
   void toggleClubIndex(int index) {
     if (selectedClubIndex.value == index) {
-      selectedClubIndex.value = -1; // Collapse
+      selectedClubIndex.value = -1;
     } else {
-      selectedClubIndex.value = index; // Expand selected
+      selectedClubIndex.value = index;
     }
   }
 

@@ -9,6 +9,8 @@ import '../../../../core/network_caller/utils/utils.dart';
 class ClubController extends GetxController {
   SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
   int selectedIndex = 0;
+  var selectedClubId = ''.obs;
+  var areYouFromHome = false.obs;
   var isLoading = false.obs;
   final Logger logger = Logger();
   final Rx<Result?> clubDetail = Rx<Result?>(null);
@@ -25,11 +27,9 @@ class ClubController extends GetxController {
         token: preferencesHelper.getString('userToken'),
       );
 
-
       if (response.isSuccess) {
         var responseData = response.responseData;
         logger.i(responseData);
-
         if (responseData is Map<String, dynamic>) {
           clubDetail.value = Result.fromJson(responseData);
           debugPrint("+++++++++++++++++++++++++++++++✅ Club ID: ${clubDetail.value?.id}");
@@ -39,9 +39,6 @@ class ClubController extends GetxController {
         logger.d("Full API Response: ${response.responseData}");
       } else {
         logger.e("API call failed with message: ${response.responseData}");
-        Get.snackbar(
-          "Error", "Failed to fetch club data. Please try again later.",
-        );
       }
     } catch (e) {
       logger.e("Exception: $e");
@@ -53,3 +50,10 @@ class ClubController extends GetxController {
     }
   }
 }
+
+/*
+Create Post on Book
+1. Hint text to Enter text
+2. Bug on created club & Another one
+3.
+ */

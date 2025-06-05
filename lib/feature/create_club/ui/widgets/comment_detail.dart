@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
 import 'package:phictly/feature/create_club/ui/widgets/reply.dart';
 import '../../../../core/components/custom_text.dart';
@@ -37,7 +38,9 @@ class CommentDetail extends StatelessWidget {
       Get.put(ChapterCommentDetailController());
   final CommentController commentController = Get.put(CommentController());
   final PostClubController bookController = Get.put(PostClubController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
+
 
   @override
   Widget build(BuildContext context) {
@@ -319,8 +322,13 @@ class CommentDetail extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   Get.back();
+                  final clubId = sharedPreference.getString("selectedClubId");
                   await commentController.postClubReply(postId);
-                  clubController.fetchCreatedClub(bookController.createdClubId);
+                  if(clubController.areYouFromHome.value){
+                    clubController.fetchCreatedClub(clubId ?? "");
+                  }else{
+                    clubController.fetchCreatedClub(bookController.createdClubId);
+                  }
                 },
                 child: Icon(
                   Icons.send_rounded,
