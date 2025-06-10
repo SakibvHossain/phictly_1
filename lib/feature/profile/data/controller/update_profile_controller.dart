@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
-
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';
 
@@ -83,7 +80,7 @@ class UpdateProfileController extends GetxController {
       var token = preferencesHelper.getString("userToken");
       String url = Utils.baseUrl + Utils.updateProfile;
 
-      var request = http.MultipartRequest('PUT', Uri.parse(url));
+      var request = http.MultipartRequest('PUT', Uri.parse(url),);
 
       request.headers.addAll({
         'Authorization': 'Bearer $token',
@@ -101,12 +98,6 @@ class UpdateProfileController extends GetxController {
       var streamedResponse = await request.send();
 
       var response = await http.Response.fromStream(streamedResponse);
-
-      // final response = await NetworkCaller().patchRequest(
-      //   url,
-      //   body: inputClubData,
-      //   token: preferencesHelper.getString('userToken'),
-      // );
 
       if (response.statusCode == 200) {
         logger.i(response.body);
@@ -133,23 +124,33 @@ class UpdateProfileController extends GetxController {
 
     try {
       await preferencesHelper.init();
-
+      var token = preferencesHelper.getString("userToken");
       String url = Utils.baseUrl + Utils.updateProfile;
 
-      final response = await NetworkCaller().patchRequest(
-        url,
-        body: inputClubData,
-        token: preferencesHelper.getString('userToken'),
+      var request = http.MultipartRequest('PUT', Uri.parse(url));
+
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+
+      request.fields['bodyData'] = jsonEncode(inputClubData);
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'avatar',
+          pickedImage.value.toString(),
+        ),
       );
 
-      if (response.isSuccess) {
-        logger.i(response.responseData);
+      var streamedResponse = await request.send();
+
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        logger.i(response.body);
       } else {
-        Get.snackbar(
-          "Failed",
-          response.errorMessage,
-        );
-        logger.w(response.responseData);
+        logger.w(response.body);
+        logger.w(response.headers);
       }
     } catch (e) {
       debugPrint("Error: $e");

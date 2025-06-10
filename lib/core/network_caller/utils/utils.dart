@@ -18,6 +18,8 @@ class Utils {
   static String createPost = "/post/create";
   static String createReply = "/post/comment/create";
   static String updateProfile = "/auth/profile";
+  static String updateCoverImage = "/auth/cover-image";
+  static String updateProfileImage = "/auth/profile-image";
   static String statusUpdate(String id) => "/post/post-status-update/$id";
   static String clubStatusUpdate = "/club/join-status-update";
   static String favoriteGenre = "/genre/favourite-genre";
