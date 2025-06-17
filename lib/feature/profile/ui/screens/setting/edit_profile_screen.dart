@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -12,14 +14,14 @@ import '../../../../../core/components/custom_title_text.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../data/controller/change_profile_controller.dart';
 import '../../../data/controller/profile_data_controller.dart';
-import '../profile_screen.dart';
+import '../../../data/controller/progress_controller.dart';
 
 class EditProfileScreen extends StatelessWidget {
   EditProfileScreen({super.key});
 
   final controller = Get.put(ChangeProfileController());
   final profileController = Get.put(UpdateProfileController());
-  final progressController = Get.put(ProgressController());
+  final progressController = Get.find<ProgressController>();
   final profileDataController = Get.put(ProfileDataController());
 
   @override
@@ -70,21 +72,19 @@ class EditProfileScreen extends StatelessWidget {
                     final file = profileController.pickedCoverImage.value;
                     return file != null
                         ? Image.file(
-                      file,
-                      height: 200.h,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    )
+                            file,
+                            height: 200.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )
                         : Image.asset(
-                      "assets/images/udesign_portfolio_placeholder.jpg",
-                      height: 200.h,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    );
+                            "assets/images/udesign_portfolio_placeholder.jpg",
+                            height: 200.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          );
                   }),
                 ),
-
-
 
                 SizedBox(
                   height: 90.h,
@@ -156,9 +156,11 @@ class EditProfileScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Obx(() {
-                                  final genreList = profileDataController.profileResponse.value?.userGenre;
+                                  final genreList = profileDataController
+                                      .profileResponse.value?.userGenre;
 
-                                  if (profileDataController.isProfileDetailsAvailable.value) {
+                                  if (profileDataController
+                                      .isProfileDetailsAvailable.value) {
                                     return Center(
                                       child: SpinKitWave(
                                         duration: Duration(seconds: 2),
@@ -182,15 +184,22 @@ class EditProfileScreen extends StatelessWidget {
                                   return Flexible(
                                     flex: 3,
                                     child: ListView.builder(
-                                      padding: EdgeInsets.symmetric(vertical: 2),
-                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 2),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       itemCount: genreList.length,
                                       itemBuilder: (context, index) {
-                                        final genreName = genreList[index].favouriteGenre.title;
+                                        final genreName = genreList[index]
+                                            .favouriteGenre
+                                            .title;
                                         return Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0,),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0,
+                                          ),
                                           child: Padding(
-                                            padding: const EdgeInsets.only(bottom: 4.0),
+                                            padding: const EdgeInsets.only(
+                                                bottom: 4.0),
                                             child: CustomText(
                                               text: genreName.length > 16
                                                   ? "${genreName.substring(0, 16)}..."
@@ -224,7 +233,6 @@ class EditProfileScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-
                           )
                         ],
                       ),
@@ -351,26 +359,52 @@ class EditProfileScreen extends StatelessWidget {
                           )
                         : CustomButton(
                             onTap: () async {
-                              if(profileController.pickedCoverImage.value != null && profileController.pickedImage.value != null && profileController.userNameController.text.isNotEmpty && profileController.bioController.text.isNotEmpty){
-                                await profileController.postClubContent();
-                              }else{
-                                if(profileController.pickedCoverImage.value != null){
-                                  await profileController.postCoverImage();
-                                }
+                              final profileCtrl = profileController;
 
-                                if(profileController.pickedImage.value != null){
-                                  await profileController.postProfileImage();
-                                }
+                              final hasCoverImage =
+                                  profileCtrl.pickedCoverImage.value != null &&
+                                      profileCtrl.pickedCoverImage.value!.path
+                                          .isNotEmpty;
+                              final hasProfileImage =
+                                  profileCtrl.pickedImage.value != null &&
+                                      profileCtrl
+                                          .pickedImage.value!.path.isNotEmpty;
+                              final hasUsername = profileCtrl
+                                  .userNameController.text
+                                  .trim()
+                                  .isNotEmpty;
+                              final hasBio = profileCtrl.bioController.text
+                                  .trim()
+                                  .isNotEmpty;
 
-                                if(profileController.userNameController.text.isNotEmpty){
-                                  await profileController.postUsername();
-                                }
+                              final isAllInfoProvided = hasCoverImage &&
+                                  hasProfileImage &&
+                                  hasUsername &&
+                                  hasBio;
 
-                                if(profileController.bioController.text.isNotEmpty){
-                                  await profileController.postBio();
+                              if (isAllInfoProvided) {
+                                await profileCtrl.postClubContent();
+                              } else {
+                                if (hasCoverImage) {
+                                  await profileCtrl.postCoverImage();
+                                }
+                                if (hasProfileImage) {
+                                  await profileCtrl.postProfileImage();
+                                }
+                                if (hasUsername) {
+                                  await profileCtrl.postUsername();
+                                }
+                                if (hasBio) {
+                                  await profileCtrl.postBio();
                                 }
                               }
+
                               await profileDataController.fetchProfileDetails();
+
+                              // Reset picked files
+                              profileCtrl.pickedImage.value = null;
+                              profileCtrl.pickedCoverImage.value = null;
+
                               controller.updateIndex(0);
                             },
                             text: "Save",

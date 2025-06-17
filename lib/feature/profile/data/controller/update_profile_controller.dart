@@ -8,6 +8,9 @@ import '../../../../core/helper/sheared_prefarences_helper.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
 
 class UpdateProfileController extends GetxController {
   SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
@@ -66,100 +69,212 @@ class UpdateProfileController extends GetxController {
     }
   }
 
+  //* Cover Image
+  // Future<void> postCoverImage() async {
+  //   preferencesHelper.init();
+  //   isLoading.value = true;
+  //   final Logger logger = Logger();
+  //
+  //   try {
+  //     await preferencesHelper.init();
+  //     var token = preferencesHelper.getString("userToken");
+  //     String url = Utils.baseUrl + Utils.updateCoverImage;
+  //
+  //     final file = pickedCoverImage.value;
+  //     if (file == null || !await file.exists()) {
+  //       logger.e("Picked cover image is null or doesn't exist.");
+  //       isLoading.value = false;
+  //       return;
+  //     }
+  //
+  //     var request = http.MultipartRequest('PATCH', Uri.parse(url));
+  //
+  //     request.headers.addAll({
+  //       'Authorization': 'Bearer $token',
+  //     });
+  //
+  //     // Optional: Add other fields if needed
+  //     request.fields['bodyData'] = jsonEncode({
+  //       // any other data, but NOT coverPhoto
+  //     });
+  //
+  //     request.files.add(
+  //       await http.MultipartFile.fromPath(
+  //         'coverPhoto',
+  //         file.path,
+  //       ),
+  //     );
+  //
+  //     var streamedResponse = await request.send();
+  //     var response = await http.Response.fromStream(streamedResponse);
+  //
+  //     if (response.statusCode == 200) {
+  //       logger.i(response.body);
+  //     } else {
+  //       logger.w(response.body);
+  //       logger.w(response.headers);
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error: $e");
+  //     logger.e(e.toString());
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  //* Cover Image
+
+  //* Cover image
   Future<void> postCoverImage() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
 
-    Map<String, dynamic> inputClubData = {
-      "coverPhoto": pickedCoverImage.value.toString(),
-    };
-
     try {
       await preferencesHelper.init();
-      var token = preferencesHelper.getString("userToken");
-      String url = Utils.baseUrl + Utils.updateProfile;
 
-      var request = http.MultipartRequest('PUT', Uri.parse(url),);
+      String url = Utils.baseUrl + Utils.updateCoverImage;
+
+      var request = http.MultipartRequest('PATCH', Uri.parse(url));
+
 
       request.headers.addAll({
-        'Authorization': 'Bearer $token',
+        'Authorization': '${preferencesHelper.getString('userToken')}',
+        'Accept': 'application/json',
       });
 
-      request.fields['bodyData'] = jsonEncode(inputClubData);
+      final file = pickedCoverImage.value;
+
+      if (file == null || !await file.exists()) {
+        logger.e("Picked cover image is null or doesn't exist.");
+        isLoading.value = false;
+        return;
+      }
 
       request.files.add(
         await http.MultipartFile.fromPath(
           'coverPhoto',
-          pickedCoverImage.value.toString(),
+          file.path,
+          contentType: MediaType('image', 'jpeg'),
+          filename: path.basename(file.path),
         ),
       );
 
-      var streamedResponse = await request.send();
+      var response = await request.send();
 
-      var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        logger.i(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = await http.Response.fromStream(response);
+        logger.i(responseData.body);
       } else {
-        logger.w(response.body);
-        logger.w(response.headers);
+        final errorData = await http.Response.fromStream(response);
+        logger.w(errorData.body);
       }
     } catch (e) {
-      debugPrint("Error: $e");
-      logger.e(e.toString());
+      logger.e("Exception: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
+  // //* Profile Image
+  // Future<void> postProfileImage() async {
+  //   preferencesHelper.init();
+  //   isLoading.value = true;
+  //   final Logger logger = Logger();
+  //
+  //   Map<String, dynamic> inputClubData = {
+  //     "avatar": pickedImage.value.toString(),
+  //   };
+  //
+  //   try {
+  //     await preferencesHelper.init();
+  //     var token = preferencesHelper.getString("userToken");
+  //     String url = Utils.baseUrl + Utils.updateProfile;
+  //
+  //     var request = http.MultipartRequest('PATCH', Uri.parse(url));
+  //
+  //     request.headers.addAll({
+  //       'Authorization': 'Bearer $token',
+  //     });
+  //
+  //     request.fields['bodyData'] = jsonEncode(inputClubData);
+  //
+  //     request.files.add(
+  //       await http.MultipartFile.fromPath(
+  //         'avatar',
+  //         pickedImage.value.toString(),
+  //       ),
+  //     );
+  //
+  //     var streamedResponse = await request.send();
+  //
+  //     var response = await http.Response.fromStream(streamedResponse);
+  //
+  //     if (response.statusCode == 200) {
+  //       logger.i(response.body);
+  //     } else {
+  //       logger.w(response.body);
+  //       logger.w(response.headers);
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error: $e");
+  //     logger.e(e.toString());
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  //* Profile Image
+
+  //* Image profile
   Future<void> postProfileImage() async {
     preferencesHelper.init();
     isLoading.value = true;
     final Logger logger = Logger();
 
-    Map<String, dynamic> inputClubData = {
-      "avatar": pickedImage.value.toString(),
-    };
-
     try {
       await preferencesHelper.init();
-      var token = preferencesHelper.getString("userToken");
-      String url = Utils.baseUrl + Utils.updateProfile;
-
-      var request = http.MultipartRequest('PUT', Uri.parse(url));
-
+      String url = Utils.baseUrl + Utils.updateProfileImage;
+      var request = http.MultipartRequest('PATCH', Uri.parse(url));
       request.headers.addAll({
-        'Authorization': 'Bearer $token',
+        'Authorization': '${preferencesHelper.getString('userToken')}',
+        'Accept': 'application/json',
       });
 
-      request.fields['bodyData'] = jsonEncode(inputClubData);
+      final file = pickedImage.value;
+
+      if (file == null || !await file.exists()) {
+        logger.e("Picked profilePhoto image is null or doesn't exist.");
+        isLoading.value = false;
+        return;
+      }
 
       request.files.add(
         await http.MultipartFile.fromPath(
-          'avatar',
-          pickedImage.value.toString(),
+          'profilePhoto',
+          file.path,
+          contentType: MediaType('image', 'jpeg'),
+          filename: path.basename(file.path),
         ),
       );
 
-      var streamedResponse = await request.send();
+      var response = await request.send();
 
-      var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        logger.i(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = await http.Response.fromStream(response);
+        logger.i(responseData.body);
       } else {
-        logger.w(response.body);
-        logger.w(response.headers);
+        final errorData = await http.Response.fromStream(response);
+        logger.w(errorData.body);
       }
     } catch (e) {
-      debugPrint("Error: $e");
-      logger.e(e.toString());
+      logger.e("Exception: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
+  //* Post Bio
   Future<void> postBio() async {
     preferencesHelper.init();
     isLoading.value = true;
@@ -197,6 +312,7 @@ class UpdateProfileController extends GetxController {
     }
   }
 
+  //* Username
   Future<void> postUsername() async {
     preferencesHelper.init();
     isLoading.value = true;

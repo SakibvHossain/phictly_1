@@ -73,10 +73,8 @@ class RecentItem extends StatelessWidget {
                 ? recent.clubMember!.first.status
                 : null;
 
-            debugPrint(
-                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
-            debugPrint(
-                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}");
+            debugPrint("+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
+            debugPrint("+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}");
 
             final memberSize = recent.memberSize;
             final activeMembers = recent.count?.clubMember;
@@ -113,7 +111,7 @@ class RecentItem extends StatelessWidget {
                 difference = '${diff.inMinutes}m';
               } else if (diff.inHours < 24) {
                 difference = '${diff.inHours}h';
-              } else if (diff.inDays < 7) {
+              } else if (diff.inDays < 365) {
                 difference = '${diff.inDays}d';
               } else {
                 difference =
@@ -417,7 +415,6 @@ class RecentItem extends StatelessWidget {
                                         ACCPECT
                                         DELETED
                                        */
-
                                       Column(
                                         children: [
                                           (status == null ||
@@ -428,16 +425,13 @@ class RecentItem extends StatelessWidget {
                                             onTap: () async {
                                               if (recent.id == null || recent.type == null) return;
 
+                                              //* What kind of check I should give based on which condition
                                               if (recent.type!.contains("PRIVATE")) {
                                                 await joinClubController.joinPrivateClub(recent.id!);
                                               } else {
                                                 await joinClubController.joinPublicClub(recent.id!);
-                                                navController.updateIndex(2);
-                                                changeClubController.updateIndex(1);
                                                 clubController.fetchCreatedClub(recent.id ?? "");
                                               }
-
-                                              await clubItemController.fetchTrendingClubs();
                                             },
                                             child: Image.asset(
                                               "assets/icons/join_read_icon.png",
@@ -463,7 +457,7 @@ class RecentItem extends StatelessWidget {
                                             height: 28.16,
                                             width: 28.52,
                                           ),
-
+                                          //* Another Issue arise here!!
                                           // buildStatusIcon(status!, trending.id ?? ""),
                                           buildStatusText(status),
 

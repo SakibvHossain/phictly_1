@@ -293,16 +293,14 @@ class CustomBookItem extends StatelessWidget {
                       ),
                       Column(
                         children: [
-                          noReqOrJoinAvailable ? Image.asset(
-                            requestOrJoinImage ?? "assets/icons/request_icon.png",
+                          noReqOrJoinAvailable ? SizedBox(
                             height: 28.16,
                             width: 28.52,
                           ) : SizedBox(),
-                          noReqOrJoinAvailable ? _customText(
-                              text: requestOrJoin ?? "Request",
-                              color: Colors.black,
-                              fontSize: 9.78,
-                              fontWeight: FontWeight.w400) : SizedBox(),
+                          SizedBox(
+                            height: 28.16,
+                            width: 28.52,
+                          ),
                           SizedBox(
                             height: 6.h,
                           ),

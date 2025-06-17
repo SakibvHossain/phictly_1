@@ -18,7 +18,7 @@ import '../../data/controller/status_controller.dart';
 import '../../data/controller/talk_point_controller.dart';
 
 class JoinClubScreen extends StatelessWidget {
-  JoinClubScreen({super.key});
+   JoinClubScreen({super.key});
 
   final TalkPointController pointController = Get.put(TalkPointController());
   final ChangeClubController changeClubController = Get.put(ChangeClubController());
@@ -37,9 +37,10 @@ class JoinClubScreen extends StatelessWidget {
         color: AppColors.primaryColor,
         onRefresh: () async {
           final value = sharedPreference.getString("selectedClubId");
-          debugPrint("+________________________________________+++${clubController.selectedClubId.value}");
+          debugPrint("____________________________________________${clubController.selectedClubId.value}");
           clubController.fetchCreatedClub(value ?? "");
         },
+
         child: Stack(
           children: [
             Column(
@@ -144,7 +145,7 @@ class JoinClubScreen extends StatelessWidget {
                     difference = '${diff.inMinutes}m';
                   } else if (diff.inHours < 24) {
                     difference = '${diff.inHours}h';
-                  } else if (diff.inDays < 7) {
+                  } else if (diff.inDays < 356) {
                     difference = '${diff.inDays}d';
                   } else {
                     difference =
@@ -258,11 +259,10 @@ class JoinClubScreen extends StatelessWidget {
                           difference = '${diff.inMinutes}m';
                         } else if (diff.inHours < 24) {
                           difference = '${diff.inHours}h';
-                        } else if (diff.inDays < 7) {
+                        } else if (diff.inDays < 365) {
                           difference = '${diff.inDays}d';
                         } else {
-                          difference =
-                              '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                          difference = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
                         }
 
                         debugPrint("++++++++++++++++++++++++++++++${post.id}");

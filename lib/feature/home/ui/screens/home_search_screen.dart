@@ -53,6 +53,7 @@ class HomeSearchScreen extends StatelessWidget {
             () {
               final clubs = controller.clubResponse;
 
+
               if (controller.isClubDataAvailable.value) {
                 return Column(
                   children: [
@@ -111,6 +112,10 @@ class HomeSearchScreen extends StatelessWidget {
                         ),
                         itemCount: clubs.length,
                         itemBuilder: (context, index) {
+                          final status =
+                          (clubs[index].clubMember.isNotEmpty)
+                              ? clubs[index].clubMember.first.status
+                              : null;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: SearchBookItem(

@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,38 +6,41 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_book_items/custom_book_item.dart';
+import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_outline_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_title_text.dart';
 import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
+import 'package:phictly/feature/create_club/data/controller/follow_controller.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_data_controller.dart';
+import 'package:phictly/feature/profile/data/controller/progress_controller.dart';
+import 'package:phictly/feature/profile/data/controller/redirected_profile_controller.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../create_club/data/controller/change_club_controller.dart';
 import '../../../create_club/data/controller/club_controller.dart';
-import '../../../create_club/data/controller/follow_controller.dart';
 import '../../../home/data/controller/bottom_nav_controller.dart';
 import '../../data/controller/fetch_my_club_controller.dart';
-import '../../data/controller/progress_controller.dart';
 
-
-class ProfileScreen extends StatelessWidget {
+class RedirectedProfileScreen extends StatelessWidget {
   final progressController = Get.find<ProgressController>();
   final controller = Get.find<ChangeProfileController>();
   final profileController = Get.put(ProfileController());
   final profileDataController = Get.put(ProfileDataController());
+  final redirectProfileController = Get.put(RedirectedProfileController());
   final fetchMyClubController = Get.put(FetchMyClubController());
   final changeClubController = Get.put(ChangeClubController());
   final navController = Get.put(BottomNavController());
-  final sharedPreferencesHelper = Get.put(SharedPreferencesHelper());
-  final followController = Get.put(FollowController());
+  final changeProfileController = Get.put(ChangeProfileController());
   final clubController = Get.find<ClubController>();
+  final followController = Get.put(FollowController());
+  final sharedPreferencesHelper = Get.put(SharedPreferencesHelper());
   final Logger logger = Logger();
 
-  ProfileScreen({super.key});
+  RedirectedProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +49,7 @@ class ProfileScreen extends StatelessWidget {
       body: RefreshIndicator(
         color: AppColors.primaryColor,
         onRefresh: () async {
-          await profileDataController.fetchProfileDetails();
-          followController.fetchFollowing();
-          followController.fetchFollower();
+          //* await profileDataController.fetchProfileDetails();
         },
         child: SingleChildScrollView(
           child: Stack(
@@ -108,7 +106,8 @@ class ProfileScreen extends StatelessWidget {
 
                   //* Background Image
                   Obx(() {
-                    final profile = profileDataController.profileResponse.value;
+                    final profile =
+                        redirectProfileController.profileResponse.value;
 
                     if (profile == null ||
                         profile.coverPhoto == null ||
@@ -145,107 +144,6 @@ class ProfileScreen extends StatelessWidget {
                     height: 12.h,
                   ),
 
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          fetchMyClubController.fetchAllMyClubs();
-                          controller.updateIndex(1);
-                          profileController.updateTabIndex(0);
-                        },
-                        child: Obx(() {
-                          final profile =
-                              profileDataController.profileResponse.value;
-
-                          if (profileDataController
-                              .isProfileDetailsAvailable.value) {
-                            return Skeletonizer(child: statItem("0", "Clubs"));
-                          }
-
-                          if (profile == null) {
-                            return statItem("0", "Clubs");
-                          }
-
-                          return statItem(
-                              "${profile.count.clubMember}", "Clubs");
-                        }),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.updateIndex(1);
-                          profileController.updateTabIndex(1);
-                        },
-                        child: Obx(() {
-                          final profile =
-                              profileDataController.profileResponse.value;
-
-                          if (profileDataController
-                              .isProfileDetailsAvailable.value) {
-                            return Skeletonizer(
-                                child: statItem("0", "Followers"));
-                          }
-
-                          if (profile == null) {
-                            return statItem("0", "Followers");
-                          }
-
-                          return statItem(
-                              "${profile.count.followers}", "Followers");
-                        }),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.updateIndex(1);
-                          profileController.updateTabIndex(2);
-                        },
-                        //Skeletonizer(child: statItem("78", "Following")),
-                        child: Obx(() {
-                          final profile =
-                              profileDataController.profileResponse.value;
-
-                          if (profileDataController
-                              .isProfileDetailsAvailable.value) {
-                            return Skeletonizer(
-                              child: statItem("0", "Following"),
-                            );
-                          }
-
-                          if (profile == null) {
-                            return statItem("0", "Following");
-                          }
-
-                          return statItem("${profile.count.following}", "Following");
-                        }),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.updateIndex(1);
-                          profileController.updateTabIndex(3);
-                        },
-                        //Skeletonizer(child: statItem("3", "Groups")),
-                        child: Obx(() {
-                          final profile =
-                              profileDataController.profileResponse.value;
-
-                          if (profileDataController
-                              .isProfileDetailsAvailable.value) {
-                            return Skeletonizer(
-                              child: statItem("0", "Groups"),
-                            );
-                          }
-
-                          if (profile == null) {
-                            return statItem("0", "Groups");
-                          }
-
-                          return statItem("${profile.count.groups}", "Groups");
-                        }),
-                      ),
-                    ],
-                  ),
-
                   SizedBox(
                     height: 12.h,
                   ),
@@ -256,9 +154,21 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SizedBox(
-                          width: 120.w,
-                          height: 40.h,
+                        GestureDetector(
+                          onTap: (){
+                            final profile = redirectProfileController.profileResponse.value;
+                            followController.followUser(profile?.id ?? "");
+                          },
+                          child: Obx((){
+                            return CustomButton(
+                              text: followController.isLoading.value ? "..." : "Follow",
+                              width: 120.w,
+                              height: 40.h,
+                              textFontSize: 15.sp,
+                              textFontWeight: FontWeight.w400,
+                              borderRadius: 6.r,
+                            );
+                          }),
                         ),
                         SizedBox(
                           width: 16.w,
@@ -287,9 +197,9 @@ class ProfileScreen extends StatelessWidget {
                       alignment: AlignmentDirectional.centerStart,
                       child: Obx(() {
                         final profile =
-                            profileDataController.profileResponse.value;
+                            redirectProfileController.profileResponse.value;
 
-                        if (profileDataController
+                        if (redirectProfileController
                             .isProfileDetailsAvailable.value) {
                           return Skeletonizer(
                             child: CustomText(
@@ -322,9 +232,11 @@ class ProfileScreen extends StatelessWidget {
 
                   //* Profile Bio
                   Obx(() {
-                    final profile = profileDataController.profileResponse.value;
+                    final profile =
+                        redirectProfileController.profileResponse.value;
 
-                    if (profileDataController.isProfileDetailsAvailable.value) {
+                    if (redirectProfileController
+                        .isProfileDetailsAvailable.value) {
                       return Skeletonizer(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -433,13 +345,13 @@ class ProfileScreen extends StatelessWidget {
                                 ],
                               ),
                               child: Obx(() {
-                                final genreList = profileDataController
+                                final genreList = redirectProfileController
                                     .profileResponse.value?.userGenre;
 
                                 debugPrint(
                                     "++++++++++++++++++++++++++++++++++++++++++++++++++++$genreList");
 
-                                if (profileDataController
+                                if (redirectProfileController
                                     .isProfileDetailsAvailable.value) {
                                   return Center(
                                     child: SpinKitWave(
@@ -586,11 +498,12 @@ class ProfileScreen extends StatelessWidget {
 
                   Obx(() {
                     final activeRead =
-                        profileDataController.profileResponse.value?.record;
+                        redirectProfileController.profileResponse.value?.record;
 
                     logger.i(activeRead);
 
-                    if (profileDataController.isProfileDetailsAvailable.value) {
+                    if (redirectProfileController
+                        .isProfileDetailsAvailable.value) {
                       return Center(
                         child: SpinKitWave(
                           duration: Duration(seconds: 2),
@@ -678,9 +591,10 @@ class ProfileScreen extends StatelessWidget {
 
                   Obx(() {
                     final lastRead =
-                        profileDataController.profileResponse.value?.record;
+                        redirectProfileController.profileResponse.value?.record;
 
-                    if (profileDataController.isProfileDetailsAvailable.value) {
+                    if (redirectProfileController
+                        .isProfileDetailsAvailable.value) {
                       return Center(
                         child: SpinKitWave(
                           duration: Duration(seconds: 2),
@@ -767,9 +681,10 @@ class ProfileScreen extends StatelessWidget {
 
                   Obx(() {
                     final lastWatch =
-                        profileDataController.profileResponse.value?.record;
+                        redirectProfileController.profileResponse.value?.record;
 
-                    if (profileDataController.isProfileDetailsAvailable.value) {
+                    if (redirectProfileController
+                        .isProfileDetailsAvailable.value) {
                       return Center(
                         child: SpinKitWave(
                           duration: Duration(seconds: 2),
@@ -878,7 +793,8 @@ class ProfileScreen extends StatelessWidget {
                 child: Stack(
                   children: [
                     Obx(() {
-                      final profile = profileDataController.profileResponse.value;
+                      final profile =
+                          redirectProfileController.profileResponse.value;
 
                       Logger log = Logger();
 
@@ -955,6 +871,17 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              Positioned(
+                top: MediaQuery.sizeOf(context).height * 0.15,
+                child: IconButton(
+                  onPressed: () {
+                    navController.updateIndex(2);
+                    changeProfileController.updateIndex(2);
+                  },
+                  icon: Icon(Icons.arrow_back_ios_new_sharp, color: Colors.white,),
                 ),
               ),
             ],

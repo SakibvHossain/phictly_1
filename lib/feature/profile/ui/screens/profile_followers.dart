@@ -10,6 +10,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../core/components/custom_app_bar.dart';
 import '../../../../core/components/custom_text.dart';
 import '../../../../core/utils/app_colors.dart';
+import '../../../create_club/data/controller/follow_controller.dart';
+import '../../../message/ui/screens/chat_screen.dart';
 import '../../data/controller/change_profile_controller.dart';
 import '../../data/controller/profile_controller.dart';
 import '../../data/controller/profile_data_controller.dart';
@@ -22,6 +24,7 @@ class ProfileFollowers extends StatelessWidget {
   final profileController = Get.put(ProfileController());
   final profileDataController = Get.put(ProfileDataController());
   final fetchMyClubController = Get.put(FetchMyClubController());
+  final followController = Get.put(FollowController());
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +147,6 @@ class ProfileFollowers extends StatelessWidget {
                     Obx((){
                       final clubs = fetchMyClubController.allMyClubs;
 
-
-
                       if(fetchMyClubController.isMyAllClubsLoading.value){
                         return SpinKitWave(
                           color: AppColors.primaryColor,
@@ -212,119 +213,265 @@ class ProfileFollowers extends StatelessWidget {
                           );
                       });
                     }),
-                    Center(
-                      child: Text("0 Followers"),
-                    ),
-                    Center(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0, right: 16.0, top: 16, bottom: 16.0),
-                            child: CustomTextFormFieldWithoutIcon(
-                              controller: userSearchController,
-                              fillColorIsTrue: true,
-                              fillColor: Colors.white,
-                              suffixIcon: Icon(
-                                Icons.search,
-                                color: AppColors.primaryColor,
-                              ),
-                              hintText: "Search",
-                              borderRadius: BorderRadius.circular(6.r),
-                              cursorColor: Colors.white.withValues(alpha: 0.60),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0, right: 16.0, bottom: 8.0),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Image.asset(
-                                "assets/profile/image/follower_1.png",
-                                height: 50.h,
-                                width: 50.w,
-                              ),
-                              title: CustomText(
-                                text: "hilamsam19",
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff000000),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    "assets/profile/icons/chat_with_follower.png",
-                                    height: 40.h,
-                                    width: 40.w,
-                                  ),
-                                  SizedBox(
-                                    width: 8.h,
-                                  ),
-                                  // GestureDetector(
-                                  //   onTap: () {
-                                  //     popUpMenuButton();
-                                  //   },
-                                  //   child: Image.asset(
-                                  //     "assets/images/dot_bar.png",
-                                  //     height: 14.h,
-                                  //     width: 26.w,
-                                  //   ),
-                                  // ),
+                    Obx((){
+                      if(followController.isFollowerLoading.value){
+                        return Center(child: SpinKitWave(color: AppColors.primaryColor,size: 15,),);
+                      }
 
-                                  PopupMenuButton<String>(
-                                    color: Colors.white,
-                                    offset: Offset(-20, 0),
-                                    onSelected: (value) {
-                                      // Handle menu item selection
-                                      if (value == "Invite") {
-                                        print("Invite Clicked");
-                                      } else if (value == "Nudge") {
-                                        print("Nudge Clicked");
-                                      } else if (value == "Unfollow") {
-                                        print("Unfollow Clicked");
-                                      } else if (value == "Block") {
-                                        print("Block Clicked");
-                                      }
-                                    },
-                                    itemBuilder: (context) => [
-                                      PopupMenuItem(
-                                        padding: EdgeInsets.only(left: 16),
-                                        value: "Invite",
-                                        child: Text("Invite"),
+                      if(followController.follower.isEmpty){
+                        return Center(child: CustomText(text: "You don't have any follower", fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black),);
+                      }
+
+                      return ListView.builder(
+                          itemCount: followController.follower.length,
+                          itemBuilder: (context, index){
+                            final avatar = followController.follower[index].following?.avatar;
+                            return Center(
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16.0, right: 16.0, bottom: 8.0),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      leading:
+                                    (avatar != null && avatar.isNotEmpty)
+                                        ? CachedNetworkImage(
+                                      imageUrl: avatar,
+                                      height: 50.h,
+                                      width: 50.w,
+                                      fit: BoxFit.cover,
+                                      placeholder: (_, __) => CircularProgressIndicator(),
+                                      errorWidget: (_, __, ___) => Image.asset("assets/profile/image/follower_1.png", height: 50.h, width: 50.w, fit: BoxFit.cover),
+                                    )
+                                        : Image.asset("assets/profile/image/follower_1.png", height: 50.h, width: 50.w, fit: BoxFit.cover),
+
+                                      title: CustomText(
+                                        text: "${followController.follower[index].following?.username}",
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff000000),
                                       ),
-                                      PopupMenuItem(
-                                        padding: EdgeInsets.only(left: 16),
-                                        value: "Nudge",
-                                        child: Text("Nudge"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap:(){
+                                              Get.snackbar("ID: ", followController.follower[index].id);
+                                              Get.to(
+                                                    () => ChatScreen(
+                                                  receiverId: followController.follower[index].id,
+                                                      image:  followController.follower[index].following?.avatar,
+                                                      userName: followController.follower[index].following?.username,
+
+                                                ),
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              "assets/profile/icons/chat_with_follower.png",
+                                              height: 40.h,
+                                              width: 40.w,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 8.h,
+                                          ),
+                                          // GestureDetector(
+                                          //   onTap: () {
+                                          //     popUpMenuButton();
+                                          //   },
+                                          //   child: Image.asset(
+                                          //     "assets/images/dot_bar.png",
+                                          //     height: 14.h,
+                                          //     width: 26.w,
+                                          //   ),
+                                          // ),
+
+                                          PopupMenuButton<String>(
+                                            color: Colors.white,
+                                            offset: Offset(-20, 0),
+                                            onSelected: (value) {
+                                              // Handle menu item selection
+                                              if (value == "Invite") {
+                                                print("Invite Clicked");
+                                              } else if (value == "Nudge") {
+                                                print("Nudge Clicked");
+                                              } else if (value == "Unfollow") {
+                                                print("Unfollow Clicked");
+                                              } else if (value == "Block") {
+                                                print("Block Clicked");
+                                              }
+                                            },
+                                            itemBuilder: (context) => [
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Invite",
+                                                child: Text("Invite"),
+                                              ),
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Nudge",
+                                                child: Text("Nudge"),
+                                              ),
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Unfollow",
+                                                child: Text(
+                                                  "Unfollow",
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Block",
+                                                child: Text(
+                                                  "Block",
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                            ],
+                                            child: Icon(
+                                                Icons.more_vert), // 3-dot menu icon
+                                          ),
+                                        ],
                                       ),
-                                      PopupMenuItem(
-                                        padding: EdgeInsets.only(left: 16),
-                                        value: "Unfollow",
-                                        child: Text(
-                                          "Unfollow",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                      PopupMenuItem(
-                                        padding: EdgeInsets.only(left: 16),
-                                        value: "Block",
-                                        child: Text(
-                                          "Block",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                    child: Icon(
-                                        Icons.more_vert), // 3-dot menu icon
-                                  ),
+                                    ),
+                                  )
                                 ],
                               ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                            );
+                          });
+                    }),
+                    Obx((){
+                      if(followController.isFollowingLoading.value){
+                        return Center(child: SpinKitWave(color: AppColors.primaryColor,size: 15,),);
+                      }
+
+                      if(followController.following.isEmpty){
+                        return Center(child: CustomText(text: "You don't have any follower", fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black),);
+                      }
+
+                      return ListView.builder(
+                          itemCount: followController.following.length,
+                          itemBuilder: (context, index){
+                            final avatar = followController.following[index].following?.avatar;
+                            return Center(
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16.0, right: 16.0, bottom: 8.0),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      leading:
+                                      (avatar != null && avatar.isNotEmpty)
+                                          ? CachedNetworkImage(
+                                        imageUrl: avatar,
+                                        height: 50.h,
+                                        width: 50.w,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) => CircularProgressIndicator(),
+                                        errorWidget: (_, __, ___) => Image.asset("assets/profile/image/follower_1.png", height: 50.h, width: 50.w, fit: BoxFit.cover),
+                                      )
+                                          : Image.asset("assets/profile/image/follower_1.png", height: 50.h, width: 50.w, fit: BoxFit.cover),
+
+                                      title: CustomText(
+                                        text: "${followController.following[index].following?.username}",
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff000000),
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap:(){
+
+                                              Get.snackbar("ID: ", followController.following[index].following!.username);
+
+                                              Get.to(
+                                                    () => ChatScreen(
+                                                  receiverId: followController.following[index].id,
+                                                  image:  followController.following[index].following?.avatar,
+                                                  userName: followController.following[index].following?.username ?? "User 3",
+                                                ),
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              "assets/profile/icons/chat_with_follower.png",
+                                              height: 40.h,
+                                              width: 40.w,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 8.h,
+                                          ),
+                                          // GestureDetector(
+                                          //   onTap: () {
+                                          //     popUpMenuButton();
+                                          //   },
+                                          //   child: Image.asset(
+                                          //     "assets/images/dot_bar.png",
+                                          //     height: 14.h,
+                                          //     width: 26.w,
+                                          //   ),
+                                          // ),
+
+                                          PopupMenuButton<String>(
+                                            color: Colors.white,
+                                            offset: Offset(-20, 0),
+                                            onSelected: (value) {
+                                              // Handle menu item selection
+                                              if (value == "Invite") {
+                                                print("Invite Clicked");
+                                              } else if (value == "Nudge") {
+                                                print("Nudge Clicked");
+                                              } else if (value == "Unfollow") {
+                                                print("Unfollow Clicked");
+                                              } else if (value == "Block") {
+                                                print("Block Clicked");
+                                              }
+                                            },
+                                            itemBuilder: (context) => [
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Invite",
+                                                child: Text("Invite"),
+                                              ),
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Nudge",
+                                                child: Text("Nudge"),
+                                              ),
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Unfollow",
+                                                child: Text(
+                                                  "Unfollow",
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                              PopupMenuItem(
+                                                padding: EdgeInsets.only(left: 16),
+                                                value: "Block",
+                                                child: Text(
+                                                  "Block",
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                            ],
+                                            child: Icon(
+                                                Icons.more_vert), // 3-dot menu icon
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          });
+                    }),
                     Center(
                       child: Text("No Groups Created Yet"),
                     ),

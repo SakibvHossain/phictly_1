@@ -117,7 +117,7 @@ class TrendingItem extends StatelessWidget {
                 difference = '${diff.inMinutes}m';
               } else if (diff.inHours < 24) {
                 difference = '${diff.inHours}h';
-              } else if (diff.inDays < 7) {
+              } else if (diff.inDays < 365) {
                 difference = '${diff.inDays}d';
               } else {
                 difference =
@@ -424,16 +424,12 @@ class TrendingItem extends StatelessWidget {
                                             behavior: HitTestBehavior.opaque,
                                             onTap: () async {
                                               if (trending.id == null || trending.type == null) return;
-
                                               if (trending.type!.contains("PRIVATE")) {
                                                 await joinClubController.joinPrivateClub(trending.id!);
                                               } else {
                                                 await joinClubController.joinPublicClub(trending.id!);
-                                                navController.updateIndex(2);
-                                                changeClubController.updateIndex(1);
                                                 clubController.fetchCreatedClub(trending.id ?? "");
                                               }
-                                              await clubItemController.fetchTrendingClubs();
                                             },
                                             child: Image.asset(
                                               "assets/icons/join_read_icon.png",

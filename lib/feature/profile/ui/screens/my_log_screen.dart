@@ -1,8 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:get/get.dart';
+import 'package:phictly/core/utils/app_colors.dart';
+import 'package:phictly/feature/profile/data/controller/log_controller.dart';
 import '../../../../core/components/custom_outline_button.dart';
 import '../../data/controller/change_profile_controller.dart';
 
@@ -10,6 +16,8 @@ class MyLogScreen extends StatelessWidget {
   MyLogScreen({super.key});
 
   final controller = Get.find<ChangeProfileController>();
+  final logController = Get.put(LogController());
+  final logger = Logger();
 
   final List<String> myBadges = [
     "assets/profile/image/myLog_image_1.png",
@@ -23,12 +31,17 @@ class MyLogScreen extends StatelessWidget {
     double width = MediaQuery.sizeOf(context).width;
     double height = MediaQuery.sizeOf(context).height;
 
+    logger.i("${logController.myLogList}");
+
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
-      body: SingleChildScrollView(
+      body: RefreshIndicator(
+        color: AppColors.primaryColor,
+        onRefresh: () async {
+        logController.fetchAllMyLogs();
+      }, child: SingleChildScrollView(
         child: Column(
           children: [
-
             //* App bar
             Container(
               width: double.infinity,
@@ -49,7 +62,6 @@ class MyLogScreen extends StatelessWidget {
                           height: 42.93.h,
                           width: 130.96.w,
                         ),
-
                         SizedBox()
                       ],
                     ),
@@ -80,7 +92,9 @@ class MyLogScreen extends StatelessWidget {
                           width: 13.75.w,
                         ),
                       ),
-                      SizedBox(width: 18.w,),
+                      SizedBox(
+                        width: 18.w,
+                      ),
                     ],
                   ),
                   Row(
@@ -104,12 +118,21 @@ class MyLogScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   Row(
                     children: [
-                      Image.asset("assets/tv/tune.png", height: 20.h, width: 18.w,),
-                      SizedBox(width: 16.h,),
-                      Image.asset("assets/tv/sort_by.png", height: 20.h, width: 18.w,),
+                      Image.asset(
+                        "assets/tv/tune.png",
+                        height: 20.h,
+                        width: 18.w,
+                      ),
+                      SizedBox(
+                        width: 16.h,
+                      ),
+                      Image.asset(
+                        "assets/tv/sort_by.png",
+                        height: 20.h,
+                        width: 18.w,
+                      ),
                     ],
                   )
                 ],
@@ -122,132 +145,194 @@ class MyLogScreen extends StatelessWidget {
 
             SizedBox(
               height: 800.h,
-              child: GridView.builder(
-                  padding: EdgeInsets.only(top: 8, bottom: 16),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.63),
-                  itemCount: myBadges.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 8),
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6.r),
+              child: Obx(() {
+                if (logController.isLogLoading.value) {
+                  return Center(
+                    child: SpinKitWave(
+                      color: AppColors.primaryColor,
+                      size: 15,
+                    ),
+                  );
+                }
+
+                if(logController.myLogList.isEmpty){
+                  return ListView(
+                    physics: AlwaysScrollableScrollPhysics(), // enables refresh even if short
+                    children: [
+                      SizedBox(height: MediaQuery.sizeOf(context).height * 0.3),
+                      Center(
+                        child: CustomText(
+                          text: "${logController.myLogList.length}",
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff000000),
+                        ),
                       ),
-                      child: Column(
-                        children: [
-                          Stack(
-                            children: [
-                              Image.asset(
-                                height: 245.h,
-                                myBadges[index],
-                                fit: BoxFit.cover,
-                              ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Image.asset("assets/profile/icons/log_heart.png", height: 24.h, width: 24.w,),),
-                            ],
-                          ),
-                          SizedBox(height: 8.h,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(text: "Waving Levers", fontSize: 16.sp, fontWeight: FontWeight.w700, color: Color(0xff000000),),
-                                  CustomText(text: "Jhon Groman", fontSize: 15.sp, fontWeight: FontWeight.w400, color: Color(0xff000000).withValues(alpha: 0.60),),
-                                ],
-                              ),
-                              GestureDetector(
-                                  onTap: (){
-                                    //* Todo
-                                    Get.dialog(
-                                      Dialog(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(6.r),
-                                            ),
-                                            height: 190,
-                                            width: 390.w,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                SizedBox(
-                                                  height: 16.h,
-                                                ),
-                                                Image.asset(
-                                                  "assets/profile/icons/delete_log.png",
-                                                  height: 40.h,
-                                                  width: 36.w,
-                                                ),
-                                                SizedBox(
-                                                  height: 16.h,
-                                                ),
-                                                CustomText(
-                                                  text: "Are you sure want to delete?",
-                                                  fontSize: 18.sp,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xff000000),
-                                                ),
-                                                SizedBox(
-                                                  height: 16.h,
-                                                ),
-                                                Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    CustomOutlineButton(
-                                                      onTap: () {
-                                                        Get.back();
-                                                      },
-                                                      text: "NO",
-                                                      width: 150.w,
-                                                      height: 50.h,
-                                                      textFontSize: 15.sp,
-                                                      borderRadius: 6.r,
-                                                      textFontWeight: FontWeight.w400,
-                                                      color: Color(0xff29605E),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 16.w,
-                                                    ),
-                                                    CustomButton(
-                                                      onTap: () {
-                                                        //* Todo
-                                                        Get.back();
-                                                      },
-                                                      text: "YES",
-                                                      width: 150.w,
-                                                      height: 50.h,
-                                                      textFontSize: 15.sp,
-                                                      textFontWeight: FontWeight.w400,
-                                                      borderRadius: 6.r,
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 16.h,
-                                                ),
-                                              ],
-                                            ),
-                                          )),
-                                    );
-                                  },
-                                  child: Icon(Icons.delete, color: Colors.red,))
-                            ],
-                          )
-                        ],
-                      ),
-                    );
-                  }),
+                    ],
+                  );
+                }
+
+                return GridView.builder(
+                    padding: EdgeInsets.only(top: 8, bottom: 16),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.63),
+                    itemCount: logController.myLogList.length,
+                    itemBuilder: (context, index) {
+                      final logList = logController.myLogList[index];
+
+                      return Container(
+                        margin: EdgeInsets.symmetric(horizontal: 8),
+                        padding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                Image.network(
+                                  height: 245.h,
+                                  logList.poster ?? "",
+                                  fit: BoxFit.cover,
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Image.asset(
+                                    "assets/profile/icons/log_heart.png",
+                                    height: 24.h,
+                                    width: 24.w,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8.h,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text: logList.title.length > 15
+                                          ? "${logList.title.substring(0, 15)}..."
+                                          : logList.title,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xff000000),
+                                    ),
+                                    CustomText(
+                                      text: logList.writer.length > 12
+                                          ? "${logList.writer.substring(0, 12)}..."
+                                          : logList.writer,
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xff000000).withOpacity(0.60),
+                                    ),
+                                  ],
+                                ),
+                                GestureDetector(
+                                    onTap: () {
+                                      //* Todo
+                                      Get.dialog(
+                                        Dialog(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                BorderRadius.circular(6.r),
+                                              ),
+                                              height: 190,
+                                              width: 390.w,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  SizedBox(
+                                                    height: 16.h,
+                                                  ),
+                                                  Image.asset(
+                                                    "assets/profile/icons/delete_log.png",
+                                                    height: 40.h,
+                                                    width: 36.w,
+                                                  ),
+                                                  SizedBox(
+                                                    height: 16.h,
+                                                  ),
+                                                  CustomText(
+                                                    text:
+                                                    "Are you sure want to delete?",
+                                                    fontSize: 18.sp,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff000000),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 16.h,
+                                                  ),
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                    children: [
+                                                      CustomOutlineButton(
+                                                        onTap: () {
+                                                          Get.back();
+                                                        },
+                                                        text: "NO",
+                                                        width: 150.w,
+                                                        height: 50.h,
+                                                        textFontSize: 15.sp,
+                                                        borderRadius: 6.r,
+                                                        textFontWeight:
+                                                        FontWeight.w400,
+                                                        color: Color(0xff29605E),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 16.w,
+                                                      ),
+                                                      CustomButton(
+                                                        onTap: () {
+                                                          //* Todo
+                                                          Get.back();
+                                                        },
+                                                        text: "YES",
+                                                        width: 150.w,
+                                                        height: 50.h,
+                                                        textFontSize: 15.sp,
+                                                        textFontWeight:
+                                                        FontWeight.w400,
+                                                        borderRadius: 6.r,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 16.h,
+                                                  ),
+                                                ],
+                                              ),
+                                            )),
+                                      );
+                                    },
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ))
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    });
+              }),
             ),
 
             SizedBox(
@@ -255,7 +340,7 @@ class MyLogScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ),),
     );
   }
 }

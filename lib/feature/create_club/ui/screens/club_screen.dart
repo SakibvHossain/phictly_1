@@ -153,7 +153,7 @@ class ClubScreen extends StatelessWidget {
                     difference = '${diff.inMinutes}m';
                   } else if (diff.inHours < 24) {
                     difference = '${diff.inHours}h';
-                  } else if (diff.inDays < 7) {
+                  } else if (diff.inDays < 356) {
                     difference = '${diff.inDays}d';
                   } else {
                     difference =

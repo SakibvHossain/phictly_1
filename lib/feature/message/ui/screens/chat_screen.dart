@@ -296,7 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           messageController.clear();
                         }
                       },
-                      child: Icon(Icons.send)),
+                      child: Icon(Icons.send)),//6850e48e5646ced38a2d5c59
                 ],
               ),
             ),

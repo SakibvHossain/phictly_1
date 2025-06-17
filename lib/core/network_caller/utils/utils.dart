@@ -20,12 +20,17 @@ class Utils {
   static String updateProfile = "/auth/profile";
   static String updateCoverImage = "/auth/cover-image";
   static String updateProfileImage = "/auth/profile-image";
+  static String fetchMyLogs = "/profile/my-log";
   static String statusUpdate(String id) => "/post/post-status-update/$id";
   static String clubStatusUpdate = "/club/join-status-update";
   static String favoriteGenre = "/genre/favourite-genre";
   static String fetchAllMyClubs = "/club/get-all-my-club";
+  static String fetchFollowing = "/follow/following";
+  static String fetchFollower = "/follow/follower";
   static String createFavoriteGenre = "/profile/favarite-genre";
   static String privateClubJoinRequest(String id) => "/club/joining-private/$id";
   static String publicClubJoinRequest(String id) => "/club/joining-public/$id";
+  static String fetchSingleUser(String id) => "/users/$id";
+  static String followUser(String id) => "/follow/create/$id";
   static String searchAllClubs(String queryValue) => "/club?page=1&limit=35&searchQuery=$queryValue";
 }

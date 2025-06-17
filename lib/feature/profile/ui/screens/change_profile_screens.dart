@@ -6,6 +6,7 @@ import 'package:phictly/feature/profile/ui/screens/my_log_screen.dart';
 import 'package:phictly/feature/profile/ui/screens/profile_badges_screen.dart';
 import 'package:phictly/feature/profile/ui/screens/profile_followers.dart';
 import 'package:phictly/feature/profile/ui/screens/profile_screen.dart';
+import 'package:phictly/feature/profile/ui/screens/redirected_profile_screen.dart';
 import 'package:phictly/feature/profile/ui/screens/setting/about_screen.dart';
 import 'package:phictly/feature/profile/ui/screens/setting/account_details.dart';
 import 'package:phictly/feature/profile/ui/screens/setting/add_group_member_screen.dart';
@@ -60,6 +61,8 @@ class ChangeProfileScreens extends StatelessWidget {
           return CreateGroupScreen();
         }else if (controller.currentIndex.value == 15) {
           return AddGroupMemberScreen();
+        }else if (controller.currentIndex.value == 16) {
+          return RedirectedProfileScreen();
         }else {
           return ProfileScreen();
         }
