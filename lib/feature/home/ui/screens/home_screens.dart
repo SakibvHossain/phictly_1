@@ -123,7 +123,11 @@ class HomeScreens extends StatelessWidget {
             SizedBox(height: 16.h),
 
             // Social Feed
-            sectionTitle("Social Feed"),
+            GestureDetector(
+                onTap: (){
+
+                },
+                child: sectionTitle("Social Feed")),
 
             Obx(() {
               final feedList = socialFeed.socialFeedList;
@@ -162,7 +166,7 @@ class HomeScreens extends StatelessWidget {
                           style: TextStyle(color: Colors.black),
                           children: [
                             TextSpan(
-                              text: "${item.user?.username ?? "Unknown"} ",
+                              text: "${item.user?.username ?? "Hello"} ",
                               style: GoogleFonts.dmSans(
                                 color: AppColors.primaryColor,
                                 fontWeight: FontWeight.w600,
@@ -170,7 +174,7 @@ class HomeScreens extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: "Just added Serpent and Dove to her favorite",
+                              text: item.title ?? "Just added Serpent and Dove to her favorite",
                               style: GoogleFonts.dmSans(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w400,

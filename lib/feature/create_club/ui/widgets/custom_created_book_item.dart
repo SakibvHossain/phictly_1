@@ -167,7 +167,7 @@ class CustomCreatedBookItem extends StatelessWidget {
                       : _rowCustomText(
                     firstText: "Length: ",
                     firstFontSize: 12,
-                    secondText: length.toString(),
+                    secondText: "${length.toString()} Pages",
                     secondFontSize: 12,
                   ),
 

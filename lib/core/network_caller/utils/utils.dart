@@ -27,6 +27,7 @@ class Utils {
   static String fetchAllMyClubs = "/club/get-all-my-club";
   static String fetchFollowing = "/follow/following";
   static String fetchFollower = "/follow/follower";
+  static String socialFeed = "/profile/social-feed";
   static String createFavoriteGenre = "/profile/favarite-genre";
   static String privateClubJoinRequest(String id) => "/club/joining-private/$id";
   static String publicClubJoinRequest(String id) => "/club/joining-public/$id";

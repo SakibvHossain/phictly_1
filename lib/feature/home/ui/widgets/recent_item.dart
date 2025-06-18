@@ -255,7 +255,7 @@ class RecentItem extends StatelessWidget {
                                     _rowCustomText(
                                       firstText: "Member Count: ",
                                       firstFontSize: 12,
-                                      secondText: "${trendingClubs.memberSize}",
+                                      secondText: "${trendingClubs.count?.clubMember}/${trendingClubs.memberSize}",
                                       secondFontSize: 12,
                                     ),
                                     SizedBox(
@@ -272,15 +272,9 @@ class RecentItem extends StatelessWidget {
                                               trackShape:
                                               const RoundedRectSliderTrackShape(),
                                               trackHeight: 2.0,
-                                              thumbShape:
-                                              const RoundSliderThumbShape(
-                                                  enabledThumbRadius:
-                                                  1.0),
-                                              overlayShape:
-                                              SliderComponentShape
-                                                  .noOverlay,
-                                              thumbColor:
-                                              const Color(0xff29605E),
+                                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 1.0),
+                                              overlayShape: SliderComponentShape.noOverlay,
+                                              thumbColor: const Color(0xff29605E),
                                               activeTrackColor:
                                               const Color(0xff29605E),
                                               inactiveTrackColor:

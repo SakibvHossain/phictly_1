@@ -24,3 +24,5 @@ class TagsController extends GetxController {
   // Extract only the IDs for the API call
   List<String> get selectedGenreIds => selectedGenres.map((g) => g.id).toList();
 }
+
+// 2/7

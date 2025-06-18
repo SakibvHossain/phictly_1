@@ -216,7 +216,7 @@ class SignUpScreen extends StatelessWidget {
                           CustomTextField(
                             controller: controller.dateController,
                             validator: dateValidation,
-                            hintText: "Enter Age",
+                            hintText: "age",
                             prefixIcon: Icons.calendar_month,
                             inputType: TextInputType.number,
                           ),
@@ -227,7 +227,7 @@ class SignUpScreen extends StatelessWidget {
 
                           DropdownLocation(
                             locationList: locationList,
-                            selectedHint: "Location",
+                            selectedHint: "location",
                             icon: Icons.location_on,
                           ),
 
@@ -237,7 +237,7 @@ class SignUpScreen extends StatelessWidget {
 
                           GenderDropdown(
                             genderList: genderList,
-                            selectedHint: "Gender",
+                            selectedHint: "gender",
                             icon: Icons.mood,
                           ),
 
