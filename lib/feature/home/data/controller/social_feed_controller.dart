@@ -33,7 +33,7 @@ class SocialFeedController extends GetxController{
 
     try {
       isLoading.value = true;
-      String url = Utils.baseUrl + Utils.fetchFollower;
+      String url = Utils.baseUrl + Utils.socialFeed;
       final response = await NetworkCaller().getRequest(
         url,
         token: preferencesHelper.getString('userToken'),
@@ -51,7 +51,6 @@ class SocialFeedController extends GetxController{
             .map((e) => SocialFeedItem.fromJson(e))
             .toList()
             .cast<SocialFeedItem>();
-
         logger.i("✅ Follower Parsed: $socialFeedList");
         // Get.snackbar("Social Feed Length   ", "${socialFeedList.length}");
       } else {
