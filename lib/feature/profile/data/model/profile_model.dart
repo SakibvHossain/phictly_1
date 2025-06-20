@@ -17,11 +17,12 @@ class ProfileResponse {
     required this.result,
   });
 
-  factory ProfileResponse.fromJson(Map<String, dynamic> json) => ProfileResponse(
-    success: json["success"] ?? false,
-    message: json["message"] ?? '',
-    result: Result.fromJson(json["result"] ?? {}),
-  );
+  factory ProfileResponse.fromJson(Map<String, dynamic> json) =>
+      ProfileResponse(
+        success: json["success"] ?? false,
+        message: json["message"] ?? '',
+        result: Result.fromJson(json["result"] ?? {}),
+      );
 
   Map<String, dynamic> toJson() => {
     "success": success,
@@ -38,7 +39,7 @@ class Result {
   final String? bio;
   final List<UserGenre> userGenre;
   final Count count;
-  final List<Record> record;
+  final Record record;
 
   Result({
     required this.id,
@@ -60,7 +61,7 @@ class Result {
     userGenre: List<UserGenre>.from(
         (json["userGenre"] ?? []).map((x) => UserGenre.fromJson(x))),
     count: Count.fromJson(json["_count"] ?? {}),
-    record: List<Record>.from((json["record"] ?? []).map((x) => Record.fromJson(x))),
+    record: Record.fromJson(json["record"] ?? {}),
   );
 
   Map<String, dynamic> toJson() => {
@@ -69,9 +70,9 @@ class Result {
     "avatar": avatar,
     "coverPhoto": coverPhoto,
     "bio": bio,
-    "userGenre": List<dynamic>.from(userGenre.map((x) => x.toJson())),
+    "userGenre": userGenre.map((x) => x.toJson()).toList(),
     "_count": count.toJson(),
-    "record": List<dynamic>.from(record.map((x) => x.toJson())),
+    "record": record.toJson(),
   };
 }
 
@@ -98,10 +99,11 @@ class FavouriteGenre {
     required this.title,
   });
 
-  factory FavouriteGenre.fromJson(Map<String, dynamic> json) => FavouriteGenre(
-    id: json["id"] ?? '',
-    title: json["title"] ?? '',
-  );
+  factory FavouriteGenre.fromJson(Map<String, dynamic> json) =>
+      FavouriteGenre(
+        id: json["id"] ?? '',
+        title: json["title"] ?? '',
+      );
 
   Map<String, dynamic> toJson() => {
     "id": id,
@@ -141,25 +143,27 @@ class Record {
   final ActiveRead? activeRead;
   final ActiveRead? lastRead;
   final ActiveRead? lastWatched;
+  final ActiveRead? activeWatch;
 
   Record({
     this.activeRead,
     this.lastRead,
     this.lastWatched,
+    this.activeWatch,
   });
 
   factory Record.fromJson(Map<String, dynamic> json) => Record(
-    activeRead:
-    json["activeRead"] != null ? ActiveRead.fromJson(json["activeRead"]) : null,
+    activeRead: json["activeRead"] != null ? ActiveRead.fromJson(json["activeRead"]) : null,
     lastRead: json["lastRead"] != null ? ActiveRead.fromJson(json["lastRead"]) : null,
-    lastWatched:
-    json["lastWatched"] != null ? ActiveRead.fromJson(json["lastWatched"]) : null,
+    lastWatched: json["lastWatched"] != null ? ActiveRead.fromJson(json["lastWatched"]) : null,
+    activeWatch: json["activeWatched"] != null ? ActiveRead.fromJson(json["activeWatched"]) : null,
   );
 
   Map<String, dynamic> toJson() => {
     "activeRead": activeRead?.toJson(),
     "lastRead": lastRead?.toJson(),
     "lastWatched": lastWatched?.toJson(),
+    "activeWatched": activeWatch?.toJson(),
   };
 }
 
@@ -215,11 +219,14 @@ class ActiveRead {
     title: json["title"] ?? '',
     writer: json["writer"],
     type: json["type"] ?? '',
-    admin: json["admin"] != null ? Admin.fromJson(json["admin"]) : null,
+    admin:
+    json["admin"] != null ? Admin.fromJson(json["admin"]) : null,
     clubMember: json["clubMember"] != null
         ? List<dynamic>.from(json["clubMember"])
         : null,
-    count: json["_count"] != null ? Count.fromJson(json["_count"]) : null,
+    count: json["_count"] != null
+        ? Count.fromJson(json["_count"])
+        : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -230,7 +237,7 @@ class ActiveRead {
     "clubMediumType": clubMediumType,
     "startDate": startDate.toIso8601String(),
     "endDate": endDate.toIso8601String(),
-    "talkPoint": List<dynamic>.from(talkPoint.map((x) => x.toIso8601String())),
+    "talkPoint": talkPoint.map((x) => x.toIso8601String()).toList(),
     "timeLine": timeLine,
     "poster": poster,
     "title": title,
@@ -261,4 +268,3 @@ class Admin {
     "avatar": avatar,
   };
 }
-

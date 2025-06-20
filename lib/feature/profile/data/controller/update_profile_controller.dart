@@ -37,8 +37,6 @@ class UpdateProfileController extends GetxController {
     Map<String, dynamic> inputClubData = {
       "bio": bioController.text,
       "username": userNameController.text,
-      "coverPhoto": pickedCoverImage.value.toString(),
-      "avatar": pickedImage.value.toString(),
     };
 
     try {
@@ -54,6 +52,8 @@ class UpdateProfileController extends GetxController {
 
       if (response.isSuccess) {
         logger.i(response.responseData);
+        postCoverImage();
+        postProfileImage();
       } else {
         Get.snackbar(
           "Failed",
