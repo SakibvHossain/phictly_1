@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-{"flutter":{"platforms":{"ios":{"default":{"projectId":"phictly-notification-sys-25c90","appId":"1:831191760425:ios:f8f3b9f06c76fe20f12638","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"phictly-notification-sys-25c90","configurations":{"ios":"1:831191760425:ios:f8f3b9f06c76fe20f12638"}}}}}}
-=======
+
 {"flutter":{"platforms":{"android":{"default":{"projectId":"phictly-notification-sys-25c90","appId":"1:831191760425:android:556feab867d081f3f12638","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"phictly-notification-sys-25c90","configurations":{"android":"1:831191760425:android:556feab867d081f3f12638","ios":"1:831191760425:ios:77127a75c03354a2f12638"}}}}}}
->>>>>>> 2b0fd2bdb483fd03af9b03a3308434410103a32a
+

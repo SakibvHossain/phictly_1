@@ -1,6 +1,7 @@
 import 'package:phictly/feature/book/data/controller/change_book_controller.dart';
 import 'package:phictly/feature/create_club/data/controller/change_club_controller.dart';
 import 'package:phictly/feature/home/data/controller/change_home_controller.dart';
+import 'package:phictly/feature/home/data/controller/notification_controller.dart';
 import 'package:phictly/feature/message/data/controller/chat_controller.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:phictly/feature/tv/data/controller/change_tv_controller.dart';
@@ -19,11 +20,13 @@ class AppBinding extends Bindings {
     Get.put(ChangeProfileController());
     Get.put(ChangeBookController());
     Get.put(ChangeTvController());
+    Get.put(NotificationController());
     Get.put(ChangeClubController());
     Get.put(BottomNavController());
     Get.put(ProgressController());
     Get.put(BookGenreController());
     Get.put(ClubController());
-    Get.put(ChatController()); //6850e48e5646ced38a2d5c59
+    Get.put(ChatController());
+
   }
 }
