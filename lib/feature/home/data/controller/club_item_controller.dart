@@ -14,8 +14,8 @@ class ClubItemController extends GetxController {
   RxList<ClubModel> recentDataList = <ClubModel>[].obs;
   var isTrendingDataLoading = false.obs;
   var isRecentDataLoading = false.obs;
-  RxBool isLoading = false.obs;
   final Logger logger = Logger();
+  RxBool isLoading = false.obs;
 
 
   //* Trending Clubs

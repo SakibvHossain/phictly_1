@@ -26,10 +26,9 @@ class PostClubController extends GetxController{
   final TagsController bookGenreController = Get.put(TagsController());
   final clubController = Get.find<ClubController>();
 
-
   RxList<Book> searchedBookList = <Book>[].obs;
-  RxList<Movie> searchedMovieList = <Movie>[].obs;
   RxList<Show> searchedShowList = <Show>[].obs;
+  RxList<Movie> searchedMovieList = <Movie>[].obs;
   var isUserClickedToSearch = false.obs;
 
   //* For Books
@@ -106,21 +105,19 @@ class PostClubController extends GetxController{
     isLoading.value = true;
     DateFormat format = DateFormat("MM-dd-yyyy");
     final Logger logger = Logger();
-
     debugPrint("+++++++++++++++++++++++++++THIS IS GENRE+++++++++++++++++++++++++++++++++${singleBook.genre.map((g) => g.toJson()).toList()}");
-
     Map<String, dynamic> inputClubData = {
       "clubId": clubId.value,
       "clubLebel": talkPointController.clubLabelController.text,
-      "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
+      "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), //* MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
       "timeLine": 30,
-      "preference": changeClubController.selectedGenderType.toUpperCase(),
-      "age": int.tryParse(ageController.text) ?? 0,
-      "memberSize": int.tryParse(sizeController.text) ?? 0,
+      "preference": changeClubController.selectedGenderTypes.map((e) => e.toUpperCase()).toList().join(","),
+      "age": int.tryParse(ageController.text) ?? 14,
+      "memberSize": int.tryParse(sizeController.text) ?? 20,
       "tags": bookGenreController.selectedGenres.map((genre) => genre.id).toList(),
       "genre": singleBook.genre.map((g) => g.toJson()).toList(),
-      "imdbID": singleBook.imdbID,
+      "imdbID": "tt11198330",
       "talkPoint": talkPointController.talkPointRxList.where((e) => e.date != null && e.date!.isNotEmpty).map((e) => format.parse(e.date!).toUtc().toString())
           .toList(),
       "title": singleBook.title,
@@ -187,9 +184,9 @@ class PostClubController extends GetxController{
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
       "timeLine": 30,
-      "preference": changeClubController.selectedGenderType.toUpperCase(),
-      "age": int.tryParse(ageController.text) ?? 0,
-      "memberSize": int.tryParse(sizeController.text) ?? 0,
+      "preference": changeClubController.selectedGenderTypes.map((e) => e.toUpperCase()).toList().join(","),
+      "age": int.tryParse(ageController.text) ?? 14,
+      "memberSize": int.tryParse(sizeController.text) ?? 20,
       "tags": bookGenreController.selectedGenres.map((genre) => genre.id).toList(),
       "genre": singleBook.genre.map((g) => g.toJson()).toList(),
       "imdbID": singleBook.imdbID,
@@ -258,9 +255,9 @@ class PostClubController extends GetxController{
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), // MOVIE , BOOK , SHOW
       "type": changeClubController.isPublicOrPrivate.toUpperCase(),
       "timeLine": 30,
-      "preference": changeClubController.selectedGenderType.toUpperCase(),
-      "age": int.tryParse(ageController.text) ?? 0,
-      "memberSize": int.tryParse(sizeController.text) ?? 0,
+      "preference": changeClubController.selectedGenderTypes.map((e) => e.toUpperCase()).toList().join(","),
+      "age": int.tryParse(ageController.text) ?? 14,
+      "memberSize": int.tryParse(sizeController.text) ?? 20,
       "tags": bookGenreController.selectedGenres.map((genre) => genre.id).toList(),
       "genre": singleBook.genre.map((g) => g.toJson()).toList(),
       "imdbID": singleBook.imdbID,

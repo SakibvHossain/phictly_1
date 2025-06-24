@@ -171,7 +171,7 @@ class JoinClubScreen extends StatelessWidget {
                         : null,
                     clubLabel: clubDetail.clubLebel,
                     length: clubDetail.clubMediumType.contains("MOVIE")
-                        ? 127
+                        ? "127"
                         : null,
                     sliderMaxLength: clubDetail.clubMediumType.contains("BOOK")
                         ? "30"

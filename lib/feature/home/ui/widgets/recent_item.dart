@@ -132,7 +132,7 @@ class RecentItem extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
-                  width: isExpanded ? 340 : 120,
+                  width: isExpanded ? 360 : 120,
                   margin: EdgeInsets.only(left: 4, right: 4),
                   padding:
                   EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
@@ -260,7 +260,7 @@ class RecentItem extends StatelessWidget {
                                     ),
                                     SizedBox(
                                       width:
-                                      300.w,
+                                      220.w,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             right: 55, left: 6),
@@ -304,10 +304,10 @@ class RecentItem extends StatelessWidget {
                                       secondFontSize: 12,
                                     ),
                                     Flexible(
-                                      flex: 3,
+                                      flex: 2,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
-                                            right: 55, left: 2),
+                                            right: 88, left: 2),
                                         child: SizedBox(
                                           height: 15,
                                           child: Obx(
@@ -348,14 +348,14 @@ class RecentItem extends StatelessWidget {
                                     SizedBox(
                                       height: 16.h,
                                       child: Flexible(
-                                        flex: 1,
+                                        flex: 2,
                                         fit: FlexFit.loose,
                                         child: Row(
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                           children: [
                                             Flexible(
-                                              flex: 2,
+                                              flex: 1,
                                               fit: FlexFit.loose,
                                               child: _customText(
                                                   text: "1",
@@ -365,13 +365,16 @@ class RecentItem extends StatelessWidget {
                                             ),
                                             Flexible(
                                               flex: 1,
-                                              fit: FlexFit.tight,
-                                              child: _customText(
-                                                  text:
-                                                  "${trendingClubs.timeLine}",
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.black),
+                                              fit: FlexFit.loose,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 85.0),
+                                                child: _customText(
+                                                    text:
+                                                    "${trendingClubs.timeLine}",
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.black),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -382,7 +385,7 @@ class RecentItem extends StatelessWidget {
                               ),
                               Positioned(
                                 bottom: 0,
-                                right: 6,
+                                right: 8,
                                 child: SizedBox(
                                   height: 160,
                                   child: Column(
@@ -427,10 +430,13 @@ class RecentItem extends StatelessWidget {
                                                 clubController.fetchCreatedClub(recent.id ?? "");
                                               }
                                             },
-                                            child: Image.asset(
-                                              "assets/icons/join_read_icon.png",
-                                              height: 28.16,
-                                              width: 28.52,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 3.0),
+                                              child: Image.asset(
+                                                "assets/icons/join_read_icon.png",
+                                                height: 28.16,
+                                                width: 28.52,
+                                              ),
                                             ),
                                           )
                                               : (status == "PENDING")
@@ -441,10 +447,13 @@ class RecentItem extends StatelessWidget {
                                               // joinClubController.joinPrivateClub(
                                               //     trending.id ?? "");
                                             },
-                                            child: Image.asset(
-                                              "assets/icons/request_icon.png",
-                                              height: 28.16,
-                                              width: 28.52,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 3.0),
+                                              child: Image.asset(
+                                                "assets/icons/request_icon.png",
+                                                height: 28.16,
+                                                width: 28.52,
+                                              ),
                                             ),
                                           )
                                               : SizedBox(
@@ -452,6 +461,10 @@ class RecentItem extends StatelessWidget {
                                             width: 28.52,
                                           ),
                                           //* Another Issue arise here!!
+
+                                          SizedBox(
+                                            height: 6.h,
+                                          ),
                                           // buildStatusIcon(status!, trending.id ?? ""),
                                           buildStatusText(status),
 

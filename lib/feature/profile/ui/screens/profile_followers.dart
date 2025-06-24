@@ -38,7 +38,7 @@ class ProfileFollowers extends StatelessWidget {
         },
         child: Column(
           children: [
-            CustomAppBar(selectedFirstIcon: false, selectedSecondIcon: true),
+            CustomAppBar(selectedFirstIcon: false, selectedSecondIcon: false),
             SizedBox(
               height: 16.h,
             ),
@@ -225,7 +225,10 @@ class ProfileFollowers extends StatelessWidget {
                       return ListView.builder(
                           itemCount: followController.follower.length,
                           itemBuilder: (context, index){
-                            final avatar = followController.follower[index].following?.avatar;
+                            final avatar = followController.follower[index].follower?.avatar;
+
+                            Get.snackbar("Title", "${followController.follower[index].follower?.username}");
+
                             return Center(
                               child: Column(
                                 children: [
@@ -247,7 +250,7 @@ class ProfileFollowers extends StatelessWidget {
                                         : Image.asset("assets/profile/image/follower_1.png", height: 50.h, width: 50.w, fit: BoxFit.cover),
 
                                       title: CustomText(
-                                        text: "${followController.follower[index].following?.username}",
+                                        text: "${followController.follower[index].follower?.username}",
                                         fontSize: 16.sp,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xff000000),
@@ -261,8 +264,8 @@ class ProfileFollowers extends StatelessWidget {
                                               Get.to(
                                                     () => ChatScreen(
                                                   receiverId: followController.follower[index].id,
-                                                      image:  followController.follower[index].following?.avatar,
-                                                      userName: followController.follower[index].following?.username,
+                                                      image:  followController.follower[index].follower?.avatar,
+                                                      userName: followController.follower[index].follower?.username,
 
                                                 ),
                                               );

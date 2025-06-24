@@ -34,7 +34,7 @@ class CustomCreatedBookItem extends StatelessWidget {
   final String? imagePath;
   final String? title;
   final String? author;
-  final int? length;
+  final String? length;
   final String? bookNo;
   final String? clubNumber;
   final String? clubCreator;

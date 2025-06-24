@@ -55,35 +55,35 @@ class ChangeClubController extends GetxController{
     }
   }
 
-  var isMale = true.obs;
+  var isMale = false.obs;
   var isFemale = false.obs;
   var isNonBinary = false.obs;
-  var selectedGenderType = "Male"; // Default to Male
 
-  void updateMaleField() {
-    if (!isMale.value) {
-      isMale.value = true;
-      isFemale.value = false;
-      isNonBinary.value = false;
-      selectedGenderType = "Male";
-    }
+// This will hold the selected gender types as a list of strings
+  var selectedGenderTypes = <String>[].obs;
+
+  void toggleMale() {
+    isMale.value = !isMale.value;
+    _updateGenderSelection("Male", isMale.value);
   }
 
-  void updateFemaleField() {
-    if (!isFemale.value) {
-      isMale.value = false;
-      isFemale.value = true;
-      isNonBinary.value = false;
-      selectedGenderType = "Female";
-    }
+  void toggleFemale() {
+    isFemale.value = !isFemale.value;
+    _updateGenderSelection("Female", isFemale.value);
   }
 
-  void updateNonBinaryField() {
-    if (!isNonBinary.value) {
-      isMale.value = false;
-      isFemale.value = false;
-      isNonBinary.value = true;
-      selectedGenderType = "Non-Binary";
+  void toggleNonBinary() {
+    isNonBinary.value = !isNonBinary.value;
+    _updateGenderSelection("Non_Binary", isNonBinary.value);
+  }
+
+  void _updateGenderSelection(String gender, bool isSelected) {
+    if (isSelected) {
+      if (!selectedGenderTypes.contains(gender)) {
+        selectedGenderTypes.add(gender);
+      }
+    } else {
+      selectedGenderTypes.remove(gender);
     }
   }
 }

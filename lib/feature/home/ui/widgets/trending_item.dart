@@ -29,13 +29,13 @@ class TrendingItem extends StatelessWidget {
   final BottomNavController navController = Get.put(BottomNavController());
   final ClubController clubController = Get.find<ClubController>();
   final JoinClubController joinClubController = Get.put(JoinClubController());
-  final Logger logger = Logger();
   final SharedPreferencesHelper sharedPreference = Get.put(SharedPreferencesHelper());
+  final Logger logger = Logger();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180.h,
+      height: 190.h,
       child: Obx(() => _buildTrendingList(context)),
     );
   }
@@ -79,7 +79,7 @@ class TrendingItem extends StatelessWidget {
         onTap: () => clubItemController.toggleClubIndex(index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          width: isExpanded ? 340.w : 120.w,
+          width: isExpanded ? 360.w : 120.w,
           margin: EdgeInsets.only(left: 4.w, right: 4.w),
           padding: EdgeInsets.only(left: 6.w, right: 0, top: 8.h, bottom: 8.h),
           decoration: BoxDecoration(
@@ -115,7 +115,7 @@ class TrendingItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(4.r),
         child: CachedNetworkImage(
           imageUrl: trending.poster ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-          height: 160.h,
+          height: 180.h,
           width: 100.w,
           fit: BoxFit.cover,
           placeholder: (context, url) => Center(
@@ -288,7 +288,7 @@ class TrendingItem extends StatelessWidget {
     return Flexible(
       flex: 3,
       child: Padding(
-        padding: EdgeInsets.only(right: 55.w, left: 6.w),
+        padding: EdgeInsets.only(right: 88.w, left: 6.w),
         child: SizedBox(
           height: 15.h,
           child: Obx(() => SliderTheme(
@@ -317,7 +317,7 @@ class TrendingItem extends StatelessWidget {
     return Flexible(
       flex: 3,
       child: Padding(
-        padding: EdgeInsets.only(right: 55.w, left: 2.w),
+        padding: EdgeInsets.only(right: 88.w, left: 2.w),
         child: SizedBox(
           height: 15.h,
           child: Obx(() => SliderTheme(
@@ -352,7 +352,7 @@ class TrendingItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
-              flex: 2,
+              flex: 1,
               fit: FlexFit.loose,
               child: _buildCustomText(
                 text: "1",
@@ -364,11 +364,14 @@ class TrendingItem extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _buildCustomText(
-                text: timeline,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 70.0),
+                child: _buildCustomText(
+                  text: timeline,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -379,7 +382,7 @@ class TrendingItem extends StatelessWidget {
 
   Widget _buildActionColumn(ClubModel trending, String? status) {
     return SizedBox(
-      height: 190.h,
+      height: 170.h,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -424,20 +427,26 @@ class TrendingItem extends StatelessWidget {
             await clubController.fetchCreatedClub(trending.id!);
           }
         },
-        child: Image.asset(
-          "assets/icons/join_read_icon.png",
-          height: 28.16.h,
-          width: 28.52.w,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 3.0),
+          child: Image.asset(
+            "assets/icons/join_read_icon.png",
+            height: 28.16.h,
+            width: 28.52.w,
+          ),
         ),
       );
     } else if (status == "PENDING") {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {},
-        child: Image.asset(
-          "assets/icons/request_icon.png",
-          height: 28.16.h,
-          width: 28.52.w,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 3.0),
+          child: Image.asset(
+            "assets/icons/request_icon.png",
+            height: 28.16.h,
+            width: 28.52.w,
+          ),
         ),
       );
     }

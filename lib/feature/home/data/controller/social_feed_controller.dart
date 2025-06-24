@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:phictly/feature/create_club/data/controller/change_club_controller.dart';
-import 'package:phictly/feature/profile/data/model/follower_model.dart';
+import 'package:phictly/feature/profile/data/model/following_model.dart';
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';

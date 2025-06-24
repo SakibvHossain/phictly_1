@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -70,19 +70,40 @@ class EditProfileScreen extends StatelessWidget {
                   },
                   child: Obx(() {
                     final file = profileController.pickedCoverImage.value;
+                    final profile = profileDataController.profileResponse.value;
+
                     return file != null
                         ? Image.file(
-                            file,
-                            height: 200.h,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          )
+                      file,
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                        : (profile?.coverPhoto?.isNotEmpty == true
+                        ? CachedNetworkImage(
+                      imageUrl: profile!.coverPhoto!,
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: SpinKitWave(
+                          color: AppColors.primaryColor,
+                          size: 15,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset(
+                        "assets/images/udesign_portfolio_placeholder.jpg",
+                        height: 200.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
                         : Image.asset(
-                            "assets/images/udesign_portfolio_placeholder.jpg",
-                            height: 200.h,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          );
+                      "assets/images/udesign_portfolio_placeholder.jpg",
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ));
                   }),
                 ),
 
@@ -436,20 +457,42 @@ class EditProfileScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Obx(() {
+                        final profile = profileDataController.profileResponse.value;
                         final file = profileController.pickedImage.value;
+
                         return ClipOval(
                           child: file != null
                               ? Image.file(
-                                  file,
-                                  width: 108.w,
-                                  height: 108.h,
-                                  fit: BoxFit.cover,
-                                )
+                            file,
+                            width: 108.w,
+                            height: 108.h,
+                            fit: BoxFit.cover,
+                          )
+                              : (profile?.avatar?.isNotEmpty == true
+                              ? CachedNetworkImage(
+                            imageUrl: profile!.avatar!,
+                            fit: BoxFit.cover,
+                            width: 108.w,
+                            height: 108.h,
+                            placeholder: (context, url) => Center(
+                              child: SpinKitWave(
+                                color: AppColors.primaryColor,
+                                size: 15,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Image.asset(
+                              "assets/images/profile_image_placeholder.jpg",
+                              fit: BoxFit.cover,
+                              width: 108.w,
+                              height: 108.h,
+                            ),
+                          )
                               : Image.asset(
-                                  "assets/images/profile_image_placeholder.jpg",
-                                  width: 108.w,
-                                  height: 108.h,
-                                ),
+                            "assets/images/profile_image_placeholder.jpg",
+                            fit: BoxFit.cover,
+                            width: 108.w,
+                            height: 108.h,
+                          )),
                         );
                       }),
                     ),

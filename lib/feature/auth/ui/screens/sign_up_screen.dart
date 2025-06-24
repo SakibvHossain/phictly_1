@@ -23,13 +23,12 @@ import '../widget/dropdown_location.dart';
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
 
-  final SignUpController controller = Get.put(SignUpController());
-  final DateController dateController = Get.put(DateController());
-  final ChangeProfileController changeProfileController =
-      Get.put(ChangeProfileController());
+  final controller = Get.put(SignUpController());
+  final dateController = Get.put(DateController());
+  final changeProfileController = Get.put(ChangeProfileController());
   final navController = Get.find<BottomNavController>();
-  final List<String> genderList = ["Male", "Female", "Nonbinary"];
-  final List<String> locationList = [
+  final genderList = ["Male", "Female", "Non_binary"];
+  final locationList = [
     "United States",
     "Canada",
     "Jamaica",

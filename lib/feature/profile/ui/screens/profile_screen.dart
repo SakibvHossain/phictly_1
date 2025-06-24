@@ -14,6 +14,7 @@ import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_data_controller.dart';
+import 'package:phictly/feature/profile/ui/widgets/profile_books_section.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../create_club/data/controller/change_club_controller.dart';
@@ -323,12 +324,14 @@ class ProfileScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: CustomText(
-                                  text: "Loading...",
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.black.withValues(alpha: 0.6))),
+                            alignment: AlignmentDirectional.centerStart,
+                            child: CustomText(
+                              text: "Loading...",
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
+                          ),
                         ),
                       );
                     }
@@ -433,7 +436,8 @@ class ProfileScreen extends StatelessWidget {
                                 debugPrint(
                                     "++++++++++++++++++++++++++++++++++++++++++++++++++++$genreList");
 
-                                if (profileDataController.isProfileDetailsAvailable.value) {
+                                if (profileDataController
+                                    .isProfileDetailsAvailable.value) {
                                   return Center(
                                     child: SpinKitWave(
                                       duration: Duration(seconds: 2),
@@ -499,7 +503,7 @@ class ProfileScreen extends StatelessWidget {
                                   boxShadow: [
                                     BoxShadow(
                                       color:
-                                      Colors.black.withValues(alpha: 0.1),
+                                          Colors.black.withValues(alpha: 0.1),
                                       // Adjust shadow color
                                       blurRadius: 1,
                                       spreadRadius: 1,
@@ -512,7 +516,7 @@ class ProfileScreen extends StatelessWidget {
                                     children: [
                                       Align(
                                         alignment:
-                                        AlignmentDirectional.centerStart,
+                                            AlignmentDirectional.centerStart,
                                         child: CustomText(
                                             text: "2025 Goals Progress",
                                             fontSize: 15.sp,
@@ -521,7 +525,7 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                       Align(
                                         alignment:
-                                        AlignmentDirectional.centerStart,
+                                            AlignmentDirectional.centerStart,
                                         child: CustomText(
                                           text: "20/24 Reads",
                                           fontSize: 15.sp,
@@ -536,7 +540,7 @@ class ProfileScreen extends StatelessWidget {
                                       right: 0,
                                       child: ValueListenableBuilder<double>(
                                         valueListenable:
-                                        progressController.progressNotifier,
+                                            progressController.progressNotifier,
                                         builder: (context, value, child) {
                                           return SimpleCircularProgressBar(
                                             progressColors: [
@@ -555,7 +559,7 @@ class ProfileScreen extends StatelessWidget {
                                                     color: Colors.black,
                                                     fontSize: 14.98.sp,
                                                     fontWeight:
-                                                    FontWeight.w600),
+                                                        FontWeight.w600),
                                               );
                                             },
                                             progressStrokeWidth: 6,
@@ -575,326 +579,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
 
-                  CustomTitleText(title: "Active Read"),
-
-                  Obx(() {
-                    final activeRead = profileDataController.profileResponse.value?.record.activeRead;
-
-                    logger.i(activeRead);
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle if activeRead[0] or its activeRead field is null
-                    if (activeRead == null) {
-                      return Center(
-                        child: Text("No active read data available."),
-                      );
-                    }
-
-                    final talkPoint = activeRead.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = activeRead.startDate;
-
-                    String difference = "";
-                    final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                    if (diff.inSeconds < 60) {
-                      difference = '${diff.inSeconds}s';
-                    } else if (diff.inMinutes < 60) {
-                      difference = '${diff.inMinutes}m';
-                    } else if (diff.inHours < 24) {
-                      difference = '${diff.inHours}h';
-                    } else if (diff.inDays < 365) {
-                      difference = '${diff.inDays}d';
-                    } else {
-                      difference =
-                      '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                    }
-
-                    //* If all good, show the book item
-                    return GestureDetector(
-                      onTap: () {
-                        debugPrint(
-                            "++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${activeRead.id}");
-                        clubController.areYouFromHome.value = true;
-                        sharedPreferencesHelper.setString(
-                            "selectedClubId", activeRead.id);
-                        debugPrint(
-                            "++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
-                        clubController.fetchCreatedClub(activeRead.id);
-                        navController.updateIndex(2);
-                        changeClubController.updateIndex(6);
-                      },
-                      child: CustomBookItem(
-                        clubId: activeRead.clubId,
-                        clubLabel: activeRead.clubLebel,
-                        imagePath: activeRead.poster,
-                        noReqOrJoinAvailable: true,
-                        author: "${activeRead.writer}",
-                        memberCount: "${activeRead.memberSize}",
-                        totalDuration: difference,
-                        clubCreator: "${activeRead.admin?.username}",
-                        timeLine: "${activeRead.timeLine}",
-                        isPublic: activeRead.type,
-                        clubType: activeRead.clubMediumType,
-                        talkPoint: talkPoint,
-                      ),
-                    );
-                  }),
-
-                  CustomTitleText(title: "Last Read"),
-
-                  Obx(() {
-                    final lastRead = profileDataController.profileResponse.value?.record.lastRead;
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle null or empty record list
-                    if (lastRead == null) {
-                      return Center(
-                        child: Text("No active reading record found."),
-                      );
-                    }
-
-                    final talkPoint = lastRead.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = lastRead.startDate;
-
-                    String difference = "";
-                    final Duration diff =
-                    DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                    if (diff.inSeconds < 60) {
-                      difference = '${diff.inSeconds}s';
-                    } else if (diff.inMinutes < 60) {
-                      difference = '${diff.inMinutes}m';
-                    } else if (diff.inHours < 24) {
-                      difference = '${diff.inHours}h';
-                    } else if (diff.inDays < 365) {
-                      difference = '${diff.inDays}d';
-                    } else {
-                      difference =
-                      '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                    }
-
-                    //* If all good, show the book item
-                    return GestureDetector(
-                      onTap: () {
-                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${lastRead.id}");
-                        clubController.areYouFromHome.value = true;
-                        sharedPreferencesHelper.setString("selectedClubId", lastRead.id);
-                        debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
-                        clubController.fetchCreatedClub(lastRead.id);
-                        navController.updateIndex(2);
-                        changeClubController.updateIndex(6);
-                      },
-                      child: CustomBookItem(
-                        clubId: lastRead.clubId,
-                        clubLabel: lastRead.clubLebel,
-                        imagePath:
-                        lastRead.poster,
-                        noReqOrJoinAvailable: false,
-                        author: "${lastRead.writer}",
-                        memberCount: "${lastRead.memberSize}",
-                        totalDuration: difference,
-                        clubCreator: "${lastRead.admin?.username}",
-                        timeLine: "${lastRead.timeLine}",
-                        isPublic: lastRead.type,
-                        clubType: lastRead.clubMediumType,
-                        talkPoint: talkPoint,
-                      ),
-                    );
-                  }),
-
-                  CustomTitleText(title: "Active Watch"),
-
-                  Obx(() {
-                    final activeWatch = profileDataController.profileResponse.value?.record.activeWatch;
-
-                    Get.snackbar("Active Watch", "$activeWatch");
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle null or empty record list
-                    if (activeWatch == null) {
-                      return Column(
-                        children: [
-                          Center(
-                            child: Text("No active watch record ${activeWatch?.title}."),
-                          ),
-                          SizedBox(
-                            height: 100.h,
-                          )
-                        ],
-                      );
-                    }
-
-                    final talkPoint = activeWatch.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = activeWatch.startDate;
-
-                    String difference = "";
-                    final Duration diff =
-                    DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                    if (diff.inSeconds < 60) {
-                      difference = '${diff.inSeconds}s';
-                    } else if (diff.inMinutes < 60) {
-                      difference = '${diff.inMinutes}m';
-                    } else if (diff.inHours < 24) {
-                      difference = '${diff.inHours}h';
-                    } else if (diff.inDays < 365) {
-                      difference = '${diff.inDays}d';
-                    } else {
-                      difference =
-                      '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                    }
-
-                    //* If all good, show the book item
-                    return GestureDetector(
-                      onTap: () {
-                        debugPrint(
-                            "++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${activeWatch.id}");
-                        clubController.areYouFromHome.value = true;
-                        sharedPreferencesHelper.setString(
-                            "selectedClubId", activeWatch.id);
-                        debugPrint(
-                            "++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
-                        clubController.fetchCreatedClub(activeWatch.id);
-                        navController.updateIndex(2);
-                        changeClubController.updateIndex(6);
-                      },
-                      child: CustomBookItem(
-                        clubId: activeWatch.clubId,
-                        clubLabel: activeWatch.clubLebel,
-                        imagePath: activeWatch.poster,
-                        noReqOrJoinAvailable: false,
-                        author: "${activeWatch.writer}",
-                        memberCount: "${activeWatch.memberSize}",
-                        totalDuration: difference,
-                        clubCreator: "${activeWatch.admin?.username}",
-                        timeLine: "${activeWatch.timeLine}",
-                        isPublic: activeWatch.type,
-                        clubType: activeWatch.clubMediumType,
-                        totalSeason: "5",
-                        talkPoint: talkPoint,
-                      ),
-                    );
-                  }),
-
-                  CustomTitleText(title: "Last Watch"),
-
-                  Obx(() {
-                    final lastWatch = profileDataController
-                        .profileResponse.value?.record.lastWatched;
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle null or empty record list
-                    if (lastWatch == null) {
-                      return Column(
-                        children: [
-                          Center(
-                            child: Text("No active reading record found."),
-                          ),
-                          SizedBox(
-                            height: 100.h,
-                          )
-                        ],
-                      );
-                    }
-
-                    final talkPoint = lastWatch.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = lastWatch.startDate;
-
-                    String difference = "";
-                    final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                    if (diff.inSeconds < 60) {
-                      difference = '${diff.inSeconds}s';
-                    } else if (diff.inMinutes < 60) {
-                      difference = '${diff.inMinutes}m';
-                    } else if (diff.inHours < 24) {
-                      difference = '${diff.inHours}h';
-                    } else if (diff.inDays < 365) {
-                      difference = '${diff.inDays}d';
-                    } else {
-                      difference =
-                      '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                    }
-
-                    //* If all good, show the book item
-                    return GestureDetector(
-                      onTap: () {
-                        debugPrint(
-                            "++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${lastWatch.id}");
-                        clubController.areYouFromHome.value = true;
-                        sharedPreferencesHelper.setString(
-                            "selectedClubId", lastWatch.id);
-                        debugPrint(
-                            "++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
-                        clubController.fetchCreatedClub(lastWatch.id);
-                        navController.updateIndex(2);
-                        changeClubController.updateIndex(6);
-                      },
-                      child: CustomBookItem(
-                        clubId: lastWatch.clubId,
-                        clubLabel: lastWatch.clubLebel,
-                        imagePath: lastWatch.poster,
-                        noReqOrJoinAvailable: false,
-                        author: "${lastWatch.writer}",
-                        memberCount: "${lastWatch.memberSize}",
-                        totalDuration: difference,
-                        clubCreator: "${lastWatch.admin?.username}",
-                        timeLine: "${lastWatch.timeLine}",
-                        isPublic: lastWatch.type,
-                        clubType: lastWatch.clubMediumType,
-                        totalSeason: "5",
-                        talkPoint: talkPoint,
-                      ),
-                    );
-                  }),
-
-                  SizedBox(
-                    height: 8.h,
-                  ),
+                  ProfileBooksSection(),
 
                   SizedBox(
                     height: 110.h,
@@ -909,13 +594,13 @@ class ProfileScreen extends StatelessWidget {
                 child: Stack(
                   children: [
                     Obx(() {
-                      final profile =
-                          profileDataController.profileResponse.value;
+                      final profile = profileDataController.profileResponse.value;
 
                       Logger log = Logger();
 
                       log.i("Profile Avatar: ${profile?.avatar.toString()}");
-                      // Placeholder if avatar is null or empty
+
+                      //* Placeholder if avatar is null or empty
                       if (profile == null ||
                           profile.avatar == null ||
                           profile.avatar!.isEmpty) {
@@ -972,6 +657,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       );
                     }),
+
                     Positioned(
                       bottom: 7,
                       right: 7,

@@ -1,5 +1,6 @@
 import 'package:phictly/feature/create_club/data/controller/change_club_controller.dart';
 import 'package:phictly/feature/profile/data/model/follower_model.dart';
+import 'package:phictly/feature/profile/data/model/following_model.dart';
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';
@@ -19,16 +20,15 @@ class FollowController extends GetxController{
   var isFollowingLoading = false.obs;
   final isLoading = false.obs;
   final following = <FollowingResult>[].obs;
-  final follower = <FollowingResult>[].obs;
+  final follower = <FollowerResult>[].obs;
 
   //* Fetch Movie Club
   Future<void> followUser(String id) async{
+    final Logger logger = Logger();
     preferencesHelper.init();
     isLoading.value = true;
-    final Logger logger = Logger();
 
     try{
-      await preferencesHelper.init();
       String url = Utils.baseUrl + Utils.followUser(id);
       final response = await NetworkCaller().postRequest(
         url,
@@ -44,7 +44,7 @@ class FollowController extends GetxController{
           "Failed",
           response.errorMessage,
         );
-        logger.w(response.responseData);
+        logger.t(response.responseData);
       }
 
     }catch (e) {
@@ -123,9 +123,9 @@ class FollowController extends GetxController{
 
       if (responseData is List) {
         follower.value = responseData
-            .map((e) => FollowingResult.fromJson(e))
+            .map((e) => FollowerResult.fromJson(e))
             .toList()
-            .cast<FollowingResult>();
+            .cast<FollowerResult>();
 
         logger.i("✅ Follower Parsed: $follower");
         // Get.snackbar("Length", "${follower.length}");

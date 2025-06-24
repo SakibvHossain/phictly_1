@@ -1,62 +1,62 @@
-class FollowerResponse {
+class FollowingResponse {
   final bool success;
   final String message;
-  final List<FollowerResult> result;
+  final List<FollowingResult> result;
 
-  FollowerResponse({
+  FollowingResponse({
     required this.success,
     required this.message,
     required this.result,
   });
 
-  factory FollowerResponse.fromJson(Map<String, dynamic> json) {
-    return FollowerResponse(
+  factory FollowingResponse.fromJson(Map<String, dynamic> json) {
+    return FollowingResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      result: (json['result'] as List? ?? []).map((item) => FollowerResult.fromJson(item)).toList(),
+      result: (json['result'] as List? ?? []).map((item) => FollowingResult.fromJson(item)).toList(),
     );
   }
 }
 
 
-class FollowerResult {
+class FollowingResult {
   final String id;
   final String status;
-  final FollowerUser? follower;
+  final FollowingUser? following;
 
-  FollowerResult({
+  FollowingResult({
     required this.id,
     required this.status,
-    this.follower,
+    this.following,
   });
 
-  factory FollowerResult.fromJson(Map<String, dynamic> json) {
-    return FollowerResult(
+  factory FollowingResult.fromJson(Map<String, dynamic> json) {
+    return FollowingResult(
       id: json['id'] ?? '',
       status: json['status'] ?? '',
-      follower: json['follower'] != null
-          ? FollowerUser.fromJson(json['follower'])
+      following: json['following'] != null
+          ? FollowingUser.fromJson(json['following'])
           : null,
     );
   }
 }
 
 
-class FollowerUser {
+class FollowingUser {
   final String username;
   final String? avatar;
   final String? coverPhoto;
   final String email;
 
-  FollowerUser({
+  FollowingUser({
     required this.username,
     this.avatar,
     this.coverPhoto,
     required this.email,
   });
 
-  factory FollowerUser.fromJson(Map<String, dynamic> json) {
-    return FollowerUser(
+  factory FollowingUser.fromJson(Map<String, dynamic> json) {
+    return FollowingUser(
       username: json['username'] ?? '',
       avatar: json['avatar'],
       coverPhoto: json['coverPhoto'],

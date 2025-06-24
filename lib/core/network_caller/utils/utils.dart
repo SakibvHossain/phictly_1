@@ -8,7 +8,7 @@ class Utils {
   static const String profile = "/profile/my-profile";
   static const String trendingOrRecent = "/club/trending-or-recent";
   static String genre(String genreType) => "/genre?type=$genreType&sortOrder=desc&page=1&limit=10";
-  static String genreWithOutType = "/genre?sortOrder=desc&page=1&limit=10";
+  static String genreWithOutType(String type) => "/genre?type=$type";
   static const String bookGenre = "/genre?type=BOOK&sortOrder=desc&page=1&limit=10";
   static const String genreTv = "/genre?type=MOVIE&sortOrder=desc&page=1&limit=10";
   static String idUrl(String id)=> "/genre/$id?page=1&limit=5&type=MOVIE";

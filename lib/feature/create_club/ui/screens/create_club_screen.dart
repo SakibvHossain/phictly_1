@@ -24,11 +24,11 @@ import 'package:phictly/feature/create_club/ui/widgets/custom_item.dart';
 import 'package:phictly/feature/create_club/ui/widgets/movie_custom_item.dart';
 import 'package:phictly/feature/create_club/ui/widgets/selected_tags.dart';
 import 'package:phictly/feature/create_club/ui/widgets/show_custom_item.dart';
+import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
 import 'package:phictly/feature/show/data/model/show_model.dart';
 import 'package:phictly/feature/tv/data/model/movie_model.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../home/data/controller/home_controller.dart';
-import '../../../profile/ui/screens/setting/group_selected_members.dart';
 import '../../data/controller/get_created_club_controller.dart';
 import '../../data/controller/tag_controller.dart';
 import '../../data/model/search_response_model.dart';
@@ -37,23 +37,22 @@ import '../widgets/selected_tag_fields.dart';
 class CreateClubScreen extends StatelessWidget {
   CreateClubScreen({super.key});
 
-  final ChangeClubController controller = Get.put(ChangeClubController());
-  final HomeController homeController = Get.put(HomeController());
-  final TextEditingController ageController = TextEditingController();
-  final TextEditingController sizeController = TextEditingController();
-  final TextEditingController searchTags = TextEditingController();
-  final TextEditingController talkPointController = TextEditingController();
-  final DateController dateController = Get.put(DateController());
-  final PostClubController bookController = Get.put(PostClubController());
-  final ChangeClubController changeClubController =
-      Get.put(ChangeClubController());
-  final TalkPointController pointController = Get.put(TalkPointController());
-  final BookGenreController genreController = Get.put(BookGenreController());
-  final GetCreatedClubController getCreatedClubController =
-      Get.put(GetCreatedClubController());
+  final controller = Get.put(ChangeClubController());
+  final homeController = Get.put(HomeController());
+  final ageController = TextEditingController();
+  final sizeController = TextEditingController();
+  final searchTags = TextEditingController();
+  final talkPointController = TextEditingController();
+  final dateController = Get.put(DateController());
+  final bookController = Get.put(PostClubController());
+  final changeClubController = Get.put(ChangeClubController());
+  final pointController = Get.put(TalkPointController());
+  final genreController = Get.put(BookGenreController());
+  final getCreatedClubController = Get.put(GetCreatedClubController());
   final clubController = Get.find<ClubController>();
-  final TagsController tagsController = Get.put(TagsController());
-  final Logger logger = Logger();
+  final tagsController = Get.put(TagsController());
+  final navController = Get.put(BottomNavController());
+  final logger = Logger();
 
   @override
   Widget build(BuildContext context) {
@@ -126,14 +125,14 @@ class CreateClubScreen extends StatelessWidget {
                 height: 16.h,
               ),
 
-
-
               //* Create Club text field
               Padding(
                 padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back_ios_sharp),
+                    IconButton(onPressed: (){
+                      navController.updateIndex(0);
+                    }, icon: Icon(Icons.arrow_back_ios_sharp),),
                     SizedBox(
                       width: width / 4.2,
                     ),
@@ -558,21 +557,11 @@ class CreateClubScreen extends StatelessWidget {
                       //* Gender
                       Row(
                         children: [
-                          checkBoxFemale("Female Only", () {
-                            controller.updateFemaleField();
-                          }, controller.isFemale),
-                          SizedBox(
-                            width: 8.w,
-                          ),
-                          checkBoxMale("Male Only", () {
-                            controller.updateMaleField();
-                          }, controller.isMale),
-                          SizedBox(
-                            width: 8.w,
-                          ),
-                          checkBoxMale("Non-Binary Only", () {
-                            controller.updateNonBinaryField();
-                          }, controller.isNonBinary),
+                          genderCheckBox("Female Only", controller.isFemale, controller.toggleFemale),
+                          SizedBox(width: 8.w),
+                          genderCheckBox("Male Only", controller.isMale, controller.toggleMale),
+                          SizedBox(width: 8.w),
+                          genderCheckBox("Non-Binary Only", controller.isNonBinary, controller.toggleNonBinary),
                         ],
                       ),
 
@@ -583,27 +572,36 @@ class CreateClubScreen extends StatelessWidget {
 
                       //* Age & Size
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          ageAndSize(
-                              titleText: "Age",
-                              controller: bookController.ageController),
-                          Padding(
-                            padding:
+                          Stack(
+                            children: [
+                              ageAndSize(
+                                  titleText: "Age Registration",
+                                  controller: bookController.ageController),
+
+                              Positioned(
+                                top: 24,
+                                left: 85,
+                                child: Padding(
+                                padding:
                                 const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: Icon(
-                              Icons.add,
-                              color: Color(0xff000000).withValues(alpha: 0.60),
-                            ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Color(0xff000000).withValues(alpha: 0.60),
+                                ),
+                              ),)
+                            ],
                           ),
                           ageAndSize(
-                              titleText: "Size",
+                              titleText: "Member Max",
                               controller: bookController.sizeController),
                         ],
                       ),
 
                       //* SizedBox
                       SizedBox(
-                        height: 24.h,
+                        height: 16.h,
                       ),
 
                       //* Tags
@@ -644,66 +642,86 @@ class CreateClubScreen extends StatelessWidget {
                                 )
                               : CustomButton(
                                   text: "Create",
-                              onTap: () async {
-                                bookController.listRefresh();
+                                  onTap: () async {
+                                    bookController.listRefresh();
 
-                                if (bookController.selectedBooks.isEmpty &&
-                                    bookController.selectedShows.isEmpty &&
-                                    bookController.selectedMovie.isEmpty) {
-                                  Get.snackbar("Club Book not selected", "Club book is empty");
-                                  return;
-                                }
+                                    if (bookController.selectedBooks.isEmpty &&
+                                        bookController.selectedShows.isEmpty &&
+                                        bookController.selectedMovie.isEmpty) {
+                                      Get.snackbar("Club Book not selected",
+                                          "Club book is empty");
+                                      return;
+                                    }
 
-                                if (int.tryParse(bookController.sizeController.text) != null &&
-                                    int.parse(bookController.sizeController.text) > 20) {
-                                  Get.snackbar("Limit Exceed", "Club size max is 20");
-                                  return;
-                                }
+                                    if (int.tryParse(bookController
+                                                .sizeController.text) !=
+                                            null &&
+                                        int.parse(bookController
+                                                .sizeController.text) >
+                                            20) {
+                                      Get.snackbar("Limit Exceed",
+                                          "Club size max is 20");
+                                      return;
+                                    }
 
-                                if (pointController.clubLabelController.text.length <= 3) {
-                                  Get.snackbar("Label length too small", "Club Label must be at least 3 characters");
-                                  return;
-                                }
+                                    if (pointController
+                                            .clubLabelController.text.length <=
+                                        3) {
+                                      Get.snackbar("Label length too small",
+                                          "Club Label must be at least 3 characters");
+                                      return;
+                                    }
 
-                                if (int.tryParse(bookController.ageController.text) != null &&
-                                    int.parse(bookController.ageController.text) < 14) {
-                                  Get.snackbar("Age restriction", "Age should be 14+ ${bookController.ageController.text}");
-                                  return;
-                                }
+                                    if (int.tryParse(bookController
+                                                .ageController.text) !=
+                                            null &&
+                                        int.parse(bookController
+                                                .ageController.text) <
+                                            14) {
+                                      Get.snackbar("Age restriction",
+                                          "Age should be 14+ ${bookController.ageController.text}");
+                                      return;
+                                    }
 
-                                //* Show loader
-                                bookController.isLoading.value = true;
+                                    //* Show loader
+                                    bookController.isLoading.value = true;
 
-                                try {
-                                  if (bookController.selectedBooks.isNotEmpty) {
-                                    Book singleBook = bookController.selectedBooks.first;
-                                    pointController.updateClubId();
-                                    await bookController.postBookClub(singleBook);
-                                    logger.i(bookController.createdClubId);
-                                  } else if (bookController.selectedShows.isNotEmpty) {
-                                    Show singleShow = bookController.selectedShows.first;
-                                    pointController.updateClubId();
-                                    await bookController.postShowClub(singleShow);
-                                    logger.i(bookController.createdClubId);
-                                  } else {
-                                    Movie singleMovie = bookController.selectedMovie.first;
-                                    pointController.updateClubId();
-                                    await bookController.postMovieClub(singleMovie);
-                                    logger.i(bookController.createdClubId);
-                                  }
+                                    try {
+                                      if (bookController
+                                          .selectedBooks.isNotEmpty) {
+                                        Book singleBook =
+                                            bookController.selectedBooks.first;
+                                        pointController.updateClubId();
+                                        await bookController
+                                            .postBookClub(singleBook);
+                                        logger.i(bookController.createdClubId);
+                                      } else if (bookController
+                                          .selectedShows.isNotEmpty) {
+                                        Show singleShow =
+                                            bookController.selectedShows.first;
+                                        pointController.updateClubId();
+                                        await bookController
+                                            .postShowClub(singleShow);
+                                        logger.i(bookController.createdClubId);
+                                      } else {
+                                        Movie singleMovie =
+                                            bookController.selectedMovie.first;
+                                        pointController.updateClubId();
+                                        await bookController
+                                            .postMovieClub(singleMovie);
+                                        logger.i(bookController.createdClubId);
+                                      }
 
-                                  changeClubController.updateIndex(1);
-
-                                } catch (e) {
-                                  logger.e(e);
-                                  Get.snackbar("Error", "Failed to create club");
-                                } finally {
-                                  //* Hide loader
-                                  bookController.isLoading.value = false;
-                                }
-                              }
-
-                          ),
+                                      changeClubController.updateIndex(1);
+                                    } catch (e) {
+                                      logger.e(e);
+                                      Get.snackbar(
+                                          "Error", "Failed to create club");
+                                    } finally {
+                                      //* Hide loader
+                                      bookController.isLoading.value = false;
+                                    }
+                                  }),
                         ),
                       ),
 
@@ -716,6 +734,7 @@ class CreateClubScreen extends StatelessWidget {
                 ),
               ),
 
+              //* SizedBox
               SizedBox(
                 height: 140.h,
               ),
@@ -835,35 +854,35 @@ class CreateClubScreen extends StatelessWidget {
     );
   }
 
-  Widget checkBoxMale(String text, Callback yourAction, RxBool value) {
+  //* Gender Box
+  Widget genderCheckBox(String text, RxBool value, VoidCallback onTap) {
     return Row(
       children: [
         CustomText(
           text: text,
           fontSize: 16.sp,
           fontWeight: FontWeight.w400,
-          color: Color(0xff000000).withValues(alpha: 0.6),
+          color: const Color(0xff000000).withOpacity(0.6),
         ),
-        SizedBox(
-          width: 6.w,
-        ),
+        SizedBox(width: 6.w),
         Obx(() {
           return GestureDetector(
-            onTap: yourAction,
+            onTap: onTap,
             child: Container(
               width: 23.w,
               height: 23.h,
               padding: EdgeInsets.all(2.r),
               decoration: BoxDecoration(
-                  border: const GradientBoxBorder(
-                    gradient: AppColors.primaryGradientColor,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(3.68),
-                  shape: BoxShape.rectangle),
+                border: const GradientBoxBorder(
+                  gradient: AppColors.primaryGradientColor,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(3.68),
+                shape: BoxShape.rectangle,
+              ),
               child: value.value
                   ? Image.asset("assets/icons/check.png")
-                  : SizedBox(),
+                  : const SizedBox(),
             ),
           );
         }),
@@ -871,83 +890,13 @@ class CreateClubScreen extends StatelessWidget {
     );
   }
 
-  Widget checkBoxFemale(String text, Callback yourAction, RxBool value) {
-    return Row(
-      children: [
-        CustomText(
-          text: text,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w400,
-          color: Color(0xff000000).withValues(alpha: 0.6),
-        ),
-        SizedBox(
-          width: 6.w,
-        ),
-        Obx(() {
-          return GestureDetector(
-            onTap: yourAction,
-            child: Container(
-              width: 23.w,
-              height: 23.h,
-              padding: EdgeInsets.all(2.r),
-              decoration: BoxDecoration(
-                  border: const GradientBoxBorder(
-                    gradient: AppColors.primaryGradientColor,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(3.68),
-                  shape: BoxShape.rectangle),
-              child: value.value
-                  ? Image.asset("assets/icons/check.png")
-                  : SizedBox(),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget checkBoxNonBinary(String text, Callback yourAction, RxBool value) {
-    return Row(
-      children: [
-        CustomText(
-          text: text,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w400,
-          color: Color(0xff000000).withValues(alpha: 0.6),
-        ),
-        SizedBox(
-          width: 6.w,
-        ),
-        Obx(() {
-          return GestureDetector(
-            onTap: yourAction,
-            child: Container(
-              width: 23.w,
-              height: 23.h,
-              padding: EdgeInsets.all(2.r),
-              decoration: BoxDecoration(
-                  border: const GradientBoxBorder(
-                    gradient: AppColors.primaryGradientColor,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(3.68),
-                  shape: BoxShape.rectangle),
-              child: value.value
-                  ? Image.asset("assets/icons/check.png")
-                  : SizedBox(),
-            ),
-          );
-        }),
-      ],
-    );
-  }
 
   //* Age and Size Text Form Field
-  Widget ageAndSize({required String titleText, required TextEditingController controller}) {
+  Widget ageAndSize(
+      {required String titleText, required TextEditingController controller}) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Align(
           alignment: AlignmentDirectional.centerStart,
@@ -1019,9 +968,11 @@ class CreateClubScreen extends StatelessWidget {
   }
 
 
+  //* Add Talk Points
   void addTalkPointAction(BuildContext context) {
-    Get.dialog(
-      Dialog(
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
@@ -1043,7 +994,12 @@ class CreateClubScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Get.back();
+                      if (Get.isDialogOpen ?? false) {
+                        Get.back();
+                      } else {
+                        //* fallback: try to pop with root navigator
+                        Navigator.of(context, rootNavigator: true).pop();
+                      }
                     },
                     child: Icon(
                       Icons.close,
@@ -1078,74 +1034,80 @@ class CreateClubScreen extends StatelessWidget {
               Obx(() {
                 return pointController.editTextEnabled.value
                     ? CustomButton(
-                  text: "Edit talkpoints(s)",
-                  onTap: () {
-                    Get.back();
-                    AddTalkPoints points = AddTalkPoints(
-                      "TalkPoint ${pointController.talkPointList.length + 1}",
-                      dateController.selectedDate.value,
-                    );
-                    debugPrint("Date for editing: ${dateController.selectedDate.value}");
-                  },
-                )
+                        text: "Edit talkpoints(s)",
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          AddTalkPoints points = AddTalkPoints(
+                            "TalkPoint ${pointController.talkPointList.length + 1}",
+                            dateController.selectedDate.value,
+                          );
+                          debugPrint("Date for editing: ${dateController.selectedDate.value}");
+                        },
+                      )
                     : CustomButton(
-                  text: "Add talkpoints(s)",
-                  onTap: () {
-                    String selectedDateStr = dateController.selectedDate.value;
-                    String selectedType = controller.selectedBookType.value;
+                        text: "Add talkpoints(s)",
+                        onTap: () {
+                          String selectedDateStr =
+                              dateController.selectedDate.value;
+                          String selectedType =
+                              controller.selectedBookType.value;
 
-                    int maxValue = 30;
+                          int maxValue = 30;
 
-                    if (selectedType == "Book") {
-                      maxValue = 30;
-                    } else if (selectedType == "Show") {
-                      maxValue = 270;
-                    } else if (selectedType == "Movie") {
-                      maxValue = 9;
-                    }
+                          if (selectedType == "Book") {
+                            maxValue = 30;
+                          } else if (selectedType == "Show") {
+                            maxValue = 270;
+                          } else if (selectedType == "Movie") {
+                            maxValue = 9;
+                          }
 
+                          bool isValid = pointController.isSelectedDateValid(
+                              selectedDateStr, selectedType);
+                          if (!isValid) {
+                            Get.snackbar(
+                              "Invalid Date",
+                              "Selected date must be within $maxValue days from today.",
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                            return;
+                          }
 
-                    bool isValid = pointController.isSelectedDateValid(
-                        selectedDateStr, selectedType);
-                    if (!isValid) {
-                      Get.snackbar(
-                        "Invalid Date",
-                        "Selected date must be within $maxValue days from today.",
-                        snackPosition: SnackPosition.BOTTOM,
+                          // Fix time mismatch by zeroing the time part
+                          DateTime selectedDate =
+                              DateFormat("MM-dd-yyyy").parse(selectedDateStr);
+                          DateTime now = DateTime.now();
+                          DateTime today =
+                              DateTime(now.year, now.month, now.day);
+
+                          int differenceInDays =
+                              selectedDate.difference(today).inDays;
+
+                          if (differenceInDays >= 0 &&
+                              differenceInDays <= maxValue) {
+                            homeController
+                                .addTalkPoint(differenceInDays.toDouble());
+                            Get.back();
+                          } else {
+                            Get.snackbar(
+                              "Invalid Date",
+                              "Selected date is out of range. Please select a valid date within $maxValue days from today.",
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                            return;
+                          }
+
+                          // Add the talk point
+                          AddTalkPoints points = AddTalkPoints(
+                            talkPointController.text,
+                            selectedDateStr,
+                          );
+                          debugPrint("Selected Date: $selectedDateStr");
+
+                          pointController.talkPointList.add(points);
+                          pointController.addTalkPointListOnRxList();
+                        },
                       );
-                      return;
-                    }
-
-                    // Fix time mismatch by zeroing the time part
-                    DateTime selectedDate = DateFormat("MM-dd-yyyy").parse(selectedDateStr);
-                    DateTime now = DateTime.now();
-                    DateTime today = DateTime(now.year, now.month, now.day);
-
-                    int differenceInDays = selectedDate.difference(today).inDays;
-
-                    if (differenceInDays >= 0 && differenceInDays <= maxValue) {
-                      homeController.addTalkPoint(differenceInDays.toDouble());
-                      Get.back();
-                    } else {
-                      Get.snackbar(
-                        "Invalid Date",
-                        "Selected date is out of range. Please select a valid date within $maxValue days from today.",
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
-
-                    // Add the talk point
-                    AddTalkPoints points = AddTalkPoints(
-                      talkPointController.text,
-                      selectedDateStr,
-                    );
-                    debugPrint("Selected Date: $selectedDateStr");
-
-                    pointController.talkPointList.add(points);
-                    pointController.addTalkPointListOnRxList();
-                  },
-                );
               }),
             ],
           ),
@@ -1153,7 +1115,6 @@ class CreateClubScreen extends StatelessWidget {
       ),
     );
   }
-
 
   //* Edit Talk Points
   void editTalkPointAction(BuildContext context) {
@@ -1182,7 +1143,13 @@ class CreateClubScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Get.back();
+                      debugPrint("+++++++++++++++++++++++++++++++++++++++++This is bug");
+
+                      if (Get.isOverlaysOpen || (Get.isDialogOpen ?? false)) {
+                        Get.back();
+                      } else {
+                        Navigator.of(context, rootNavigator: true).maybePop();
+                      }
                     },
                     child: Icon(
                       Icons.close,
@@ -1266,7 +1233,8 @@ class CreateClubScreen extends StatelessWidget {
                                                     ),
                                                     GestureDetector(
                                                       onTap: () {
-                                                        Get.back();
+                                                        if (Get.isDialogOpen ??
+                                                            false) Get.back();
                                                       },
                                                       child: Icon(
                                                         Icons.close,
@@ -1315,7 +1283,8 @@ class CreateClubScreen extends StatelessWidget {
                                                 CustomButton(
                                                   text: "Edit talkpoints(s)",
                                                   onTap: () {
-                                                    Get.back();
+                                                    if (Get.isDialogOpen ??
+                                                        false) Get.back();
                                                     pointController
                                                                 .talkPointRxList[
                                                             index] =
@@ -1468,10 +1437,10 @@ class CreateClubScreen extends StatelessWidget {
                             title: book.title,
                             author: book.writer,
                             imagePath: book.poster,
-                            length: "124",
+                            length: "${book.length.toString()} Pages",
                             //* Fetch from API
-                            bookNo: book.bookNo.toString(),
-                            publishDate: book.publishDate.toString(),
+                            bookNo: book.edition,
+                            publishDate: book.publishedDate.toString(),
                           );
                         }).toList(),
                       ),
@@ -1505,10 +1474,10 @@ class CreateClubScreen extends StatelessWidget {
                             title: book.title,
                             author: book.writer,
                             imagePath: book.poster,
-                            length: "124",
+                            length: "${book.length.toString()} Pages",
                             //* Fetch from API
-                            bookNo: book.bookNo.toString(),
-                            publishDate: book.publishDate.toString(),
+                            bookNo: book.edition,
+                            publishDate: book.publishedDate.toString(),
                           ),
                         ),
                       );
@@ -1534,10 +1503,10 @@ class CreateClubScreen extends StatelessWidget {
                     title: book.title,
                     author: book.writer,
                     imagePath: book.poster,
-                    length: "124",
+                    length: "${book.length.toString()} Pages",
                     //* Fetch from API
-                    bookNo: book.bookNo.toString(),
-                    publishDate: book.publishDate.toString(),
+                    bookNo: book.edition,
+                    publishDate: book.publishedDate.toString(),
                   );
                 }).toList(),
               ),

@@ -19,13 +19,10 @@ import '../../data/controller/talk_point_controller.dart';
 
 class ClubScreen extends StatelessWidget {
   ClubScreen({super.key});
-
-  final TalkPointController pointController = Get.put(TalkPointController());
-  final  changeClubController =
-      Get.put(ChangeClubController());
-  final  bookController = Get.put(PostClubController());
-  final GetCreatedClubController getCreatedClubController =
-      Get.put(GetCreatedClubController());
+   final TalkPointController pointController = Get.put(TalkPointController());
+  final changeClubController = Get.put(ChangeClubController());
+  final bookController = Get.put(PostClubController());
+  final getCreatedClubController = Get.put(GetCreatedClubController());
   final clubController = Get.find<ClubController>();
   final navController = Get.put(BottomNavController());
   final commentController = Get.put(CommentController());
@@ -113,10 +110,9 @@ class ClubScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Club Details
+                //* Club Details
                 Obx(() {
-                  debugPrint(
-                      "+++++++++++++++CLUB SCREEN+++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
+                  debugPrint("+++++++++++++++CLUB SCREEN+++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
 
                   if (clubController.isLoading.value) {
                     return Center(
@@ -179,7 +175,7 @@ class ClubScreen extends StatelessWidget {
                         : null,
                     clubLabel: clubDetail.clubLebel,
                     length: clubDetail.clubMediumType.contains("MOVIE")
-                        ? 127
+                        ? "127"
                         : null,
                     sliderMaxLength: clubDetail.clubMediumType.contains("BOOK")
                         ? "30"
