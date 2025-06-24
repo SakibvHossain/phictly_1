@@ -2,21 +2,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-
-class GenderDropdownController extends GetxController {
-  var selectedGender = "Select".obs; // Default value
-
-  void updateGender(String gender) {
-    selectedGender.value = gender;
-  }
-}
-
+import '../../data/controller/gender_dropdown_controller.dart';
 
 class GenderDropdown extends StatelessWidget {
-  GenderDropdown({super.key, required this.genderList, required this.selectedHint, required this.icon});
+  GenderDropdown(
+      {super.key,
+      required this.genderList,
+      required this.selectedHint,
+      required this.icon});
 
-  final GenderDropdownController controller = Get.put(GenderDropdownController());
+  final GenderDropdownController controller =
+      Get.put(GenderDropdownController());
 
   final List<String> genderList;
   final String selectedHint;
@@ -42,39 +38,42 @@ class GenderDropdown extends StatelessWidget {
 
           // Dropdown Button with GetX
           Expanded(
-            child: Obx(() => DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: controller.selectedGender.value == "Select"
-                        ? null
-                        : controller.selectedGender.value,
-                    hint: Text(
-                      selectedHint,
-                      style: GoogleFonts.dmSans(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black.withValues(alpha: 0.6)),
-                    ),
-                    isExpanded: true,
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: genderList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: GoogleFonts.dmSans(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black.withValues(alpha: 0.6)),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        controller.updateGender(newValue);
-                      }
-                    },
+            child: Obx(
+              () => DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  dropdownColor: Colors.white,
+                  value: controller.selectedGender.value == "Select"
+                      ? null
+                      : controller.selectedGender.value,
+                  hint: Text(
+                    selectedHint,
+                    style: GoogleFonts.dmSans(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black.withValues(alpha: 0.6)),
                   ),
-                )),
+                  isExpanded: true,
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  items: genderList.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: GoogleFonts.dmSans(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black.withValues(alpha: 0.6)),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      controller.updateGender(newValue);
+                    }
+                  },
+                ),
+              ),
+            ),
           ),
         ],
       ),

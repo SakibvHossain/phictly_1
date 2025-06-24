@@ -7,7 +7,7 @@ import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_text_field.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/core/validation/email_validation.dart';
-import 'package:phictly/feature/auth/data/sign_in_controller.dart';
+import 'package:phictly/feature/auth/data/controller/sign_in_controller.dart';
 import 'package:get/get.dart';
 import 'package:phictly/feature/auth/ui/screens/sign_up_screen.dart';
 import 'package:phictly/feature/home/ui/screens/home_nav_screen.dart';

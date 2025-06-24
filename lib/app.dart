@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
+  import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import 'package:phictly/core/binding/binding.dart';
+import 'package:phictly/routes/app_routes.dart';
 import 'feature/splash/ui/screens/splash_screen.dart';
 
 
@@ -18,15 +17,11 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          // initialBinding: AppBinding(),
           debugShowCheckedModeBanner: false,
           title: 'Phictly',
-          //theme: lightThemeData(), // Add If needed
-          //darkTheme: darkThemeData(), // Add If needed
-          // themeMode: ThemeMode.system,
-
-          home: SplashScreen(),// After Routing done
-          // getPages: AppRoute.route,
+          initialRoute: AppRoute.getInitial(),       // ✅ use initial route
+          getPages: AppRoute.route,                  // ✅ use defined routes
+          initialBinding: AppBinding(),
           locale: const Locale("en", "US"),
           fallbackLocale: const Locale("en", "US"),
         );

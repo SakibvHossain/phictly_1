@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "831191760425",
+    "project_id": "phictly-notification-sys-25c90",
+    "storage_bucket": "phictly-notification-sys-25c90.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831191760425:android:556feab867d081f3f12638",
+        "android_client_info": {
+          "package_name": "com.example.phictly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi4uBTqH9KrMDutJW_l1J03qM7ox-wf3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

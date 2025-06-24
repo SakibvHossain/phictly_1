@@ -3,14 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LocationDropdownController extends GetxController {
-  var selectedLocation = "Select".obs; // Default value
-
-  void updateLocation(String location) {
-    selectedLocation.value = location;
-  }
-}
-
+import '../../data/controller/location_dropdown_controller.dart';
 
 class DropdownLocation extends StatelessWidget {
   DropdownLocation({super.key, required this.locationList, required this.selectedHint, required this.icon});
@@ -42,7 +35,9 @@ class DropdownLocation extends StatelessWidget {
           // Dropdown Button with GetX
           Expanded(
             child: Obx(() => DropdownButtonHideUnderline(
+
               child: DropdownButton<String>(
+                dropdownColor: Colors.white,
                 value: controller.selectedLocation.value == "Select"
                     ? null
                     : controller.selectedLocation.value,

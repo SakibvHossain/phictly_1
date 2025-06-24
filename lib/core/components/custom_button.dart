@@ -14,6 +14,7 @@ class CustomButton extends StatelessWidget {
   final Color? textColor;
   final double? borderRadius;
   final double? textFontSize;
+  final Widget? child;
   final FontWeight? textFontWeight;
 
   const CustomButton({
@@ -27,7 +28,7 @@ class CustomButton extends StatelessWidget {
     this.borderRadius,
     this.textFontSize,
     this.textColor,
-    this.textFontWeight,
+    this.textFontWeight, this.child,
   });
 
   @override
@@ -42,14 +43,13 @@ class CustomButton extends StatelessWidget {
           gradient: AppColors.primaryGradientColor,
           borderRadius: BorderRadius.circular(borderRadius?.r ?? 12.r),
         ),
-        child: text == ''
-            ? const CircularProgressIndicator()
-            : CustomText(
-          text: text,
-          fontSize: textFontSize ?? 18.sp,
-          fontWeight: textFontWeight ?? FontWeight.w600,
-          color: textColor ?? AppColors.whiteColor,
-        ),
+        child: child ??
+            CustomText(
+              text: text ?? '', //* No need to check for null, fallback to empty string
+              fontSize: textFontSize ?? 18.sp,
+              fontWeight: textFontWeight ?? FontWeight.w600,
+              color: textColor ?? AppColors.whiteColor,
+            ),
       ),
     );
   }
