@@ -6,11 +6,13 @@ import 'package:phictly/feature/auth/ui/screens/sign_up_screen.dart';
 import 'package:phictly/feature/home/ui/screens/home_nav_screen.dart';
 import 'package:phictly/feature/splash/ui/screens/splash_screen.dart';
 
+
 class AppRoute {
   static const String splash = '/splash';
   static const String navBar = '/navHome';
   static const String signUp = '/signUp';
   static const String signIn = '/signIn';
+
 
 
 

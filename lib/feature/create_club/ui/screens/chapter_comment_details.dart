@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_text.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../data/controller/change_club_controller.dart';
@@ -20,20 +21,27 @@ class ChapterCommentDetails extends StatelessWidget {
   final ChangeClubController changeClubController = Get.put(ChangeClubController());
   final TalkPointController pointController = Get.put(TalkPointController());
   final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
   final PostClubController bookController = Get.put(PostClubController());
   final Logger logger = Logger();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
-
     logger.i(clubController.selectedIndex);
     return Scaffold(
       backgroundColor: Color(0xffEEf0f8),
       body: RefreshIndicator(
         color: AppColors.primaryColor,
         onRefresh: () async {
-          clubController.fetchCreatedClub(bookController.createdClubId);
+          final clubID = sharedPreference.getString("selectedClubId");
+
+          debugPrint("");
+          if(clubController.areYouFromHome.value){
+            clubController.fetchCreatedClub(clubID ?? "");
+          }else{
+            clubController.fetchCreatedClub(bookController.createdClubId);
+          }
         },
         child: SingleChildScrollView(
           child: Column(
@@ -83,7 +91,11 @@ class ChapterCommentDetails extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        changeClubController.updateIndex(1);
+                        if(clubController.areYouFromHome.value){
+                          changeClubController.updateIndex(6);
+                        }else{
+                          changeClubController.updateIndex(1);
+                        }
                       },
                       child: Icon(
                         Icons.arrow_back_ios_sharp,
@@ -285,7 +297,6 @@ class ChapterCommentDetails extends StatelessWidget {
               ),
 
               Obx(() {
-
                 if (clubController.isLoading.value) {
                   return Column(
                     children: [

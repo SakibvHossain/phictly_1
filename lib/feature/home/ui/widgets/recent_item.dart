@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_text.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/home/data/controller/change_home_controller.dart';
 import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
@@ -26,9 +27,10 @@ class RecentItem extends StatelessWidget {
   final clubItemController = Get.put(ClubItemController());
   final changeClubController = Get.put(ChangeClubController());
   final navController = Get.put(BottomNavController());
-  final clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
   final joinClubController = Get.put(JoinClubController());
   final logger = Logger();
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +73,8 @@ class RecentItem extends StatelessWidget {
                 ? recent.clubMember!.first.status
                 : null;
 
-            debugPrint(
-                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
-            debugPrint(
-                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}");
+            debugPrint("+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
+            debugPrint("+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}");
 
             final memberSize = recent.memberSize;
             final activeMembers = recent.count?.clubMember;
@@ -111,7 +111,7 @@ class RecentItem extends StatelessWidget {
                 difference = '${diff.inMinutes}m';
               } else if (diff.inHours < 24) {
                 difference = '${diff.inHours}h';
-              } else if (diff.inDays < 7) {
+              } else if (diff.inDays < 365) {
                 difference = '${diff.inDays}d';
               } else {
                 difference =
@@ -132,7 +132,7 @@ class RecentItem extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
-                  width: isExpanded ? 340 : 120,
+                  width: isExpanded ? 360 : 120,
                   margin: EdgeInsets.only(left: 4, right: 4),
                   padding:
                   EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
@@ -189,9 +189,13 @@ class RecentItem extends StatelessWidget {
                                 onTap: () async {
                                   if (status!=null) {
                                     if(status.contains("ACCPECT")){
-                                      navController.updateIndex(2);
-                                      changeClubController.updateIndex(1);
+                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${recent.id}");
+                                      sharedPreference.setString("selectedClubId", recent.id ?? "");
+                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
                                       clubController.fetchCreatedClub(recent.id ?? "");
+                                      clubController.areYouFromHome.value = true;
+                                      navController.updateIndex(2);
+                                      changeClubController.updateIndex(6);
                                     }
                                   } else {
                                     debugPrint("+++++++++++++++Private Club++++++++++++++++++");
@@ -214,11 +218,31 @@ class RecentItem extends StatelessWidget {
                                         firstFontSize: 12,
                                         secondText: "${trendingClubs.title}",
                                         secondFontSize: 12),
-                                    _rowCustomText(
+
+                                    trendingClubs.writer == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
                                         firstText: "Author: ",
                                         firstFontSize: 12,
                                         secondText: "${trendingClubs.writer}",
                                         secondFontSize: 12),
+
+                                    trendingClubs.totalSeasons == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                        firstText: "Season: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.totalSeasons}",
+                                        secondFontSize: 12),
+
+                                    trendingClubs.totalEpisodes == null
+                                        ? SizedBox.shrink()
+                                        : _rowCustomText(
+                                        firstText: "Episode: ",
+                                        firstFontSize: 12,
+                                        secondText: "${trendingClubs.totalEpisodes}",
+                                        secondFontSize: 12),
+
                                     _rowCustomText(
                                       firstText: "Club Creator: ",
                                       firstFontSize: 12,
@@ -231,11 +255,12 @@ class RecentItem extends StatelessWidget {
                                     _rowCustomText(
                                       firstText: "Member Count: ",
                                       firstFontSize: 12,
-                                      secondText: "${trendingClubs.memberSize}",
+                                      secondText: "${trendingClubs.count?.clubMember}/${trendingClubs.memberSize}",
                                       secondFontSize: 12,
                                     ),
-                                    Flexible(
-                                      flex: 3,
+                                    SizedBox(
+                                      width:
+                                      220.w,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             right: 55, left: 6),
@@ -247,15 +272,9 @@ class RecentItem extends StatelessWidget {
                                               trackShape:
                                               const RoundedRectSliderTrackShape(),
                                               trackHeight: 2.0,
-                                              thumbShape:
-                                              const RoundSliderThumbShape(
-                                                  enabledThumbRadius:
-                                                  1.0),
-                                              overlayShape:
-                                              SliderComponentShape
-                                                  .noOverlay,
-                                              thumbColor:
-                                              const Color(0xff29605E),
+                                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 1.0),
+                                              overlayShape: SliderComponentShape.noOverlay,
+                                              thumbColor: const Color(0xff29605E),
                                               activeTrackColor:
                                               const Color(0xff29605E),
                                               inactiveTrackColor:
@@ -285,10 +304,10 @@ class RecentItem extends StatelessWidget {
                                       secondFontSize: 12,
                                     ),
                                     Flexible(
-                                      flex: 3,
+                                      flex: 2,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
-                                            right: 55, left: 2),
+                                            right: 88, left: 2),
                                         child: SizedBox(
                                           height: 15,
                                           child: Obx(
@@ -329,14 +348,14 @@ class RecentItem extends StatelessWidget {
                                     SizedBox(
                                       height: 16.h,
                                       child: Flexible(
-                                        flex: 1,
+                                        flex: 2,
                                         fit: FlexFit.loose,
                                         child: Row(
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                           children: [
                                             Flexible(
-                                              flex: 2,
+                                              flex: 1,
                                               fit: FlexFit.loose,
                                               child: _customText(
                                                   text: "1",
@@ -346,13 +365,16 @@ class RecentItem extends StatelessWidget {
                                             ),
                                             Flexible(
                                               flex: 1,
-                                              fit: FlexFit.tight,
-                                              child: _customText(
-                                                  text:
-                                                  "${trendingClubs.timeLine}",
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.black),
+                                              fit: FlexFit.loose,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 85.0),
+                                                child: _customText(
+                                                    text:
+                                                    "${trendingClubs.timeLine}",
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.black),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -363,7 +385,7 @@ class RecentItem extends StatelessWidget {
                               ),
                               Positioned(
                                 bottom: 0,
-                                right: 6,
+                                right: 8,
                                 child: SizedBox(
                                   height: 160,
                                   child: Column(
@@ -390,7 +412,6 @@ class RecentItem extends StatelessWidget {
                                         ACCPECT
                                         DELETED
                                        */
-
                                       Column(
                                         children: [
                                           (status == null ||
@@ -401,21 +422,21 @@ class RecentItem extends StatelessWidget {
                                             onTap: () async {
                                               if (recent.id == null || recent.type == null) return;
 
+                                              //* What kind of check I should give based on which condition
                                               if (recent.type!.contains("PRIVATE")) {
                                                 await joinClubController.joinPrivateClub(recent.id!);
                                               } else {
                                                 await joinClubController.joinPublicClub(recent.id!);
-                                                navController.updateIndex(2);
-                                                changeClubController.updateIndex(1);
                                                 clubController.fetchCreatedClub(recent.id ?? "");
                                               }
-
-                                              await clubItemController.fetchTrendingClubs();
                                             },
-                                            child: Image.asset(
-                                              "assets/icons/join_read_icon.png",
-                                              height: 28.16,
-                                              width: 28.52,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 3.0),
+                                              child: Image.asset(
+                                                "assets/icons/join_read_icon.png",
+                                                height: 28.16,
+                                                width: 28.52,
+                                              ),
                                             ),
                                           )
                                               : (status == "PENDING")
@@ -426,17 +447,24 @@ class RecentItem extends StatelessWidget {
                                               // joinClubController.joinPrivateClub(
                                               //     trending.id ?? "");
                                             },
-                                            child: Image.asset(
-                                              "assets/icons/request_icon.png",
-                                              height: 28.16,
-                                              width: 28.52,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 3.0),
+                                              child: Image.asset(
+                                                "assets/icons/request_icon.png",
+                                                height: 28.16,
+                                                width: 28.52,
+                                              ),
                                             ),
                                           )
                                               : SizedBox(
                                             height: 28.16,
                                             width: 28.52,
                                           ),
+                                          //* Another Issue arise here!!
 
+                                          SizedBox(
+                                            height: 6.h,
+                                          ),
                                           // buildStatusIcon(status!, trending.id ?? ""),
                                           buildStatusText(status),
 

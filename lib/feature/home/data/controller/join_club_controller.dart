@@ -5,10 +5,16 @@ import 'package:phictly/feature/create_club/data/model/search_response_model.dar
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';
+import '../../../create_club/data/controller/change_club_controller.dart';
+import 'bottom_nav_controller.dart';
+import 'club_item_controller.dart';
 
 class JoinClubController extends GetxController{
   SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
   RxList<Book> searchedBookList = <Book>[].obs;
+  final navController = Get.put(BottomNavController());
+  final changeClubController = Get.put(ChangeClubController());
+  final clubItemController = Get.put(ClubItemController());
   String clubId = "";
   var isLoading = false.obs;
   var isAcceptLoading = false.obs;
@@ -36,6 +42,8 @@ class JoinClubController extends GetxController{
         logger.i(response.responseData);
         var isPending = response.responseData;
         logger.i(isPending);
+        navController.updateIndex(2);
+        changeClubController.updateIndex(1);
       } else {
         Get.snackbar(
           "Failed",
@@ -73,6 +81,10 @@ class JoinClubController extends GetxController{
         logger.i(response.responseData);
         var isPending = response.responseData;
         logger.i(isPending);
+        navController.updateIndex(2);
+        changeClubController.updateIndex(1);
+        clubItemController.fetchTrendingClubs();
+        clubItemController.fetchRecentClubs();
       } else {
         Get.snackbar(
           "Failed",

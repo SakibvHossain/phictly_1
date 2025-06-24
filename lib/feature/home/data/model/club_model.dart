@@ -52,7 +52,7 @@ class ClubModel {
   final List<DateTime>? talkPoint;
   final Admin? admin;
   final String? adminId;
-  final String? preference;
+  final List<String>? preference; // ✅ Changed from String? to List<String>?
   final int? age;
   final int? rating;
   final String? publishDate;
@@ -63,7 +63,7 @@ class ClubModel {
   final String? length;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final List<ClubMember>? clubMember; // ✅ Newly added field
+  final List<ClubMember>? clubMember;
 
   ClubModel({
     this.id,
@@ -82,7 +82,7 @@ class ClubModel {
     this.talkPoint,
     this.admin,
     this.adminId,
-    this.preference,
+    this.preference, // ✅ updated
     this.age,
     this.rating,
     this.publishDate,
@@ -93,13 +93,13 @@ class ClubModel {
     this.length,
     this.createdAt,
     this.updatedAt,
-    this.clubMember, // ✅ Added to constructor
+    this.clubMember,
   });
 
   factory ClubModel.fromJson(Map<String, dynamic> json) {
     return ClubModel(
       id: json['id'] as String?,
-      clubLabel: json['clubLebel'] as String?,
+      clubLabel: json['clubLebel'] as String?, // Note: JSON typo handled here
       clubId: json['clubId']?.toString(),
       memberSize: json['memberSize'] as int? ?? 0,
       startDate: json['startDate'] as String?,
@@ -118,7 +118,9 @@ class ClubModel {
           [],
       admin: json['admin'] != null ? Admin.fromJson(json['admin']) : null,
       adminId: json['adminId'] as String?,
-      preference: json['preference'] as String?,
+      preference: (json['preference'] as List?)
+          ?.map((e) => e.toString())
+          .toList(), // ✅ Safely parse list
       age: json['age'] as int?,
       rating: json['rating'] as int? ?? 0,
       publishDate: json['publishDate'] as String?,

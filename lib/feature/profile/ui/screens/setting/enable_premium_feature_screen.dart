@@ -41,7 +41,7 @@ class EnablePremiumFeatureScreen extends StatelessWidget {
                         height: 42.93.h,
                         width: 130.96.w,
                       ),
-                      SizedBox()
+                      SizedBox(),
                     ],
                   ),
                 ),
@@ -218,7 +218,7 @@ class EnablePremiumFeatureScreen extends StatelessWidget {
               top: -3,
               left: -8.5,
               child: Transform.rotate(
-                angle: -pi / 47, // Rotate for perfect diagonal alignment
+                angle: -pi / 47, //* Rotate for perfect diagonal alignment
                 child: Image.asset(
                   "assets/profile/icons/your_plan_banner.png",
                   height: 91.36,

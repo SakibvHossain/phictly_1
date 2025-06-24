@@ -1,3 +1,4 @@
+//Pin validation
 String? validatePin(String? value) {
   if (value == null || value.isEmpty) {
     return 'PIN cannot be empty';

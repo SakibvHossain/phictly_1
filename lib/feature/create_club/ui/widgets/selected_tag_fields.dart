@@ -24,22 +24,19 @@ class SelectedTagsField extends StatelessWidget {
           //* Then safely update observables AFTER the build
           genreController.fetchGenre();
           genreController.getAllGenre();
-
           showAdaptiveDialog(context: context, builder: (context){
             return TagSelectionScreen();
           });
         }, // Opens the dialog
         decoration: InputDecoration(
-          hintText:
-          controller.selectedGenres.isNotEmpty ? "" : "Select tags...",
+          hintText: controller.selectedGenres.isNotEmpty ? "" : "Select tags...",
           border: OutlineInputBorder(
             borderSide:
             BorderSide(color: Color(0xff000000).withValues(alpha: 0.20)),
             borderRadius: BorderRadius.circular(8),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide:
-            BorderSide(color: Color(0xff000000).withValues(alpha: 0.20)),
+            borderSide: BorderSide(color: Color(0xff000000).withValues(alpha: 0.20)),
             borderRadius: BorderRadius.circular(8),
           ),
           focusedBorder: OutlineInputBorder(

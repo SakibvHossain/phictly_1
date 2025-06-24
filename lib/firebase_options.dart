@@ -24,10 +24,7 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
@@ -52,9 +49,17 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyBi4uBTqH9KrMDutJW_l1J03qM7ox-wf3A',
+    appId: '1:831191760425:android:556feab867d081f3f12638',
+    messagingSenderId: '831191760425',
+    projectId: 'phictly-notification-sys-25c90',
+    storageBucket: 'phictly-notification-sys-25c90.firebasestorage.app',
+  );
+
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAANWBVXWkn8dmBS8OvoXD8HqAKslCbklA',
-    appId: '1:831191760425:ios:f8f3b9f06c76fe20f12638',
+    appId: '1:831191760425:ios:77127a75c03354a2f12638',
     messagingSenderId: '831191760425',
     projectId: 'phictly-notification-sys-25c90',
     storageBucket: 'phictly-notification-sys-25c90.firebasestorage.app',

@@ -1,9 +1,11 @@
 import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/feature/book/ui/screens/chapter_comment_detail_controller.dart';
 import 'package:phictly/feature/create_club/data/controller/status_controller.dart';
 import 'package:phictly/feature/create_club/ui/screens/chapter_comment_details.dart';
+import 'package:phictly/feature/profile/data/controller/redirected_profile_controller.dart';
 import '../../../../core/components/custom_text.dart';
 import '../../../../core/utils/app_colors.dart';
 import 'package:get/get.dart';
@@ -40,9 +42,11 @@ class ChapterComments extends StatelessWidget {
 
   final ChangeClubController changeClubController = Get.put(ChangeClubController());
   final ChapterCommentDetailController commentDetailController = Get.put(ChapterCommentDetailController());
-  final ClubController clubController = Get.put(ClubController());
+  final clubController = Get.find<ClubController>();
   final PostClubController bookController = Get.put(PostClubController());
   final status = Get.put(StatusController());
+  final sharedPreference = Get.put(SharedPreferencesHelper());
+  final redirectProfileController = Get.put(RedirectedProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -71,14 +75,15 @@ class ChapterComments extends StatelessWidget {
                         children: [
                           GestureDetector(
                             onTap:(){
-                              Get.to(
-                                    () => ChatScreen(
-                                  receiverId: userId,
-                                      image:  image,
-                                      userName: userName,
-
-                                ),
-                              );
+                              // Get.to(
+                              //       () => ChatScreen(
+                              //     receiverId: userId,
+                              //         image:  image,
+                              //         userName: userName,
+                              //
+                              //   ),
+                              // );
+                              redirectProfileController.fetchProfileDetails(userId);
                             },
                             child: CustomText(
                                 text: userName ??  "hp990",
@@ -91,7 +96,6 @@ class ChapterComments extends StatelessWidget {
                           //   Icons.share,
                           //   color: AppColors.primaryColor,
                           // )
-
                           SizedBox(),
                         ],
                       ),
@@ -245,7 +249,8 @@ class ChapterComments extends StatelessWidget {
             child: GestureDetector(
               onTap: () async {
                 status.updateStatus(id);
-                await clubController.fetchCreatedClub(bookController.createdClubId);
+                final clubID = sharedPreference.getString("selectedClubId");
+                await clubController.fetchCreatedClub(clubID ?? "");
               },
               child: CustomText(
                 text: "Tap to show",

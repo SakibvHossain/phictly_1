@@ -11,11 +11,12 @@ class SearchResponse {
 
   factory SearchResponse.fromJson(Map<String, dynamic> json) {
     return SearchResponse(
-      success: json['success'],
-      message: json['message'],
-      result: (json['result'] as List)
-          .map((e) => Book.fromJson(e))
-          .toList(),
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      result: (json['result'] as List<dynamic>?)
+          ?.map((e) => Book.fromJson(e))
+          .toList() ??
+          [],
     );
   }
 
@@ -32,32 +33,46 @@ class Book {
   final String title;
   final String writer;
   final String poster;
-  final String imdbID;
-  final String publishDate;
-  final int bookNo;
-  final List<Genre> genre;
+  final String? publishedDate;
+  final String? isbn10;
+  final String? isbn13;
+  final int? length;
+  final String? edition;
+  final List<Genre> genre; // ✅ name kept as 'genre' to match your usage
+  final String? imdbID;     // ✅ manually added, not in JSON
 
   Book({
     required this.title,
     required this.writer,
     required this.poster,
-    required this.imdbID,
-    required this.publishDate,
-    required this.bookNo,
+    this.publishedDate,
+    this.isbn10,
+    this.isbn13,
+    this.length,
+    this.edition,
     required this.genre,
+    this.imdbID,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
     return Book(
-      title: json['title'],
-      writer: json['writer'],
-      poster: json['poster'],
-      imdbID: json['imdbID'].toString(),
-      publishDate: json['publishDate'].toString(),
-      bookNo: json['book_No'],
-      genre: (json['genre'] as List)
-          .map((e) => Genre.fromJson(e))
-          .toList(),
+      title: json['title'] ?? '',
+      writer: json['writer'] ?? '',
+      poster: json['poster'] ?? '',
+      publishedDate: json['publishedDate'],
+      isbn10: json['isbn10'],
+      isbn13: json['isbn13'],
+      length: json['length'] is int
+          ? json['length']
+          : int.tryParse(json['length']?.toString() ?? ''),
+      edition: (json['edition'] as String?)?.trim().isEmpty ?? true
+          ? null
+          : json['edition'],
+      genre: (json['genres'] as List<dynamic>?) // ✅ maps from JSON key 'genres'
+          ?.map((e) => Genre.fromJson(e))
+          .toList() ??
+          [],
+      imdbID: json['imdbID'], // ✅ Will be null if not present
     );
   }
 
@@ -66,10 +81,13 @@ class Book {
       'title': title,
       'writer': writer,
       'poster': poster,
+      'publishedDate': publishedDate,
+      'isbn10': isbn10,
+      'isbn13': isbn13,
+      'length': length,
+      'edition': edition,
+      'genres': genre.map((e) => e.toJson()).toList(),
       'imdbID': imdbID,
-      'publishDate': publishDate,
-      'book_No': bookNo,
-      'genre': genre.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -77,16 +95,19 @@ class Book {
 class Genre {
   final String name;
   final String image;
+  final String? id; // optional for tags if needed
 
   Genre({
     required this.name,
     required this.image,
+    this.id,
   });
 
   factory Genre.fromJson(Map<String, dynamic> json) {
     return Genre(
-      name: json['name'],
-      image: json['image'],
+      name: json['name'] ?? '',
+      image: json['image'] ?? '',
+      id: json['id']?.toString(),
     );
   }
 
@@ -94,6 +115,7 @@ class Genre {
     return {
       'name': name,
       'image': image,
+      if (id != null) 'id': id,
     };
   }
 }

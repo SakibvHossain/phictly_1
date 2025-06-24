@@ -12,542 +12,230 @@ import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
 import 'package:phictly/feature/home/data/controller/home_controller.dart';
 import 'package:phictly/feature/home/data/controller/slider_controller.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
-import '../../../create_club/data/controller/change_club_controller.dart';
-import '../../../create_club/data/controller/club_controller.dart';
-import '../../data/controller/bottom_nav_controller.dart';
-import '../../data/controller/join_club_controller.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
+import 'package:phictly/feature/create_club/data/controller/change_club_controller.dart';
+import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
+import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
+import 'package:phictly/feature/home/data/controller/join_club_controller.dart';
 
 class TrendingItem extends StatelessWidget {
   TrendingItem({super.key});
 
-  final controller = Get.put(HomeController());
-  final changeHomeController = Get.find<ChangeHomeController>();
-  final sliderController = Get.put(SliderController());
-  final clubItemController = Get.put(ClubItemController());
-  final changeClubController = Get.put(ChangeClubController());
-  final navController = Get.put(BottomNavController());
-  final clubController = Get.put(ClubController());
-  final joinClubController = Get.put(JoinClubController());
-  final logger = Logger();
+  final HomeController controller = Get.put(HomeController());
+  final ChangeHomeController changeHomeController = Get.find<ChangeHomeController>();
+  final SliderController sliderController = Get.put(SliderController());
+  final ClubItemController clubItemController = Get.put(ClubItemController());
+  final ChangeClubController changeClubController = Get.put(ChangeClubController());
+  final BottomNavController navController = Get.put(BottomNavController());
+  final ClubController clubController = Get.find<ClubController>();
+  final JoinClubController joinClubController = Get.put(JoinClubController());
+  final SharedPreferencesHelper sharedPreference = Get.put(SharedPreferencesHelper());
+  final Logger logger = Logger();
 
   @override
   Widget build(BuildContext context) {
-    return _buildTrendingItem();
-  }
-
-  //* Trending Item
-  Widget _buildTrendingItem() {
     return SizedBox(
-      height: 180.h,
-      child: Obx(() {
-        if (clubItemController.isTrendingDataLoading.value) {
-          return const Center(
-            child: SpinKitWave(
-              duration: Duration(seconds: 2),
-              size: 15,
-              color: AppColors.primaryColor,
-            ),
-          );
-        }
-
-        if (clubItemController.trendingDataList.isEmpty) {
-          return Center(
-            child: CustomText(
-                text: "No trending data found",
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff000000)),
-          );
-        }
-
-        return ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: clubItemController.trendingDataList.length,
-          itemBuilder: (context, index) {
-            ClubModel trending = clubItemController.trendingDataList[index];
-
-            final status =
-                (trending.clubMember != null && trending.clubMember!.isNotEmpty)
-                    ? trending.clubMember!.first.status
-                    : null;
-
-            debugPrint(
-                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
-            debugPrint(
-                "+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${trending.clubMember?.length}");
-
-            final memberSize = trending.memberSize;
-            final activeMembers = trending.count?.clubMember;
-            double maxValue = 0.0;
-            double minValue = 0.0;
-
-            if (memberSize != null && activeMembers != null) {
-              minValue = activeMembers.toDouble();
-              maxValue = memberSize.toDouble();
-            } else {
-              sliderController.min.value = 0.0;
-              sliderController.max.value =
-                  100.0; //* or 0.0 if you want to disable the slider
-            }
-
-            debugPrint(
-                "+++++++++++++++++++++++MAX+++++++++++++++++++++++++$maxValue");
-            debugPrint(
-                "+++++++++++++++++++++++MIN+++++++++++++++++++++++++$minValue");
-
-            //* Time & Date
-            DateTime? createdAt = trending.startDate != null
-                ? DateTime.tryParse(trending.startDate!)
-                : null;
-
-            String difference = "";
-            if (createdAt != null) {
-              final Duration diff =
-                  DateTime.now().toUtc().difference(createdAt.toUtc());
-
-              if (diff.inSeconds < 60) {
-                difference = '${diff.inSeconds}s';
-              } else if (diff.inMinutes < 60) {
-                difference = '${diff.inMinutes}m';
-              } else if (diff.inHours < 24) {
-                difference = '${diff.inHours}h';
-              } else if (diff.inDays < 7) {
-                difference = '${diff.inDays}d';
-              } else {
-                difference =
-                    '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-              }
-            } else {
-              difference = "Unknown time";
-            }
-
-            return Obx(() {
-              final trendingClubs = clubItemController.trendingDataList[index];
-              final isExpanded =
-                  clubItemController.selectedClubIndex.value == index;
-
-              return GestureDetector(
-                onTap: () {
-                  // sliderController.updateSlider(minValue, minValue, sliderValue);
-                  clubItemController.toggleClubIndex(index);
-                  debugPrint(
-                      "+++++++++++++++++++++++++++++Club Poster Toggled: ${trendingClubs.poster}+++++++++++++++++++++++++++++");
-                },
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  width: isExpanded ? 340 : 120,
-                  margin: EdgeInsets.only(left: 4, right: 4),
-                  padding:
-                      EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
-                  // No right padding here
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                      )
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: CachedNetworkImage(
-                            imageUrl: trendingClubs.poster ??
-                                "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-                            height: 160,
-                            width: 100,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
-                              child: SizedBox(
-                                height: 25,
-                                width: 25,
-                                child: SpinKitWave(
-                                  duration: Duration(seconds: 2),
-                                  size: 15,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              "assets/images/placeholder_image.png",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (isExpanded) SizedBox(width: 4),
-                      if (isExpanded)
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () async {
-                                  if (status != null) {
-                                    if (status.contains("ACCPECT")) {
-                                      navController.updateIndex(2);
-                                      changeClubController.updateIndex(1);
-                                      clubController
-                                          .fetchCreatedClub(trending.id ?? "");
-                                    }
-                                  } else {
-                                    debugPrint(
-                                        "+++++++++++++++Private Club++++++++++++++++++");
-                                  }
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _customText(
-                                        text: "${trendingClubs.clubId}",
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.black),
-                                    _customText(
-                                      text: "${trendingClubs.clubLabel}",
-                                      color: Colors.black.withOpacity(0.5),
-                                    ),
-                                    _rowCustomText(
-                                        firstText: "Title: ",
-                                        firstFontSize: 12,
-                                        secondText: "${trendingClubs.title}",
-                                        secondFontSize: 12),
-                                    _rowCustomText(
-                                        firstText: "Author: ",
-                                        firstFontSize: 12,
-                                        secondText: "${trendingClubs.writer}",
-                                        secondFontSize: 12),
-                                    _rowCustomText(
-                                      firstText: "Club Creator: ",
-                                      firstFontSize: 12,
-                                      secondText:
-                                          "${trendingClubs.admin?.username}" ??
-                                              "${trendingClubs.writer}",
-                                      secondFontSize: 12,
-                                      secondColor: Color(0xff29605E),
-                                    ),
-                                    _rowCustomText(
-                                      firstText: "Member Count: ",
-                                      firstFontSize: 12,
-                                      secondText: "${trendingClubs.memberSize}",
-                                      secondFontSize: 12,
-                                    ),
-                                    Flexible(
-                                      flex: 3,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            right: 55, left: 6),
-                                        child: SizedBox(
-                                          height: 15,
-                                          child: Obx(() => SliderTheme(
-                                                data: SliderTheme.of(context)
-                                                    .copyWith(
-                                                  trackShape:
-                                                      const RoundedRectSliderTrackShape(),
-                                                  trackHeight: 2.0,
-                                                  thumbShape:
-                                                      const RoundSliderThumbShape(
-                                                          enabledThumbRadius:
-                                                              1.0),
-                                                  overlayShape:
-                                                      SliderComponentShape
-                                                          .noOverlay,
-                                                  thumbColor:
-                                                      const Color(0xff29605E),
-                                                  activeTrackColor:
-                                                      const Color(0xff29605E),
-                                                  inactiveTrackColor:
-                                                      Colors.grey.shade300,
-                                                ),
-                                                child: Slider(
-                                                  min: 0.0,
-                                                  max: maxValue,
-                                                  value: sliderController
-                                                      .value.value
-                                                      .clamp(
-                                                          minValue, maxValue),
-                                                  onChanged: (val) {
-                                                    debugPrint(
-                                                        "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
-                                                    // sliderController.value.value = val;
-                                                  },
-                                                ),
-                                              )),
-                                        ),
-                                      ),
-                                    ),
-                                    _rowCustomText(
-                                      firstText: "Timeline: ",
-                                      firstFontSize: 12,
-                                      secondText:
-                                          "${trendingClubs.timeLine} day(s)",
-                                      secondFontSize: 12,
-                                    ),
-                                    Flexible(
-                                      flex: 3,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            right: 55, left: 2),
-                                        child: SizedBox(
-                                          height: 15,
-                                          child: Obx(
-                                            () => SliderTheme(
-                                              data: SliderTheme.of(context)
-                                                  .copyWith(
-                                                trackShape:
-                                                    const RoundedRectSliderTrackShape(),
-                                                trackHeight: 2.0,
-                                                thumbShape:
-                                                    const RoundSliderThumbShape(
-                                                        enabledThumbRadius:
-                                                            5.0),
-                                                overlayShape:
-                                                    SliderComponentShape
-                                                        .noOverlay,
-                                                thumbColor:
-                                                    const Color(0xff29605E),
-                                                activeTrackColor:
-                                                    const Color(0xff29605E),
-                                                inactiveTrackColor:
-                                                    Colors.grey.shade300,
-                                              ),
-                                              child: Slider(
-                                                min: 0.0,
-                                                max: maxValue,
-                                                value: sliderController
-                                                    .value.value
-                                                    .clamp(maxValue, maxValue),
-                                                onChanged: (val) {
-                                                  // sliderController.value.value =
-                                                  //     val;
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 16.h,
-                                      child: Flexible(
-                                        flex: 1,
-                                        fit: FlexFit.loose,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Flexible(
-                                              flex: 2,
-                                              fit: FlexFit.loose,
-                                              child: _customText(
-                                                  text: "1",
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.black),
-                                            ),
-                                            Flexible(
-                                              flex: 1,
-                                              fit: FlexFit.tight,
-                                              child: _customText(
-                                                  text:
-                                                      "${trendingClubs.timeLine}",
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.black),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 6,
-                                child: SizedBox(
-                                  height: 160,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            // "assets/icons/bag_icon.png",
-                                            height: 20,
-                                            width: 20,
-                                          ),
-                                          SizedBox(width: 4),
-                                          Image.asset(
-                                            "assets/icons/share.png",
-                                            height: 20,
-                                            width: 20,
-                                          ),
-                                        ],
-                                      ),
-                                      /*
-                                        PENDING
-                                        ACCPECT
-                                        DELETED
-                                       */
-
-                                      Column(
-                                        children: [
-                                          (status == null ||
-                                                  status == "DELETED")
-                                              ? GestureDetector(
-                                                  behavior:
-                                                      HitTestBehavior.opaque,
-                                                  onTap: () async {
-                                                    if (trending.id == null ||
-                                                        trending.type == null)
-                                                      return;
-
-                                                    if (trending.type!
-                                                        .contains("PRIVATE")) {
-                                                      await joinClubController
-                                                          .joinPrivateClub(
-                                                              trending.id!);
-                                                    } else {
-                                                      await joinClubController
-                                                          .joinPublicClub(
-                                                              trending.id!);
-                                                      navController
-                                                          .updateIndex(2);
-                                                      changeClubController
-                                                          .updateIndex(1);
-                                                      clubController
-                                                          .fetchCreatedClub(
-                                                              trending.id ??
-                                                                  "");
-                                                    }
-
-                                                    await clubItemController
-                                                        .fetchTrendingClubs();
-                                                  },
-                                                  child: Image.asset(
-                                                    "assets/icons/join_read_icon.png",
-                                                    height: 28.16,
-                                                    width: 28.52,
-                                                  ),
-                                                )
-                                              : (status == "PENDING")
-                                                  ? GestureDetector(
-                                                      behavior: HitTestBehavior
-                                                          .opaque,
-                                                      onTap: () async {
-                                                        // joinClubController.joinPrivateClub(
-                                                        //     trending.id ?? "");
-                                                      },
-                                                      child: Image.asset(
-                                                        "assets/icons/request_icon.png",
-                                                        height: 28.16,
-                                                        width: 28.52,
-                                                      ),
-                                                    )
-                                                  : SizedBox(
-                                                      height: 28.16,
-                                                      width: 28.52,
-                                                    ),
-
-                                          // buildStatusIcon(status!, trending.id ?? ""),
-                                          buildStatusText(status),
-
-                                          SizedBox(
-                                            height: 6.h,
-                                          ),
-                                          _customText(
-                                              text: difference,
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontSize: 9.78,
-                                              fontWeight: FontWeight.w400),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            });
-          },
-        );
-      }),
+      height: 190.h,
+      child: Obx(() => _buildTrendingList(context)),
     );
   }
 
-  //* Row Texts
-  Widget _rowCustomText({
-    required String firstText,
-    required String secondText,
-    double? firstFontSize,
-    double? secondFontSize,
-    int? secondTextSubStringLength,
-    Color? secondColor,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0, bottom: 1),
-      child: Row(
-        children: [
-          Flexible(
-            // Or use Expanded
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: firstText.length > 20
-                        ? '${firstText.substring(0, 20)}...'
-                        : firstText,
-                    style: GoogleFonts.dmSans(
-                      fontSize: firstFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                  TextSpan(
-                    text: secondText.length > 16
-                        ? '${secondText.substring(0, 16)}...'
-                        : secondText,
-                    style: GoogleFonts.dmSans(
-                      fontSize: secondFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: secondColor ?? Colors.black.withOpacity(0.6),
-                    ),
-                  ),
-                ],
+  Widget _buildTrendingList(BuildContext context) {
+    if (clubItemController.isTrendingDataLoading.value) {
+      return const Center(
+        child: SpinKitWave(
+          duration: Duration(seconds: 2),
+          size: 15,
+          color: AppColors.primaryColor,
+        ),
+      );
+    }
+
+    if (clubItemController.trendingDataList.isEmpty) {
+      return Center(
+        child: CustomText(
+          text: "No trending data found",
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+      );
+    }
+
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: clubItemController.trendingDataList.length,
+      itemBuilder: (context, index) => _buildClubCard(context, index),
+    );
+  }
+
+  Widget _buildClubCard(BuildContext context, int index) {
+    final ClubModel trending = clubItemController.trendingDataList[index];
+    final String? status = trending.clubMember?.isNotEmpty ?? false ? trending.clubMember!.first.status : null;
+
+    return Obx(() {
+      final bool isExpanded = clubItemController.selectedClubIndex.value == index;
+      return GestureDetector(
+        onTap: () => clubItemController.toggleClubIndex(index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: isExpanded ? 360.w : 120.w,
+          margin: EdgeInsets.only(left: 4.w, right: 4.w),
+          padding: EdgeInsets.only(left: 6.w, right: 0, top: 8.h, bottom: 8.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 5.r,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildClubImage(trending),
+              if (isExpanded) ...[
+                SizedBox(width: 4.w),
+                Expanded(child: _buildClubDetails(context, trending, status, index)),
+              ],
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildClubImage(ClubModel trending) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4.r),
+        child: CachedNetworkImage(
+          imageUrl: trending.poster ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+          height: 180.h,
+          width: 100.w,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Center(
+            child: SizedBox(
+              height: 25.h,
+              width: 25.w,
+              child: const SpinKitWave(
+                duration: Duration(seconds: 2),
+                size: 15,
+                color: AppColors.primaryColor,
+              ),
             ),
           ),
-        ],
+          errorWidget: (context, url, error) => Image.asset(
+            "assets/images/placeholder_image.png",
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }
 
-  //* Single Text
-  Widget _customText({
+  Widget _buildClubDetails(BuildContext context, ClubModel trending, String? status, int index) {
+    final double maxValue = trending.memberSize?.toDouble() ?? 100.0;
+    final double minValue = trending.count?.clubMember?.toDouble() ?? 0.0;
+
+    return Stack(
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _handleClubTap(trending, status),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCustomText(
+                text: trending.clubId ?? "",
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+              _buildCustomText(
+                text: trending.clubLabel ?? "",
+                fontSize: 12.sp,
+                color: Colors.black.withOpacity(0.5),
+              ),
+              _buildRowCustomText(
+                firstText: "Title: ",
+                secondText: trending.title ?? "",
+                fontSize: 12.sp,
+              ),
+              if (trending.writer != null)
+                _buildRowCustomText(
+                  firstText: "Author: ",
+                  secondText: trending.writer!,
+                  fontSize: 12.sp,
+                ),
+              if (trending.totalSeasons != null)
+                _buildRowCustomText(
+                  firstText: "Season: ",
+                  secondText: trending.totalSeasons.toString(),
+                  fontSize: 12.sp,
+                ),
+              if (trending.totalEpisodes != null)
+                _buildRowCustomText(
+                  firstText: "Episode: ",
+                  secondText: trending.totalEpisodes.toString(),
+                  fontSize: 12.sp,
+                ),
+              _buildRowCustomText(
+                firstText: "Club Creator: ",
+                secondText: trending.admin?.username ?? trending.writer ?? "",
+                fontSize: 12.sp,
+                secondColor: const Color(0xff29605E),
+              ),
+              _buildRowCustomText(
+                firstText: "Member Count: ",
+                secondText: trending.memberSize?.toString() ?? "0",
+                fontSize: 12.sp,
+              ),
+              _buildMemberSlider(context, minValue, maxValue),
+              _buildRowCustomText(
+                firstText: "Timeline: ",
+                secondText: "${trending.timeLine ?? 0} day(s)",
+                fontSize: 12.sp,
+              ),
+              _buildTimelineSlider(context, maxValue),
+              _buildTimelineRow(trending.timeLine?.toString() ?? "0"),
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 6.w,
+          child: _buildActionColumn(trending, status),
+        ),
+      ],
+    );
+  }
+
+  void _handleClubTap(ClubModel trending, String? status) async {
+    if (status == "ACCPECT" && trending.id != null) {
+      logger.d("Navigating to private club: ${trending.id}");
+      clubController.areYouFromHome.value = true;
+      await sharedPreference.setString("selectedClubId", trending.id!);
+      clubController.fetchCreatedClub(trending.id!);
+      navController.updateIndex(2);
+      changeClubController.updateIndex(6);
+    } else {
+      logger.d("Private club access denied");
+    }
+  }
+
+  Widget _buildCustomText({
     required String text,
-    double? fontSize,
+    required double fontSize,
     FontWeight? fontWeight,
     Color? color,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
+      padding: EdgeInsets.only(left: 8.w),
       child: Text(
         text,
         style: GoogleFonts.dmSans(
@@ -561,87 +249,239 @@ class TrendingItem extends StatelessWidget {
     );
   }
 
-  //* Placing perfect Position for Talk Point
-  double mapSliderValue(double x, double max) {
-    double y = -1.1;
-
-    if (max == 30.0) {
-      y = -1.1;
-    } else if (max == 90.0) {
-      y = -5.5;
-    } else if (max == 270.0) {
-      y = -18;
-    } else if (max == 9.0) {
-      y = 0.42;
-    }
-
-    return -5 + ((x - y) / (max - y)) * 150;
+  Widget _buildRowCustomText({
+    required String firstText,
+    required String secondText,
+    required double fontSize,
+    Color? secondColor,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(left: 8.w, bottom: 1.h),
+      child: RichText(
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: firstText.length > 20 ? '${firstText.substring(0, 20)}...' : firstText,
+              style: GoogleFonts.dmSans(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            TextSpan(
+              text: secondText.length > 16 ? '${secondText.substring(0, 16)}...' : secondText,
+              style: GoogleFonts.dmSans(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w400,
+                color: secondColor ?? Colors.black.withOpacity(0.6),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget buildStatusIcon(String? status, String id) {
-    debugPrint(
-        "++++++++++++++++++++++++++buildStatusIcon+++++++++++++++++++++++++++++$status");
+  Widget _buildMemberSlider(BuildContext context, double minValue, double maxValue) {
+    return Flexible(
+      flex: 3,
+      child: Padding(
+        padding: EdgeInsets.only(right: 88.w, left: 6.w),
+        child: SizedBox(
+          height: 15.h,
+          child: Obx(() => SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackShape: const RoundedRectSliderTrackShape(),
+              trackHeight: 2.0,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 1.0),
+              overlayShape: SliderComponentShape.noOverlay,
+              thumbColor: const Color(0xff29605E),
+              activeTrackColor: const Color(0xff29605E),
+              inactiveTrackColor: Colors.grey.shade300,
+            ),
+            child: Slider(
+              min: 0.0,
+              max: maxValue,
+              value: sliderController.value.value.clamp(minValue, maxValue),
+              onChanged: (val) {},
+            ),
+          )),
+        ),
+      ),
+    );
+  }
 
+  Widget _buildTimelineSlider(BuildContext context, double maxValue) {
+    return Flexible(
+      flex: 3,
+      child: Padding(
+        padding: EdgeInsets.only(right: 88.w, left: 2.w),
+        child: SizedBox(
+          height: 15.h,
+          child: Obx(() => SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackShape: const RoundedRectSliderTrackShape(),
+              trackHeight: 2.0,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5.0),
+              overlayShape: SliderComponentShape.noOverlay,
+              thumbColor: const Color(0xff29605E),
+              activeTrackColor: const Color(0xff29605E),
+              inactiveTrackColor: Colors.grey.shade300,
+            ),
+            child: Slider(
+              min: 0.0,
+              max: maxValue,
+              value: sliderController.value.value.clamp(maxValue, maxValue),
+              onChanged: (val) {},
+            ),
+          )),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimelineRow(String timeline) {
+    return SizedBox(
+      height: 16.h,
+      child: Flexible(
+        flex: 1,
+        fit: FlexFit.loose,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              flex: 1,
+              fit: FlexFit.loose,
+              child: _buildCustomText(
+                text: "1",
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 70.0),
+                child: _buildCustomText(
+                  text: timeline,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionColumn(ClubModel trending, String? status) {
+    return SizedBox(
+      height: 170.h,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              SizedBox(height: 20.h, width: 20.w),
+              SizedBox(width: 4.w),
+              Image.asset("assets/icons/share.png", height: 20.h, width: 20.w),
+            ],
+          ),
+          Column(
+            children: [
+              _buildStatusIcon(trending, status),
+              _buildStatusText(status),
+              SizedBox(height: 6.h),
+              _buildCustomText(
+                text: _formatTimeDifference(trending.startDate),
+                fontSize: 9.78.sp,
+                fontWeight: FontWeight.w400,
+                color: Colors.black.withOpacity(0.6),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusIcon(ClubModel trending, String? status) {
     if (status == null || status == "DELETED") {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
-          await joinClubController.joinPrivateClub(id);
-          await clubItemController.fetchTrendingClubs();
+          if (trending.id == null || trending.type == null) {
+            logger.e("Invalid club ID or type");
+            return;
+          }
+          if (trending.type!.contains("PRIVATE")) {
+            await joinClubController.joinPrivateClub(trending.id!);
+          } else {
+            await joinClubController.joinPublicClub(trending.id!);
+            await clubController.fetchCreatedClub(trending.id!);
+          }
         },
-        child: Image.asset(
-          "assets/icons/join_read_icon.png",
-          height: 28.16,
-          width: 28.52,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 3.0),
+          child: Image.asset(
+            "assets/icons/join_read_icon.png",
+            height: 28.16.h,
+            width: 28.52.w,
+          ),
         ),
       );
     } else if (status == "PENDING") {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () async {
-          // await joinClubController.acceptPrivateClubRequest(id);
-        },
-        child: Image.asset(
-          "assets/icons/request_icon.png",
-          height: 28.16,
-          width: 28.52,
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.only(left: 3.0),
+          child: Image.asset(
+            "assets/icons/request_icon.png",
+            height: 28.16.h,
+            width: 28.52.w,
+          ),
         ),
       );
-    } else if (status == "ACCPECT") {
-      return SizedBox(
-        height: 28.16,
-        width: 28.52,
-      );
-    } else {
-      return SizedBox(
-        height: 28.16,
-        width: 28.52,
-      );
     }
+    return SizedBox(height: 28.16.h, width: 28.52.w);
   }
 
-  Widget buildStatusText(String? status) {
-    debugPrint(
-        "++++++++++++++++++++++++++buildStatusText+++++++++++++++++++++++++++++$status");
-
+  Widget _buildStatusText(String? status) {
     if (status == null || status == "DELETED") {
-      return _customText(
+      return _buildCustomText(
         text: "Join Read",
-        color: Colors.black,
-        fontSize: 9.78,
+        fontSize: 9.78.sp,
         fontWeight: FontWeight.w400,
+        color: Colors.black,
       );
     } else if (status == "PENDING") {
-      return _customText(
+      return _buildCustomText(
         text: "Request",
-        color: Colors.black,
-        fontSize: 9.78,
+        fontSize: 9.78.sp,
         fontWeight: FontWeight.w400,
+        color: Colors.black,
       );
-    } else if (status == "ACCPECT") {
-      return SizedBox.shrink();
-    } else {
-      return SizedBox.shrink();
     }
+    return const SizedBox.shrink();
+  }
+
+  String _formatTimeDifference(String? startDate) {
+    if (startDate == null) return "Unknown time";
+    final DateTime? createdAt = DateTime.tryParse(startDate);
+    if (createdAt == null) return "Unknown time";
+
+    final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
+    if (diff.inSeconds < 60) return '${diff.inSeconds}s';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
+    if (diff.inHours < 24) return '${diff.inHours}h';
+    if (diff.inDays < 365) return '${diff.inDays}d';
+    return '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
   }
 }

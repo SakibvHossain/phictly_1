@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phictly/core/components/custom_text.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/create_club/data/controller/comment_controller.dart';
 import 'package:phictly/feature/create_club/ui/screens/create_post_screen.dart';
@@ -18,17 +19,15 @@ import '../../data/controller/talk_point_controller.dart';
 
 class ClubScreen extends StatelessWidget {
   ClubScreen({super.key});
-
-  final TalkPointController pointController = Get.put(TalkPointController());
-  final ChangeClubController changeClubController =
-      Get.put(ChangeClubController());
-  final PostClubController bookController = Get.put(PostClubController());
-  final GetCreatedClubController getCreatedClubController =
-      Get.put(GetCreatedClubController());
-  final ClubController clubController = Get.put(ClubController());
-  final BottomNavController navController = Get.put(BottomNavController());
-  final CommentController commentController = Get.put(CommentController());
+   final TalkPointController pointController = Get.put(TalkPointController());
+  final changeClubController = Get.put(ChangeClubController());
+  final bookController = Get.put(PostClubController());
+  final getCreatedClubController = Get.put(GetCreatedClubController());
+  final clubController = Get.find<ClubController>();
+  final navController = Get.put(BottomNavController());
+  final commentController = Get.put(CommentController());
   final status = Get.put(StatusController());
+  final sharedPreference = Get.put(SharedPreferencesHelper());
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,12 @@ class ClubScreen extends StatelessWidget {
       body: RefreshIndicator(
         color: AppColors.primaryColor,
         onRefresh: () async {
-          clubController.fetchCreatedClub(bookController.createdClubId);
+          final clubID = sharedPreference.getString("selectedClubId");
+          if(clubController.areYouFromHome.value){
+            clubController.fetchCreatedClub(clubID ?? "");
+          }else{
+            clubController.fetchCreatedClub(bookController.createdClubId);
+          }
         },
         child: Stack(
           children: [
@@ -106,10 +110,9 @@ class ClubScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Club Details
+                //* Club Details
                 Obx(() {
-                  debugPrint(
-                      "+++++++++++++++CLUB SCREEN+++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
+                  debugPrint("+++++++++++++++CLUB SCREEN+++++++++++++++This is the Club ID+++++++++++++++++++++++++++${clubController.clubDetail.value?.id}");
 
                   if (clubController.isLoading.value) {
                     return Center(
@@ -146,7 +149,7 @@ class ClubScreen extends StatelessWidget {
                     difference = '${diff.inMinutes}m';
                   } else if (diff.inHours < 24) {
                     difference = '${diff.inHours}h';
-                  } else if (diff.inDays < 7) {
+                  } else if (diff.inDays < 356) {
                     difference = '${diff.inDays}d';
                   } else {
                     difference =
@@ -172,7 +175,7 @@ class ClubScreen extends StatelessWidget {
                         : null,
                     clubLabel: clubDetail.clubLebel,
                     length: clubDetail.clubMediumType.contains("MOVIE")
-                        ? 127
+                        ? "127"
                         : null,
                     sliderMaxLength: clubDetail.clubMediumType.contains("BOOK")
                         ? "30"

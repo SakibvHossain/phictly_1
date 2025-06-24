@@ -8,6 +8,8 @@ import 'package:phictly/feature/create_club/ui/screens/create_post_movie_screen.
 import 'package:phictly/feature/create_club/ui/screens/create_post_screen.dart';
 import 'package:phictly/feature/create_club/ui/screens/create_post_show_screen.dart';
 
+import 'join_club_screen.dart';
+
 class ChangeClubScreen extends StatelessWidget {
   ChangeClubScreen({super.key});
 
@@ -29,6 +31,8 @@ class ChangeClubScreen extends StatelessWidget {
           return CreatePostMovieScreen();
         }else if (controller.currentIndex.value == 5) {
           return CreatePostShowScreen();
+        } else if(controller.currentIndex.value == 6){
+          return JoinClubScreen();
         } else {
           return CreateClubScreen();
         }

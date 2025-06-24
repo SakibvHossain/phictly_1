@@ -14,7 +14,6 @@ class HomeSearchScreen extends StatelessWidget {
 
   final SearchFilterController controller = Get.put(SearchFilterController());
   final changeHomeController = Get.find<ChangeHomeController>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +53,7 @@ class HomeSearchScreen extends StatelessWidget {
             () {
               final clubs = controller.clubResponse;
 
+
               if (controller.isClubDataAvailable.value) {
                 return Column(
                   children: [
@@ -70,17 +70,37 @@ class HomeSearchScreen extends StatelessWidget {
               }
 
               if (controller.clubResponse.isEmpty) {
-                return Column(
-                  children: [
-                    SizedBox(height: 150.h,),
-                    Center(
-                      child: CustomText(
-                          text: "Club not found",
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black),
-                    ),
-                  ],
+                return Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: 1,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          CustomText(
+                            text: "Phictly Featured",
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff000000),
+                          ),
+                          SizedBox(
+                            height: 8.h,
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 42, vertical: 42),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6.0.r),
+                                color: Color(0xffFFFFFF)),
+                            child: Image.asset(
+                                "assets/images/search_image.png"),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 );
               }
 
@@ -92,6 +112,10 @@ class HomeSearchScreen extends StatelessWidget {
                         ),
                         itemCount: clubs.length,
                         itemBuilder: (context, index) {
+                          final status =
+                          (clubs[index].clubMember.isNotEmpty)
+                              ? clubs[index].clubMember.first.status
+                              : null;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: SearchBookItem(
@@ -166,7 +190,7 @@ class HomeSearchScreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 16.w,
+              height: 16.h
             ),
             Expanded(
                 child: TextFormField(

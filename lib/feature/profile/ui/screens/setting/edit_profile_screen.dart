@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
@@ -11,16 +14,15 @@ import '../../../../../core/components/custom_title_text.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../data/controller/change_profile_controller.dart';
 import '../../../data/controller/profile_data_controller.dart';
-import '../profile_screen.dart';
+import '../../../data/controller/progress_controller.dart';
 
 class EditProfileScreen extends StatelessWidget {
   EditProfileScreen({super.key});
 
-  final ChangeProfileController controller = Get.put(ChangeProfileController());
-  final UpdateProfileController profileController = Get.put(UpdateProfileController());
-  final ProgressController progressController = Get.put(ProgressController());
-  final ProfileDataController profileDataController = Get.put(ProfileDataController());
-
+  final controller = Get.put(ChangeProfileController());
+  final profileController = Get.put(UpdateProfileController());
+  final progressController = Get.find<ProgressController>();
+  final profileDataController = Get.put(ProfileDataController());
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +70,8 @@ class EditProfileScreen extends StatelessWidget {
                   },
                   child: Obx(() {
                     final file = profileController.pickedCoverImage.value;
+                    final profile = profileDataController.profileResponse.value;
+
                     return file != null
                         ? Image.file(
                       file,
@@ -75,16 +79,33 @@ class EditProfileScreen extends StatelessWidget {
                       width: double.infinity,
                       fit: BoxFit.cover,
                     )
+                        : (profile?.coverPhoto?.isNotEmpty == true
+                        ? CachedNetworkImage(
+                      imageUrl: profile!.coverPhoto!,
+                      height: 200.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: SpinKitWave(
+                          color: AppColors.primaryColor,
+                          size: 15,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset(
+                        "assets/images/udesign_portfolio_placeholder.jpg",
+                        height: 200.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
                         : Image.asset(
                       "assets/images/udesign_portfolio_placeholder.jpg",
                       height: 200.h,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                    );
+                    ));
                   }),
                 ),
-
-
 
                 SizedBox(
                   height: 90.h,
@@ -155,54 +176,80 @@ class EditProfileScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Fantasy",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Mystery",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Horror",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: CustomText(
-                                      text: "Thriller",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    controller.updateIndex(11);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: CustomText(
+                                Obx(() {
+                                  final genreList = profileDataController
+                                      .profileResponse.value?.userGenre;
+
+                                  if (profileDataController
+                                      .isProfileDetailsAvailable.value) {
+                                    return Center(
+                                      child: SpinKitWave(
+                                        duration: Duration(seconds: 2),
+                                        size: 15,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    );
+                                  }
+
+                                  if (genreList == null || genreList.isEmpty) {
+                                    return Center(
+                                      child: CustomText(
+                                        text: "Genre Empty",
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                      ),
+                                    );
+                                  }
+
+                                  return Flexible(
+                                    flex: 3,
+                                    child: ListView.builder(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 2),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: genreList.length,
+                                      itemBuilder: (context, index) {
+                                        final genreName = genreList[index]
+                                            .favouriteGenre
+                                            .title;
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 4.0),
+                                            child: CustomText(
+                                              text: genreName.length > 16
+                                                  ? "${genreName.substring(0, 16)}..."
+                                                  : genreName,
+                                              fontSize: 15.sp,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }),
+                                Flexible(
+                                  flex: 1,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      controller.updateIndex(11);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: CustomText(
                                         text: "+ Add Genre",
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w400,
-                                        color: AppColors.primaryColor),
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -260,7 +307,7 @@ class EditProfileScreen extends StatelessWidget {
                                   ],
                                 ),
                                 Positioned(
-                                  bottom: 20,
+                                  bottom: 25,
                                   right: 5,
                                   child: ValueListenableBuilder<double>(
                                     valueListenable:
@@ -326,31 +373,59 @@ class EditProfileScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: profileController.isLoading.value
                         ? Center(
-                            child: CircularProgressIndicator(
-                                color: AppColors.primaryColor),
+                            child: SpinKitWave(
+                              color: AppColors.primaryColor,
+                              size: 15,
+                            ),
                           )
                         : CustomButton(
                             onTap: () async {
-                              if(profileController.pickedCoverImage.value != null && profileController.pickedImage.value != null && profileController.userNameController.text.isNotEmpty && profileController.bioController.text.isNotEmpty){
-                                await profileController.postClubContent();
-                              }else{
-                                if(profileController.pickedCoverImage.value != null){
-                                  await profileController.postCoverImage();
-                                }
+                              final profileCtrl = profileController;
 
-                                if(profileController.pickedImage.value != null){
-                                  await profileController.postProfileImage();
-                                }
+                              final hasCoverImage =
+                                  profileCtrl.pickedCoverImage.value != null &&
+                                      profileCtrl.pickedCoverImage.value!.path
+                                          .isNotEmpty;
+                              final hasProfileImage =
+                                  profileCtrl.pickedImage.value != null &&
+                                      profileCtrl
+                                          .pickedImage.value!.path.isNotEmpty;
+                              final hasUsername = profileCtrl
+                                  .userNameController.text
+                                  .trim()
+                                  .isNotEmpty;
+                              final hasBio = profileCtrl.bioController.text
+                                  .trim()
+                                  .isNotEmpty;
 
-                                if(profileController.userNameController.text.isNotEmpty){
-                                  await profileController.postUsername();
-                                }
+                              final isAllInfoProvided = hasCoverImage &&
+                                  hasProfileImage &&
+                                  hasUsername &&
+                                  hasBio;
 
-                                if(profileController.bioController.text.isNotEmpty){
-                                  await profileController.postBio();
+                              if (isAllInfoProvided) {
+                                await profileCtrl.postClubContent();
+                              } else {
+                                if (hasCoverImage) {
+                                  await profileCtrl.postCoverImage();
+                                }
+                                if (hasProfileImage) {
+                                  await profileCtrl.postProfileImage();
+                                }
+                                if (hasUsername) {
+                                  await profileCtrl.postUsername();
+                                }
+                                if (hasBio) {
+                                  await profileCtrl.postBio();
                                 }
                               }
+
                               await profileDataController.fetchProfileDetails();
+
+                              // Reset picked files
+                              profileCtrl.pickedImage.value = null;
+                              profileCtrl.pickedCoverImage.value = null;
+
                               controller.updateIndex(0);
                             },
                             text: "Save",
@@ -382,20 +457,42 @@ class EditProfileScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Obx(() {
+                        final profile = profileDataController.profileResponse.value;
                         final file = profileController.pickedImage.value;
+
                         return ClipOval(
                           child: file != null
                               ? Image.file(
-                                  file,
-                                  width: 108.w,
-                                  height: 108.h,
-                                  fit: BoxFit.cover,
-                                )
+                            file,
+                            width: 108.w,
+                            height: 108.h,
+                            fit: BoxFit.cover,
+                          )
+                              : (profile?.avatar?.isNotEmpty == true
+                              ? CachedNetworkImage(
+                            imageUrl: profile!.avatar!,
+                            fit: BoxFit.cover,
+                            width: 108.w,
+                            height: 108.h,
+                            placeholder: (context, url) => Center(
+                              child: SpinKitWave(
+                                color: AppColors.primaryColor,
+                                size: 15,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Image.asset(
+                              "assets/images/profile_image_placeholder.jpg",
+                              fit: BoxFit.cover,
+                              width: 108.w,
+                              height: 108.h,
+                            ),
+                          )
                               : Image.asset(
-                                  "assets/images/profile_image_placeholder.jpg",
-                                  width: 108.w,
-                                  height: 108.h,
-                                ),
+                            "assets/images/profile_image_placeholder.jpg",
+                            fit: BoxFit.cover,
+                            width: 108.w,
+                            height: 108.h,
+                          )),
                         );
                       }),
                     ),

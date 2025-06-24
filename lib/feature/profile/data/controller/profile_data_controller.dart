@@ -39,6 +39,8 @@ class ProfileDataController extends GetxController {
       if (responseData is Map<String, dynamic>) {
           profileResponse.value = Result.fromJson(responseData);
           debugPrint("+++++++++++++++++++++++++++++++✅ Club ID: ${profileResponse.value?.id}");
+          Get.snackbar("Active Watch", "${profileResponse.value?.record.activeWatch?.clubLebel}");
+
       } else {
         Get.snackbar("Error", "Unexpected response format");
       }

@@ -1,7 +1,3 @@
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,31 +6,38 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/core/components/custom_book_items/custom_book_item.dart';
-import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_outline_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_title_text.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
 import 'package:phictly/core/utils/app_colors.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_controller.dart';
 import 'package:phictly/feature/profile/data/controller/profile_data_controller.dart';
+import 'package:phictly/feature/profile/ui/widgets/profile_books_section.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-
-class ProgressController extends GetxController {
-  ValueNotifier<double> progressNotifier =
-      ValueNotifier<double>(20.0);
-}
+import '../../../create_club/data/controller/change_club_controller.dart';
+import '../../../create_club/data/controller/club_controller.dart';
+import '../../../create_club/data/controller/follow_controller.dart';
+import '../../../home/data/controller/bottom_nav_controller.dart';
+import '../../data/controller/fetch_my_club_controller.dart';
+import '../../data/controller/progress_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final progressController = Get.put(ProgressController());
+  final progressController = Get.find<ProgressController>();
   final controller = Get.find<ChangeProfileController>();
   final profileController = Get.put(ProfileController());
   final profileDataController = Get.put(ProfileDataController());
+  final fetchMyClubController = Get.put(FetchMyClubController());
+  final changeClubController = Get.put(ChangeClubController());
+  final navController = Get.put(BottomNavController());
+  final sharedPreferencesHelper = Get.put(SharedPreferencesHelper());
+  final followController = Get.put(FollowController());
+  final clubController = Get.find<ClubController>();
   final Logger logger = Logger();
-  ProfileScreen({super.key});
 
-  final List<String> genres = ["Fantasy", "Mystery", "Horror", "Thriller"];
+  ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +47,8 @@ class ProfileScreen extends StatelessWidget {
         color: AppColors.primaryColor,
         onRefresh: () async {
           await profileDataController.fetchProfileDetails();
+          followController.fetchFollowing();
+          followController.fetchFollower();
         },
         child: SingleChildScrollView(
           child: Stack(
@@ -100,8 +105,7 @@ class ProfileScreen extends StatelessWidget {
 
                   //* Background Image
                   Obx(() {
-                    final profile =
-                        profileDataController.profileResponse.value;
+                    final profile = profileDataController.profileResponse.value;
 
                     if (profile == null ||
                         profile.coverPhoto == null ||
@@ -114,23 +118,23 @@ class ProfileScreen extends StatelessWidget {
                       );
                     }
 
-                    final coverPath = profile.coverPhoto!
-                        .replaceFirst("File: '", "")
-                        .replaceFirst("'", "");
-                    final avatarFile = File(coverPath);
-
-                    return avatarFile.existsSync()
-                        ? Image.file(
-                      avatarFile,
+                    return CachedNetworkImage(
+                      imageUrl: profile.coverPhoto!,
                       height: 200.h,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                    )
-                        : Image.asset(
-                      "assets/images/udesign_portfolio_placeholder.jpg",
-                      height: 200.h,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: SpinKitWave(
+                          color: AppColors.primaryColor,
+                          size: 15,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Image.asset(
+                        "assets/images/udesign_portfolio_placeholder.jpg",
+                        height: 200.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                     );
                   }),
 
@@ -143,7 +147,8 @@ class ProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          fetchMyClubController.fetchAllMyClubs();
                           controller.updateIndex(1);
                           profileController.updateTabIndex(0);
                         },
@@ -208,7 +213,8 @@ class ProfileScreen extends StatelessWidget {
                             return statItem("0", "Following");
                           }
 
-                          return statItem("0", "Following");
+                          return statItem(
+                              "${profile.count.following}", "Following");
                         }),
                       ),
                       GestureDetector(
@@ -238,53 +244,19 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
 
-                  /*
-                  Skeletonizer(child: statItem("22", "Clubs"))
-
-                  Obx((){
-                        final profile = profileDataController.profileResponse.value;
-
-                        if(profileDataController.isProfileDetailsAvailable.value){
-                          return Skeletonizer(
-                            child: CustomText(
-                              text: "Sakib X Hossain",
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          );
-                        }
-
-                        if(profile == null){
-                          return CustomText(text: "Failed to fetch Name", fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black);
-                        }
-
-                        return CustomText(
-                          text: profile.username ?? "username",
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        );
-                      })
-
-                   */
-
                   SizedBox(
                     height: 12.h,
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        CustomButton(
-                          text: "Follow",
+                        SizedBox(
                           width: 120.w,
                           height: 40.h,
-                          textFontSize: 15.sp,
-                          textFontWeight: FontWeight.w400,
-                          borderRadius: 6.r,
                         ),
                         SizedBox(
                           width: 16.w,
@@ -301,6 +273,7 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+
                   SizedBox(
                     height: 8.h,
                   ),
@@ -311,11 +284,8 @@ class ProfileScreen extends StatelessWidget {
                     child: Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: Obx(() {
-                        final profile =
-                            profileDataController.profileResponse.value;
-
-                        if (profileDataController
-                            .isProfileDetailsAvailable.value) {
+                        final profile = profileDataController.profileResponse.value;
+                        if (profileDataController.isProfileDetailsAvailable.value) {
                           return Skeletonizer(
                             child: CustomText(
                               text: "Sakib X Hossain",
@@ -326,16 +296,12 @@ class ProfileScreen extends StatelessWidget {
                           );
                         }
 
-                        if (profile == null) {
-                          return CustomText(
-                              text: "Failed to fetch Name",
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black);
+                        if (profile?.username == null) {
+                          return SizedBox.shrink();
                         }
 
                         return CustomText(
-                          text: profile.username ?? "username",
+                          text: profile?.username ?? "username",
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
@@ -358,26 +324,24 @@ class ProfileScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: CustomText(
-                                  text: "Loading...",
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.black.withOpacity(0.6))),
+                            alignment: AlignmentDirectional.centerStart,
+                            child: CustomText(
+                              text: "Loading...",
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
+                          ),
                         ),
                       );
                     }
 
-                    if (profile == null) {
+                    if (profile?.bio == null) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Align(
                             alignment: AlignmentDirectional.centerStart,
-                            child: CustomText(
-                                text: "Failed to fetch Name",
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black)),
+                            child: SizedBox.shrink()),
                       );
                     }
 
@@ -386,12 +350,10 @@ class ProfileScreen extends StatelessWidget {
                       child: Align(
                         alignment: AlignmentDirectional.centerStart,
                         child: CustomText(
-                          text: profile.bio ??
-                              "A word after a word after a word is power.",
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black.withOpacity(0.6),
-                        ),
+                            text: "${profile?.bio}",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
                       ),
                     );
                   }),
@@ -467,10 +429,15 @@ class ProfileScreen extends StatelessWidget {
                                   )
                                 ],
                               ),
-                              child: Obx((){
-                                final lastWatch = profileDataController.profileResponse.value?.userGenre;
+                              child: Obx(() {
+                                final genreList = profileDataController
+                                    .profileResponse.value?.userGenre;
 
-                                if (profileDataController.isProfileDetailsAvailable.value) {
+                                debugPrint(
+                                    "++++++++++++++++++++++++++++++++++++++++++++++++++++$genreList");
+
+                                if (profileDataController
+                                    .isProfileDetailsAvailable.value) {
                                   return Center(
                                     child: SpinKitWave(
                                       duration: Duration(seconds: 2),
@@ -481,7 +448,7 @@ class ProfileScreen extends StatelessWidget {
                                 }
 
                                 //* Handle null or empty record list
-                                if (lastWatch == null || lastWatch.isEmpty) {
+                                if (genreList == null || genreList.isEmpty) {
                                   return Center(
                                     child: CustomText(
                                       text: "Genre Empty",
@@ -495,12 +462,18 @@ class ProfileScreen extends StatelessWidget {
                                 return ListView.builder(
                                   padding: EdgeInsets.symmetric(vertical: 8),
                                   physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: genres.length,
+                                  itemCount: genreList.length,
                                   itemBuilder: (context, index) {
+                                    final genreName =
+                                        genreList[index].favouriteGenre.title;
+
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 4),
                                       child: CustomText(
-                                        text: genres[index],
+                                        text: genreName.length > 16
+                                            ? "${genreName.substring(0, 16)}..."
+                                            : genreName,
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w400,
                                         color: Colors.black,
@@ -606,243 +579,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
 
-                  CustomTitleText(title: "Active Read"),
-
-                  Obx(() {
-                    final activeRead =
-                        profileDataController.profileResponse.value?.record;
-
-                    logger.i(activeRead);
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle null or empty record list
-                    if (activeRead == null || activeRead.isEmpty) {
-                      return Center(
-                        child: Text("No active reading record found."),
-                      );
-                    }
-
-                    //* Handle if activeRead[0] or its activeRead field is null
-                    if (activeRead[0].activeRead == null) {
-                      return Center(
-                        child: Text("No active read data available."),
-                      );
-                    }
-
-                    final talkPoint = activeRead[0].activeRead?.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = activeRead[0].activeRead?.startDate;
-
-                    String difference = "";
-                    if (createdAt != null) {
-                      final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                      if (diff.inSeconds < 60) {
-                        difference = '${diff.inSeconds}s';
-                      } else if (diff.inMinutes < 60) {
-                        difference = '${diff.inMinutes}m';
-                      } else if (diff.inHours < 24) {
-                        difference = '${diff.inHours}h';
-                      } else if (diff.inDays < 7) {
-                        difference = '${diff.inDays}d';
-                      } else {
-                        difference =
-                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                      }
-                    } else {
-                      difference = "Unknown time";
-                    }
-
-                    //* If all good, show the book item
-                    return CustomBookItem(
-                      clubId: "${activeRead[0].activeRead?.clubId}",
-                      clubLabel: "${activeRead[0].activeRead?.clubLebel}",
-                      imagePath: "${activeRead[0].activeRead?.poster}" ??
-                          "assets/images/book_2.png",
-                      requestOrJoinImage: "assets/icons/join_read_icon.png",
-                      noReqOrJoinAvailable: true,
-                      author: "${activeRead[0].activeRead?.writer}",
-                      memberCount: "${activeRead[0].activeRead?.memberSize}",
-                      totalDuration: difference,
-                      requestOrJoin: "Join Read",
-                      clubCreator: "${activeRead[0].activeRead?.admin?.username}",
-                      timeLine: "${activeRead[0].activeRead?.timeLine}",
-                      isPublic: "${activeRead[0].activeRead?.type}",
-                      clubType: "${activeRead[0].activeRead?.clubMediumType}",
-                      talkPoint: talkPoint,
-                    );
-                  }),
-
-                  CustomTitleText(title: "Last Read"),
-
-                  Obx(() {
-                    final lastRead =
-                        profileDataController.profileResponse.value?.record;
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle null or empty record list
-                    if (lastRead == null || lastRead.isEmpty) {
-                      return Center(
-                        child: Text("No active reading record found."),
-                      );
-                    }
-
-                    //* Handle if activeRead[0] or its activeRead field is null
-                    if (lastRead[1].lastRead == null) {
-                      return Center(
-                        child: Text("No active read data available."),
-                      );
-                    }
-
-                    final talkPoint = lastRead[1].lastRead?.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = lastRead[1].lastRead?.startDate;
-
-                    String difference = "";
-                    if (createdAt != null) {
-                      final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                      if (diff.inSeconds < 60) {
-                        difference = '${diff.inSeconds}s';
-                      } else if (diff.inMinutes < 60) {
-                        difference = '${diff.inMinutes}m';
-                      } else if (diff.inHours < 24) {
-                        difference = '${diff.inHours}h';
-                      } else if (diff.inDays < 7) {
-                        difference = '${diff.inDays}d';
-                      } else {
-                        difference =
-                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                      }
-                    } else {
-                      difference = "Unknown time";
-                    }
-
-                    //* If all good, show the book item
-                    return CustomBookItem(
-                      clubId: "${lastRead[1].lastRead?.clubId}",
-                      clubLabel: "${lastRead[1].lastRead?.clubLebel}",
-                      imagePath: "${lastRead[1].lastRead?.poster}" ??
-                          "assets/images/book_2.png",
-                      requestOrJoinImage: "assets/icons/join_read_icon.png",
-                      noReqOrJoinAvailable: false,
-                      author: "${lastRead[1].lastRead?.writer}",
-                      memberCount: "${lastRead[1].lastRead?.memberSize}",
-                      requestOrJoin: "Join Read",
-                      totalDuration: difference,
-                      clubCreator: "${lastRead[1].lastRead?.admin?.username}",
-                      timeLine: "${lastRead[1].lastRead?.timeLine}",
-                      isPublic: "${lastRead[1].lastRead?.type}",
-                      clubType: "${lastRead[1].lastRead?.clubMediumType}",
-                      talkPoint: talkPoint,
-                    );
-                  }),
-
-                  CustomTitleText(title: "Last Watch"),
-
-                  Obx(() {
-                    final lastWatch =
-                        profileDataController.profileResponse.value?.record;
-
-                    if (profileDataController.isProfileDetailsAvailable.value) {
-                      return Center(
-                        child: SpinKitWave(
-                          duration: Duration(seconds: 2),
-                          size: 15,
-                          color: AppColors.primaryColor,
-                        ),
-                      );
-                    }
-
-                    //* Handle null or empty record list
-                    if (lastWatch == null || lastWatch.isEmpty) {
-                      return Column(
-                        children: [
-                          Center(
-                            child: Text("No active reading record found."),
-                          ),
-
-                          SizedBox(height: 100.h,)
-                        ],
-                      );
-                    }
-
-                    //* Handle if activeRead[0] or its activeRead field is null
-                    if (lastWatch[2].lastWatched == null) {
-                      return Center(
-                        child: Text("No active read data available."),
-                      );
-                    }
-
-                    final talkPoint = lastWatch[2].lastWatched?.talkPoint;
-
-                    //* Time & Date
-                    DateTime? createdAt = lastWatch[2].lastWatched?.startDate;
-
-                    String difference = "";
-                    if (createdAt != null) {
-                      final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
-
-                      if (diff.inSeconds < 60) {
-                        difference = '${diff.inSeconds}s';
-                      } else if (diff.inMinutes < 60) {
-                        difference = '${diff.inMinutes}m';
-                      } else if (diff.inHours < 24) {
-                        difference = '${diff.inHours}h';
-                      } else if (diff.inDays < 7) {
-                        difference = '${diff.inDays}d';
-                      } else {
-                        difference =
-                        '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
-                      }
-                    } else {
-                      difference = "Unknown time";
-                    }
-
-                    //* If all good, show the book item
-                    return CustomBookItem(
-                      clubId: "${lastWatch[2].lastWatched?.clubId}",
-                      clubLabel: "${lastWatch[2].lastWatched?.clubLebel}",
-                      imagePath: "${lastWatch[2].lastWatched?.poster}" ??
-                          "assets/images/book_2.png",
-                      requestOrJoinImage: "assets/icons/join_read_icon.png",
-                      noReqOrJoinAvailable: false,
-                      author: "${lastWatch[2].lastWatched?.writer}",
-                      memberCount: "${lastWatch[2].lastWatched?.memberSize}",
-                      requestOrJoin: "Join Read",
-                      totalDuration: difference,
-                      clubCreator: "${lastWatch[2].lastWatched?.admin?.username}",
-                      timeLine: "${lastWatch[2].lastWatched?.timeLine}",
-                      isPublic: "${lastWatch[2].lastWatched?.type}",
-                      clubType: "${lastWatch[2].lastWatched?.clubMediumType}",
-                      totalSeason: "5",
-                      talkPoint: talkPoint,
-                    );
-                  }),
-
-                  SizedBox(
-                    height: 8.h,
-                  ),
+                  ProfileBooksSection(),
 
                   SizedBox(
                     height: 110.h,
@@ -857,9 +594,13 @@ class ProfileScreen extends StatelessWidget {
                 child: Stack(
                   children: [
                     Obx(() {
-                      final profile =
-                          profileDataController.profileResponse.value;
+                      final profile = profileDataController.profileResponse.value;
 
+                      Logger log = Logger();
+
+                      log.i("Profile Avatar: ${profile?.avatar.toString()}");
+
+                      //* Placeholder if avatar is null or empty
                       if (profile == null ||
                           profile.avatar == null ||
                           profile.avatar!.isEmpty) {
@@ -868,7 +609,7 @@ class ProfileScreen extends StatelessWidget {
                           width: 120.w,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xffEEf0f8),
+                            color: const Color(0xffEEf0f8),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
@@ -876,43 +617,47 @@ class ProfileScreen extends StatelessWidget {
                               child: Image.asset(
                                 "assets/images/profile_image_placeholder.jpg",
                                 fit: BoxFit.cover,
+                                width: 108.w,
+                                height: 108.h,
                               ),
                             ),
                           ),
                         );
                       }
 
-                      final avatarPath = profile.avatar!
-                          .replaceFirst("File: '", "")
-                          .replaceFirst("'", "");
-                      final avatarFile = File(avatarPath);
-
                       return Container(
                         height: 120.h,
                         width: 120.w,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0xffEEf0f8),
+                          color: const Color(0xffEEf0f8),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: ClipOval(
-                            child: avatarFile.existsSync()
-                                ? Image.file(
-                                    avatarFile,
-                                    width: 108.w,
-                                    height: 108.h,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.asset(
-                                    "assets/images/profile_image_placeholder.jpg",
-                                    width: 108.w,
-                                    height: 108.h,
-                                  ),
+                            child: CachedNetworkImage(
+                              imageUrl: profile.avatar!,
+                              fit: BoxFit.cover,
+                              width: 108.w,
+                              height: 108.h,
+                              placeholder: (context, url) => Center(
+                                child: SpinKitWave(
+                                  color: AppColors.primaryColor,
+                                  size: 15,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                "assets/images/profile_image_placeholder.jpg",
+                                fit: BoxFit.cover,
+                                width: 108.w,
+                                height: 108.h,
+                              ),
+                            ),
                           ),
                         ),
                       );
                     }),
+
                     Positioned(
                       bottom: 7,
                       right: 7,

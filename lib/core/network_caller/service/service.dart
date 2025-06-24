@@ -114,6 +114,7 @@ class NetworkCaller {
           isSuccess: true,
           statusCode: response.statusCode,
           responseData: decodedResponse['result'] ?? decodedResponse,
+          responseBody: decodedResponse,
           errorMessage: '',
         );
       } else {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:iconly/iconly.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:phictly/core/components/custom_button.dart';
 import 'package:phictly/core/components/custom_text.dart';
 import 'package:phictly/core/components/custom_text_field.dart';
@@ -16,7 +16,6 @@ import '../../../../core/utils/image_path.dart';
 import '../../../../core/validation/password_validation.dart';
 import '../../../book/data/controller/date_controller.dart';
 import '../../../home/data/controller/bottom_nav_controller.dart';
-import '../../../home/data/controller/change_home_controller.dart';
 import '../../../profile/data/controller/change_profile_controller.dart';
 import '../widget/dropdown_gender.dart';
 import '../widget/dropdown_location.dart';
@@ -24,13 +23,12 @@ import '../widget/dropdown_location.dart';
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
 
-  final SignUpController controller = Get.put(SignUpController());
-  final DateController dateController = Get.put(DateController());
-  final ChangeProfileController changeProfileController =
-      Get.put(ChangeProfileController());
+  final controller = Get.put(SignUpController());
+  final dateController = Get.put(DateController());
+  final changeProfileController = Get.put(ChangeProfileController());
   final navController = Get.find<BottomNavController>();
-  final List<String> genderList = ["Male", "Female", "Non_binary"];
-  final List<String> locationList = [
+  final genderList = ["Male", "Female", "Non_binary"];
+  final locationList = [
     "United States",
     "Canada",
     "Jamaica",
@@ -217,7 +215,7 @@ class SignUpScreen extends StatelessWidget {
                           CustomTextField(
                             controller: controller.dateController,
                             validator: dateValidation,
-                            hintText: "Age",
+                            hintText: "age",
                             prefixIcon: Icons.calendar_month,
                             inputType: TextInputType.number,
                           ),
@@ -228,7 +226,7 @@ class SignUpScreen extends StatelessWidget {
 
                           DropdownLocation(
                             locationList: locationList,
-                            selectedHint: "Location",
+                            selectedHint: "location",
                             icon: Icons.location_on,
                           ),
 
@@ -238,7 +236,7 @@ class SignUpScreen extends StatelessWidget {
 
                           GenderDropdown(
                             genderList: genderList,
-                            selectedHint: "Gender",
+                            selectedHint: "gender",
                             icon: Icons.mood,
                           ),
 

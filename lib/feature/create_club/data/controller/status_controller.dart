@@ -20,25 +20,15 @@ class StatusController extends GetxController {
 
     try{
       await preferencesHelper.init();
-
       String url = Utils.baseUrl + Utils.statusUpdate(id);
-
       final response = await NetworkCaller().postRequest(
         url,
         body: {},
         token: preferencesHelper.getString('userToken'),
       );
-
       if (response.statusCode == 201) {
-        Get.snackbar(
-          "Success",
-          "Successfully Club created.",
-        );
-
         logger.i(response.responseData);
-
         var json = response.responseData;
-
       } else {
         Get.snackbar(
           "Failed",

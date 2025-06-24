@@ -143,6 +143,12 @@ class ChatController extends GetxController {
   }
 
   void joinPrivateChat(String userId2) {
+
+    if (_channel == null) {
+      debugPrint("WebSocket channel is null! Cannot join room message.");
+      return;
+    }
+
     debugPrint("Joining private chat with room: $userId2");
     final joinPrivate =
         jsonEncode({"type": "joinPrivateChat", "user2Id": userId2});
@@ -196,8 +202,7 @@ class ChatController extends GetxController {
         if (response.isSuccess) {
           final List<dynamic> resultList = response.responseData;
           allMessages.clear();
-          allMessages
-              .addAll(resultList.map((e) => Message.fromJson(e)).toList());
+          allMessages.addAll(resultList.map((e) => Message.fromJson(e)).toList().reversed);
           debugPrint("=====data=========${allMessages.length}");
         } else {
           debugPrint(

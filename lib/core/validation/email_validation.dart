@@ -9,5 +9,4 @@
       return 'Enter a valid email address';
     }
     return  null;
-   
   }

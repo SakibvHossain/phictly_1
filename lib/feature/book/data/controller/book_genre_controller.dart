@@ -9,10 +9,12 @@ import 'package:phictly/feature/book/data/model/book_model.dart';
 import '../../../../core/helper/sheared_prefarences_helper.dart';
 import '../../../../core/network_caller/service/service.dart';
 import '../../../../core/network_caller/utils/utils.dart';
+import '../../../create_club/data/controller/change_club_controller.dart';
 
 
 class BookGenreController extends GetxController {
   SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
+  final changeClubController = Get.put(ChangeClubController());
 
   RxList<GenreModel> genreDataList = <GenreModel>[].obs;
   var isGenreListAvailable = false.obs;
@@ -38,7 +40,7 @@ class BookGenreController extends GetxController {
 
       await Future.delayed(Duration(milliseconds: 200));
 
-      String url = Utils.baseUrl + Utils.genreWithOutType;
+      String url = Utils.baseUrl + Utils.genreWithOutType(changeClubController.selectedBookType.value.toUpperCase());
       final response = await NetworkCaller().getRequest(
         url,
         token: preferencesHelper.getString('userToken'),
@@ -135,7 +137,6 @@ class BookGenreController extends GetxController {
     fetchGenre(); //* Provide a default genre type
     getAllGenre();
   }
-
   Future<bool> hasInternetConnection() async {
     try {
       final result = await HttpClient().getUrl(Uri.parse('https://www.google.com'))
@@ -146,7 +147,6 @@ class BookGenreController extends GetxController {
       return false;
     }
   }
-
   void showNoConnectionDialog() {
     showDialog(
       context: Get.context!,

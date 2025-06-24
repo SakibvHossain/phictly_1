@@ -34,7 +34,7 @@ class CustomCreatedBookItem extends StatelessWidget {
   final String? imagePath;
   final String? title;
   final String? author;
-  final int? length;
+  final String? length;
   final String? bookNo;
   final String? clubNumber;
   final String? clubCreator;
@@ -167,7 +167,7 @@ class CustomCreatedBookItem extends StatelessWidget {
                       : _rowCustomText(
                     firstText: "Length: ",
                     firstFontSize: 12,
-                    secondText: length.toString(),
+                    secondText: "${length.toString()} Pages",
                     secondFontSize: 12,
                   ),
 
@@ -233,7 +233,7 @@ class CustomCreatedBookItem extends StatelessWidget {
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             double sliderMin = 1;
-                            double sliderMax = selectedType.contains("BOOK") ? 30 : (selectedType.contains("SHOW") ? 270 : 9) ;
+                            double sliderMax = selectedType.contains("BOOK") ? 30 : (selectedType.contains("SHOW") ? 30 : 30) ;
                             double sliderWidth = constraints.maxWidth;
 
                             debugPrint("+++++++++++++++++++++++++++++++++++++++++++++ $selectedType");
@@ -538,12 +538,8 @@ class CustomCreatedBookItem extends StatelessWidget {
                                                   text: "Edit talkpoints(s)",
                                                   onTap: () {
                                                     Get.back();
-                                                    pointController
-                                                        .talkPointRxList[
-                                                    index] =
-                                                        AddTalkPoints(
-                                                            talkPointController.text,
-                                                            dateController.selectedDate.value);
+                                                    pointController.talkPointRxList[
+                                                    index] = AddTalkPoints(talkPointController.text, dateController.selectedDate.value);
 
                                                     homeController.editTalkPoint(index, dateController.selectedDateTime);
 
