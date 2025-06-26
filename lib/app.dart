@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:phictly/core/binding/binding.dart';
 import 'package:phictly/routes/app_routes.dart';
-import 'feature/splash/ui/screens/splash_screen.dart';
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -19,17 +19,18 @@ class HomeScreens extends StatelessWidget {
   HomeScreens({super.key});
 
   final changeHomeController = Get.find<ChangeHomeController>();
-  final notificationController = Get.put(NotificationController());
-  final clubItemController = Get.put(ClubItemController());
-  final socialFeed = Get.put(SocialFeedController());
+  final notificationController = Get.find<NotificationController>();
+  final clubItemController = Get.find<ClubItemController>();
+  final socialFeed = Get.find<SocialFeedController>();
   final chatController = Get.find<ChatController>();
-  final controller = Get.put(HomeController());
+  final controller = Get.find<HomeController>();
   final logger = Logger();
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffEEf0f8),
+      backgroundColor: const Color(0xffEEf0f8),
       body: RefreshIndicator(
         backgroundColor: AppColors.whiteColor,
         color: AppColors.primaryColor,
@@ -43,7 +44,7 @@ class HomeScreens extends StatelessWidget {
             // AppBar section
             Container(
               width: double.infinity,
-              decoration: BoxDecoration(color: Color(0xff29605E)),
+              decoration: const BoxDecoration(color: Color(0xff29605E)),
               child: Column(
                 children: [
                   SizedBox(height: 75.h),
@@ -55,7 +56,7 @@ class HomeScreens extends StatelessWidget {
                         InkWell(
                           onTap: () => chatController.joinApp(),
                           child: Image.asset(
-                            "assets/icons/home_logo.png",
+                            'assets/icons/home_logo.png',
                             height: 42.93.h,
                             width: 130.96.w,
                           ),
@@ -65,7 +66,7 @@ class HomeScreens extends StatelessWidget {
                             GestureDetector(
                               onTap: () => changeHomeController.updateIndex(1),
                               child: Image.asset(
-                                "assets/icons/home_search.png",
+                                'assets/icons/home_search.png',
                                 height: 25.h,
                                 width: 25.w,
                               ),
@@ -75,7 +76,7 @@ class HomeScreens extends StatelessWidget {
                               onTap: () => Get.to(() => NotificationListScreen()),
                               child: Stack(
                                 children: [
-                                  Icon(Icons.notifications, size: 25, color: Colors.white),
+                                  const Icon(Icons.notifications, size: 25, color: Colors.white),
                                   Obx(() => notificationController.notificationCount.value > 0
                                       ? Positioned(
                                     top: 0,
@@ -83,19 +84,19 @@ class HomeScreens extends StatelessWidget {
                                     child: Container(
                                       height: 16,
                                       width: 16,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         color: Colors.red,
                                         shape: BoxShape.circle,
                                       ),
                                       child: Center(
                                         child: Text(
                                           '${notificationController.notificationCount.value}',
-                                          style: TextStyle(color: Colors.white, fontSize: 10),
+                                          style: const TextStyle(color: Colors.white, fontSize: 10),
                                         ),
                                       ),
                                     ),
                                   )
-                                      : SizedBox()),
+                                      : const SizedBox()),
                                 ],
                               ),
                             ),
@@ -111,13 +112,13 @@ class HomeScreens extends StatelessWidget {
             SizedBox(height: 16.h),
 
             // Trending Clubs
-            sectionTitle("Trending Clubs"),
+            sectionTitle('Trending Clubs'),
             TrendingItem(),
 
             SizedBox(height: 16.h),
 
             // Recently Created Clubs
-            sectionTitle("Recently Created Clubs"),
+            sectionTitle('Recently Created Clubs'),
             RecentItem(),
 
             SizedBox(height: 16.h),
@@ -127,7 +128,7 @@ class HomeScreens extends StatelessWidget {
                 onTap: (){
 
                 },
-                child: sectionTitle("Social Feed")),
+                child: sectionTitle('Social Feed')),
 
             Obx(() {
               final feedList = socialFeed.socialFeedList;
@@ -138,13 +139,13 @@ class HomeScreens extends StatelessWidget {
                   final avatar = item.user?.avatar;
 
                   return Container(
-                    margin: EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: ListTile(
-                      contentPadding: EdgeInsets.all(8),
+                      contentPadding: const EdgeInsets.all(8),
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: (avatar?.isNotEmpty ?? false)
@@ -155,7 +156,7 @@ class HomeScreens extends StatelessWidget {
                           width: 50,
                         )
                             : Image.asset(
-                          "assets/images/social_feed_profile_1.png",
+                          'assets/images/social_feed_profile_1.png',
                           fit: BoxFit.cover,
                           height: 50,
                           width: 50,
@@ -163,7 +164,7 @@ class HomeScreens extends StatelessWidget {
                       ),
                       title: RichText(
                         text: TextSpan(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           children: [
                             TextSpan(
                               text: "${item.user?.username ?? "Hello"} ",
@@ -174,7 +175,7 @@ class HomeScreens extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: item.title ?? "Just added Serpent and Dove to her favorite",
+                              text: item.title,
                               style: GoogleFonts.dmSans(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w400,
@@ -191,7 +192,7 @@ class HomeScreens extends StatelessWidget {
             }),
 
 
-            SizedBox(height: 100), // bottom space
+            const SizedBox(height: 100), // bottom space
           ],
         ),
       ),

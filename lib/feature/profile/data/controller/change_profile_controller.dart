@@ -6,6 +6,6 @@ class ChangeProfileController extends GetxController{
 
   void updateIndex(int index) {
     currentIndex.value = index;
-    debugPrint("=-=====================${currentIndex.value}");
+    debugPrint('=-=====================${currentIndex.value}');
   }
 }

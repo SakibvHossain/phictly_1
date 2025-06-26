@@ -1,18 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/feature/home/ui/screens/home_nav_screen.dart';
-import '../../../../core/helper/sheared_prefarences_helper.dart';
-import '../../../../core/network_caller/model/user_model.dart';
-import '../../../../core/network_caller/service/service.dart';
-import '../../../../core/network_caller/utils/utils.dart';
-import '../../../home/data/controller/bottom_nav_controller.dart';
-import '../../../home/data/controller/change_home_controller.dart';
-import '../../../profile/data/controller/change_profile_controller.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
+import 'package:phictly/core/network_caller/model/user_model.dart';
+import 'package:phictly/core/network_caller/service/service.dart';
+import 'package:phictly/core/network_caller/utils/utils.dart';
+import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
+import 'package:phictly/feature/home/data/controller/change_home_controller.dart';
+import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 
 
 class SignInController extends GetxController{
@@ -43,25 +42,25 @@ class SignInController extends GetxController{
     preferencesHelper.init();
 
     if (!await hasInternetConnection()) {
-      debugPrint("🚫 No Internet Detected");
+      debugPrint('🚫 No Internet Detected');
       showNoConnectionDialog();
       return;
     }
 
     //* Get the FCM token here first
     final token = await FirebaseMessaging.instance.getToken();
-    await preferencesHelper.setString("fcmToken", token ?? '');
+    await preferencesHelper.setString('fcmToken', token ?? '');
 
-    Map<String, dynamic> login = {
-      "email": emailController.text.trim(),
-      "password": passwordController.text.trim(),
-      "fcmToken": token
+    final Map<String, dynamic> login = {
+      'email': emailController.text.trim(),
+      'password': passwordController.text.trim(),
+      'fcmToken': token
     };
 
     try {
       await preferencesHelper.init();
       isLoading.value = true;
-      String url = Utils.baseUrl + Utils.login;
+      final String url = Utils.baseUrl + Utils.login;
       final response = await NetworkCaller().postRequest(
         url,
         body: login,
@@ -70,13 +69,13 @@ class SignInController extends GetxController{
       if (response.isSuccess) {
         await preferencesHelper.clear();
         await preferencesHelper.setString(
-          "userToken", response.responseData['accessToken'],
+          'userToken', response.responseData['accessToken'],
         );
 
         emailController.clear();
         passwordController.clear();
         Get.offAll(() => HomeNavScreen());
-        var userData = response.responseData["userInfo"];
+        final userData = response.responseData['userInfo'];
         if (userData != null) {
           userInfo.value = UserInfo.fromJson(userData);
         }
@@ -90,25 +89,25 @@ class SignInController extends GetxController{
           jsonEncode(userInfo.value.toJson()),
         );
 
-        logger.i("User Data: $userData");
+        logger.i('User Data: $userData');
         logger.i("User Role: ${userData['role']}");
         debugPrint("=========${preferencesHelper.getString("userToken")}");
         logger.i("User Token: ${preferencesHelper.getString('userToken')}");
       } else if (response.statusCode == 401 &&
           response.responseData['message'] == 'Invalid credentials') {
-        Get.snackbar("Warning", "Invalid Credential");
+        Get.snackbar('Warning', 'Invalid Credential');
         isLoading.value = false;
       } else if (response.statusCode == 404) {
-        Get.snackbar("Invalid Credential", "User not found",
+        Get.snackbar('Invalid Credential', 'User not found',
             colorText: Colors.white, backgroundColor: Colors.red);
         isLoading.value = false;
       } else {
-        Get.snackbar("Warning", "Please Check your internet Connection!",
+        Get.snackbar('Warning', 'Please Check your internet Connection!',
             colorText: Colors.white, backgroundColor: Colors.red);
         isLoading.value = false;
       }
     } catch (e) {
-      debugPrint("Error: $e");
+      debugPrint('Error: $e');
     } finally {
       isLoading.value = false;
     }
