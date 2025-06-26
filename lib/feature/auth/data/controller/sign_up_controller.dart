@@ -170,7 +170,7 @@ class SignUpController extends GetxController{
             onPressed: () {
               Navigator.of(Get.context!).pop();
             },
-            child: Text(
+            child: const Text(
               "OK",
               style: TextStyle(color: Colors.blue),
             ),
