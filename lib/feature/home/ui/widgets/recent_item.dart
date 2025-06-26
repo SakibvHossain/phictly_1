@@ -12,11 +12,11 @@ import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
 import 'package:phictly/feature/home/data/controller/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
-import '../../../create_club/data/controller/change_club_controller.dart';
-import '../../../create_club/data/controller/club_controller.dart';
-import '../../data/controller/bottom_nav_controller.dart';
-import '../../data/controller/join_club_controller.dart';
-import '../../data/controller/slider_controller.dart';
+import 'package:phictly/feature/create_club/data/controller/change_club_controller.dart';
+import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
+import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
+import 'package:phictly/feature/home/data/controller/join_club_controller.dart';
+import 'package:phictly/feature/home/data/controller/slider_controller.dart';
 
 class RecentItem extends StatelessWidget {
   RecentItem({super.key});
@@ -55,10 +55,10 @@ class RecentItem extends StatelessWidget {
         if (clubItemController.recentDataList.isEmpty) {
           return Center(
             child: CustomText(
-                text: "No trending data found",
+                text: 'No trending data found',
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
-                color: Color(0xff000000)),
+                color: const Color(0xff000000)),
           );
         }
 
@@ -66,15 +66,17 @@ class RecentItem extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: clubItemController.recentDataList.length,
           itemBuilder: (context, index) {
-            ClubModel recent = clubItemController.recentDataList[index];
+            final ClubModel recent = clubItemController.recentDataList[index];
 
             final status =
-            (recent.clubMember != null && recent.clubMember!.isNotEmpty)
-                ? recent.clubMember!.first.status
-                : null;
+                (recent.clubMember != null && recent.clubMember!.isNotEmpty)
+                    ? recent.clubMember!.first.status
+                    : null;
 
-            debugPrint("+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}");
-            debugPrint("+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}");
+            debugPrint(
+                '+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++$status}');
+            debugPrint(
+                '+++++++++++++++++++++++++++++++++++++CLUB MEMBER STATUS+++++++++++++++++++++++++++++++++++++${recent.clubMember?.length}');
 
             final memberSize = recent.memberSize;
             final activeMembers = recent.count?.clubMember;
@@ -87,23 +89,23 @@ class RecentItem extends StatelessWidget {
             } else {
               sliderController.min.value = 0.0;
               sliderController.max.value =
-              100.0; //* or 0.0 if you want to disable the slider
+                  100.0; //* or 0.0 if you want to disable the slider
             }
 
             debugPrint(
-                "+++++++++++++++++++++++MAX+++++++++++++++++++++++++$maxValue");
+                '+++++++++++++++++++++++MAX+++++++++++++++++++++++++$maxValue');
             debugPrint(
-                "+++++++++++++++++++++++MIN+++++++++++++++++++++++++$minValue");
+                '+++++++++++++++++++++++MIN+++++++++++++++++++++++++$minValue');
 
             //* Time & Date
             DateTime? createdAt = recent.startDate != null
                 ? DateTime.tryParse(recent.startDate!)
                 : null;
 
-            String difference = "";
+            String difference = '';
             if (createdAt != null) {
               final Duration diff =
-              DateTime.now().toUtc().difference(createdAt.toUtc());
+                  DateTime.now().toUtc().difference(createdAt.toUtc());
 
               if (diff.inSeconds < 60) {
                 difference = '${diff.inSeconds}s';
@@ -115,15 +117,16 @@ class RecentItem extends StatelessWidget {
                 difference = '${diff.inDays}d';
               } else {
                 difference =
-                '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+                    '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
               }
             } else {
-              difference = "Unknown time";
+              difference = 'Unknown time';
             }
 
             return Obx(() {
               final trendingClubs = clubItemController.recentDataList[index];
-              final isExpanded = clubItemController.selectedRecentClubIndex.value == index;
+              final isExpanded =
+                  clubItemController.selectedRecentClubIndex.value == index;
 
               return GestureDetector(
                 onTap: () {
@@ -131,11 +134,11 @@ class RecentItem extends StatelessWidget {
                   clubItemController.toggleRecentClubIndex(index);
                 },
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   width: isExpanded ? 360 : 120,
-                  margin: EdgeInsets.only(left: 4, right: 4),
-                  padding:
-                  EdgeInsets.only(left: 6, right: 0, top: 8, bottom: 8),
+                  margin: const EdgeInsets.only(left: 4, right: 4),
+                  padding: const EdgeInsets.only(
+                      left: 6, right: 0, top: 8, bottom: 8),
                   // No right padding here
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -152,17 +155,17 @@ class RecentItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: CachedNetworkImage(
                             imageUrl: trendingClubs.poster ??
-                                "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+                                'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg',
                             height: 160,
                             width: 100,
                             fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
-                              child: SizedBox(
+                            placeholder: (context, url) => const Center(
+                              child: const SizedBox(
                                 height: 25,
                                 width: 25,
                                 child: SpinKitWave(
@@ -173,13 +176,13 @@ class RecentItem extends StatelessWidget {
                               ),
                             ),
                             errorWidget: (context, url, error) => Image.asset(
-                              "assets/images/placeholder_image.png",
+                              'assets/images/placeholder_image.png',
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
                       ),
-                      if (isExpanded) SizedBox(width: 4),
+                      if (isExpanded) const SizedBox(width: 4),
                       if (isExpanded)
                         Expanded(
                           child: Stack(
@@ -187,120 +190,132 @@ class RecentItem extends StatelessWidget {
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () async {
-                                  if (status!=null) {
-                                    if(status.contains("ACCPECT")){
-                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${recent.id}");
-                                      sharedPreference.setString("selectedClubId", recent.id ?? "");
-                                      debugPrint("++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}");
-                                      clubController.fetchCreatedClub(recent.id ?? "");
-                                      clubController.areYouFromHome.value = true;
+                                  if (status != null) {
+                                    if (status.contains('ACCPECT')) {
+                                      debugPrint(
+                                          '++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${recent.id}');
+                                      sharedPreference.setString(
+                                          'selectedClubId', recent.id ?? '');
+                                      debugPrint(
+                                          '++++++++++++++++++++++++PRIVATE+++++++++++++++++++++++++++${clubController.selectedClubId.value}');
+                                      clubController
+                                          .fetchCreatedClub(recent.id ?? '');
+                                      clubController.areYouFromHome.value =
+                                          true;
                                       navController.updateIndex(2);
                                       changeClubController.updateIndex(6);
                                     }
                                   } else {
-                                    debugPrint("+++++++++++++++Private Club++++++++++++++++++");
+                                    debugPrint(
+                                        '+++++++++++++++Private Club++++++++++++++++++');
                                   }
                                 },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _customText(
-                                        text: "${trendingClubs.clubId}",
+                                        text: '${trendingClubs.clubId}',
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.black),
                                     _customText(
-                                      text: "${trendingClubs.clubLabel}",
+                                      text: '${trendingClubs.clubLabel}',
                                       color: Colors.black.withOpacity(0.5),
                                     ),
                                     _rowCustomText(
-                                        firstText: "Title: ",
+                                        firstText: 'Title: ',
                                         firstFontSize: 12,
-                                        secondText: "${trendingClubs.title}",
+                                        secondText: '${trendingClubs.title}',
                                         secondFontSize: 12),
-
                                     trendingClubs.writer == null
-                                        ? SizedBox.shrink()
+                                        ? const SizedBox.shrink()
                                         : _rowCustomText(
-                                        firstText: "Author: ",
-                                        firstFontSize: 12,
-                                        secondText: "${trendingClubs.writer}",
-                                        secondFontSize: 12),
-
+                                            firstText: 'Author: ',
+                                            firstFontSize: 12,
+                                            secondText:
+                                                '${trendingClubs.writer}',
+                                            secondFontSize: 12),
                                     trendingClubs.totalSeasons == null
-                                        ? SizedBox.shrink()
+                                        ? const SizedBox.shrink()
                                         : _rowCustomText(
-                                        firstText: "Season: ",
-                                        firstFontSize: 12,
-                                        secondText: "${trendingClubs.totalSeasons}",
-                                        secondFontSize: 12),
-
+                                            firstText: 'Season: ',
+                                            firstFontSize: 12,
+                                            secondText:
+                                                '${trendingClubs.totalSeasons}',
+                                            secondFontSize: 12),
                                     trendingClubs.totalEpisodes == null
-                                        ? SizedBox.shrink()
+                                        ? const SizedBox.shrink()
                                         : _rowCustomText(
-                                        firstText: "Episode: ",
-                                        firstFontSize: 12,
-                                        secondText: "${trendingClubs.totalEpisodes}",
-                                        secondFontSize: 12),
-
+                                            firstText: 'Episode: ',
+                                            firstFontSize: 12,
+                                            secondText:
+                                                '${trendingClubs.totalEpisodes}',
+                                            secondFontSize: 12),
                                     _rowCustomText(
-                                      firstText: "Club Creator: ",
+                                      firstText: 'Club Creator: ',
                                       firstFontSize: 12,
                                       secondText:
-                                      "${trendingClubs.admin?.username}" ??
-                                          "${trendingClubs.writer}",
+                                          '${trendingClubs.admin?.username}' ??
+                                              '${trendingClubs.writer}',
                                       secondFontSize: 12,
-                                      secondColor: Color(0xff29605E),
+                                      secondColor: const Color(0xff29605E),
                                     ),
                                     _rowCustomText(
-                                      firstText: "Member Count: ",
+                                      firstText: 'Member Count: ',
                                       firstFontSize: 12,
-                                      secondText: "${trendingClubs.count?.clubMember}/${trendingClubs.memberSize}",
+                                      secondText:
+                                          '${trendingClubs.count?.clubMember}/${trendingClubs.memberSize}',
                                       secondFontSize: 12,
                                     ),
                                     SizedBox(
-                                      width:
-                                      220.w,
+                                      width: 220.w,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             right: 55, left: 6),
                                         child: SizedBox(
                                           height: 15,
                                           child: Obx(() => SliderTheme(
-                                            data: SliderTheme.of(context)
-                                                .copyWith(
-                                              trackShape:
-                                              const RoundedRectSliderTrackShape(),
-                                              trackHeight: 2.0,
-                                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 1.0),
-                                              overlayShape: SliderComponentShape.noOverlay,
-                                              thumbColor: const Color(0xff29605E),
-                                              activeTrackColor:
-                                              const Color(0xff29605E),
-                                              inactiveTrackColor:
-                                              Colors.grey.shade300,
-                                            ),
-                                            child: Slider(
-                                              min: 0.0,
-                                              max: maxValue,
-                                              value: sliderController
-                                                  .value.value
-                                                  .clamp(minValue, maxValue),
-                                              onChanged: (val) {
-                                                debugPrint(
-                                                    "++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}");
-                                                // sliderController.value.value = val;
-                                              },
-                                            ),
-                                          )),
+                                                data: SliderTheme.of(context)
+                                                    .copyWith(
+                                                  trackShape:
+                                                      const RoundedRectSliderTrackShape(),
+                                                  trackHeight: 2.0,
+                                                  thumbShape:
+                                                      const RoundSliderThumbShape(
+                                                          enabledThumbRadius:
+                                                              1.0),
+                                                  overlayShape:
+                                                      SliderComponentShape
+                                                          .noOverlay,
+                                                  thumbColor:
+                                                      const Color(0xff29605E),
+                                                  activeTrackColor:
+                                                      const Color(0xff29605E),
+                                                  inactiveTrackColor:
+                                                      Colors.grey.shade300,
+                                                ),
+                                                child: Slider(
+                                                  min: 0.0,
+                                                  max: maxValue,
+                                                  value: sliderController
+                                                      .value.value
+                                                      .clamp(
+                                                          minValue, maxValue),
+                                                  onChanged: (val) {
+                                                    debugPrint(
+                                                        '++++++++++++++++++++++++++++++++++++++++++++${sliderController.value.value}');
+                                                    // sliderController.value.value = val;
+                                                  },
+                                                ),
+                                              )),
                                         ),
                                       ),
                                     ),
                                     _rowCustomText(
-                                      firstText: "Timeline: ",
+                                      firstText: 'Timeline: ',
                                       firstFontSize: 12,
                                       secondText:
-                                      "${trendingClubs.timeLine} day(s)",
+                                          '${trendingClubs.timeLine} day(s)',
                                       secondFontSize: 12,
                                     ),
                                     Flexible(
@@ -311,23 +326,25 @@ class RecentItem extends StatelessWidget {
                                         child: SizedBox(
                                           height: 15,
                                           child: Obx(
-                                                () => SliderTheme(
+                                            () => SliderTheme(
                                               data: SliderTheme.of(context)
                                                   .copyWith(
                                                 trackShape:
-                                                const RoundedRectSliderTrackShape(),
+                                                    const RoundedRectSliderTrackShape(),
                                                 trackHeight: 2.0,
                                                 thumbShape:
-                                                const RoundSliderThumbShape(
-                                                    enabledThumbRadius: 5.0),
-                                                overlayShape: SliderComponentShape
-                                                    .noOverlay,
+                                                    const RoundSliderThumbShape(
+                                                        enabledThumbRadius:
+                                                            5.0),
+                                                overlayShape:
+                                                    SliderComponentShape
+                                                        .noOverlay,
                                                 thumbColor:
-                                                const Color(0xff29605E),
+                                                    const Color(0xff29605E),
                                                 activeTrackColor:
-                                                const Color(0xff29605E),
+                                                    const Color(0xff29605E),
                                                 inactiveTrackColor:
-                                                Colors.grey.shade300,
+                                                    Colors.grey.shade300,
                                               ),
                                               child: Slider(
                                                 min: 0.0,
@@ -352,13 +369,13 @@ class RecentItem extends StatelessWidget {
                                         fit: FlexFit.loose,
                                         child: Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Flexible(
                                               flex: 1,
                                               fit: FlexFit.loose,
                                               child: _customText(
-                                                  text: "1",
+                                                  text: '1',
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w700,
                                                   color: Colors.black),
@@ -367,10 +384,11 @@ class RecentItem extends StatelessWidget {
                                               flex: 1,
                                               fit: FlexFit.loose,
                                               child: Padding(
-                                                padding: const EdgeInsets.only(right: 85.0),
+                                                padding: const EdgeInsets.only(
+                                                    right: 85.0),
                                                 child: _customText(
                                                     text:
-                                                    "${trendingClubs.timeLine}",
+                                                        '${trendingClubs.timeLine}',
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w700,
                                                     color: Colors.black),
@@ -390,18 +408,18 @@ class RecentItem extends StatelessWidget {
                                   height: 160,
                                   child: Column(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Row(
                                         children: [
-                                          SizedBox(
+                                          const SizedBox(
                                             // "assets/icons/bag_icon.png",
                                             height: 20,
                                             width: 20,
                                           ),
-                                          SizedBox(width: 4),
+                                          const SizedBox(width: 4),
                                           Image.asset(
-                                            "assets/icons/share.png",
+                                            'assets/icons/share.png',
                                             height: 20,
                                             width: 20,
                                           ),
@@ -415,51 +433,65 @@ class RecentItem extends StatelessWidget {
                                       Column(
                                         children: [
                                           (status == null ||
-                                              status == "DELETED")
+                                                  status == 'DELETED')
                                               ? GestureDetector(
-                                            behavior:
-                                            HitTestBehavior.opaque,
-                                            onTap: () async {
-                                              if (recent.id == null || recent.type == null) return;
+                                                  behavior:
+                                                      HitTestBehavior.opaque,
+                                                  onTap: () async {
+                                                    if (recent.id == null ||
+                                                        recent.type == null)
+                                                      return;
 
-                                              //* What kind of check I should give based on which condition
-                                              if (recent.type!.contains("PRIVATE")) {
-                                                await joinClubController.joinPrivateClub(recent.id!);
-                                              } else {
-                                                await joinClubController.joinPublicClub(recent.id!);
-                                                clubController.fetchCreatedClub(recent.id ?? "");
-                                              }
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 3.0),
-                                              child: Image.asset(
-                                                "assets/icons/join_read_icon.png",
-                                                height: 28.16,
-                                                width: 28.52,
-                                              ),
-                                            ),
-                                          )
-                                              : (status == "PENDING")
-                                              ? GestureDetector(
-                                            behavior: HitTestBehavior
-                                                .opaque,
-                                            onTap: () async {
-                                              // joinClubController.joinPrivateClub(
-                                              //     trending.id ?? "");
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 3.0),
-                                              child: Image.asset(
-                                                "assets/icons/request_icon.png",
-                                                height: 28.16,
-                                                width: 28.52,
-                                              ),
-                                            ),
-                                          )
-                                              : SizedBox(
-                                            height: 28.16,
-                                            width: 28.52,
-                                          ),
+                                                    //* What kind of check I should give based on which condition
+                                                    if (recent.type!
+                                                        .contains('PRIVATE')) {
+                                                      await joinClubController
+                                                          .joinPrivateClub(
+                                                              recent.id!);
+                                                    } else {
+                                                      await joinClubController
+                                                          .joinPublicClub(
+                                                              recent.id!);
+                                                      clubController
+                                                          .fetchCreatedClub(
+                                                              recent.id ?? '');
+                                                    }
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 3.0),
+                                                    child: Image.asset(
+                                                      'assets/icons/join_read_icon.png',
+                                                      height: 28.16,
+                                                      width: 28.52,
+                                                    ),
+                                                  ),
+                                                )
+                                              : (status == 'PENDING')
+                                                  ? GestureDetector(
+                                                      behavior: HitTestBehavior
+                                                          .opaque,
+                                                      onTap: () async {
+                                                        // joinClubController.joinPrivateClub(
+                                                        //     trending.id ?? "");
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 3.0),
+                                                        child: Image.asset(
+                                                          'assets/icons/request_icon.png',
+                                                          height: 28.16,
+                                                          width: 28.52,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : const SizedBox(
+                                                      height: 28.16,
+                                                      width: 28.52,
+                                                    ),
                                           //* Another Issue arise here!!
 
                                           SizedBox(
@@ -474,7 +506,7 @@ class RecentItem extends StatelessWidget {
                                           _customText(
                                               text: difference,
                                               color:
-                                              Colors.black.withOpacity(0.6),
+                                                  Colors.black.withOpacity(0.6),
                                               fontSize: 9.78,
                                               fontWeight: FontWeight.w400),
                                         ],
@@ -587,9 +619,9 @@ class RecentItem extends StatelessWidget {
 
   Widget buildStatusIcon(String? status, String id) {
     debugPrint(
-        "++++++++++++++++++++++++++buildStatusIcon+++++++++++++++++++++++++++++$status");
+        '++++++++++++++++++++++++++buildStatusIcon+++++++++++++++++++++++++++++$status');
 
-    if (status == null || status == "DELETED") {
+    if (status == null || status == 'DELETED') {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
@@ -597,30 +629,30 @@ class RecentItem extends StatelessWidget {
           await clubItemController.fetchTrendingClubs();
         },
         child: Image.asset(
-          "assets/icons/join_read_icon.png",
+          'assets/icons/join_read_icon.png',
           height: 28.16,
           width: 28.52,
         ),
       );
-    } else if (status == "PENDING") {
+    } else if (status == 'PENDING') {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
           // await joinClubController.acceptPrivateClubRequest(id);
         },
         child: Image.asset(
-          "assets/icons/request_icon.png",
+          'assets/icons/request_icon.png',
           height: 28.16,
           width: 28.52,
         ),
       );
-    } else if (status == "ACCPECT") {
-      return SizedBox(
+    } else if (status == 'ACCPECT') {
+      return const SizedBox(
         height: 28.16,
         width: 28.52,
       );
     } else {
-      return SizedBox(
+      return const SizedBox(
         height: 28.16,
         width: 28.52,
       );
@@ -629,26 +661,26 @@ class RecentItem extends StatelessWidget {
 
   Widget buildStatusText(String? status) {
     debugPrint(
-        "++++++++++++++++++++++++++buildStatusText+++++++++++++++++++++++++++++$status");
+        '++++++++++++++++++++++++++buildStatusText+++++++++++++++++++++++++++++$status');
 
-    if (status == null || status == "DELETED") {
+    if (status == null || status == 'DELETED') {
       return _customText(
-        text: "Join Read",
+        text: 'Join Read',
         color: Colors.black,
         fontSize: 9.78,
         fontWeight: FontWeight.w400,
       );
-    } else if (status == "PENDING") {
+    } else if (status == 'PENDING') {
       return _customText(
-        text: "Request",
+        text: 'Request',
         color: Colors.black,
         fontSize: 9.78,
         fontWeight: FontWeight.w400,
       );
-    } else if (status == "ACCPECT") {
-      return SizedBox.shrink();
+    } else if (status == 'ACCPECT') {
+      return const SizedBox.shrink();
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 }
