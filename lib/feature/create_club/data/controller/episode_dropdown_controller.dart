@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 class EpisodeDropdownController extends GetxController {
-  var selectedChapter = "Episode 1".obs;
+  var selectedChapter = "Select Episode".obs;
 
   var isClicked = false.obs;
 

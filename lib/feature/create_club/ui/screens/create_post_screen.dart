@@ -123,7 +123,7 @@ class CreatePostScreen extends StatelessWidget {
                           borderColor:
                               Color(0xff000000).withValues(alpha: 0.20),
                           borderRadius: BorderRadius.circular(10.r),
-                          hintText: "What did you like about chapter 3?",
+                          hintText: "Enter post details...",
                           textStyle: GoogleFonts.dmSans(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w400,

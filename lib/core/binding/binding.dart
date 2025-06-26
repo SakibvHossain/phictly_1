@@ -28,11 +28,11 @@ class AppBinding extends Bindings {
     Get.put(ProgressController());
     Get.put(BookGenreController());
     Get.put(ClubController());
-    Get.lazyPut(() => ChangeHomeController());
-    Get.lazyPut(() => NotificationController());
-    Get.lazyPut(() => ClubItemController());
-    Get.lazyPut(() => SocialFeedController());
-    Get.lazyPut(() => HomeController());
-    Get.lazyPut(() => ChatController());
+    Get.put( ChangeHomeController());
+    Get.put( NotificationController());
+    Get.put( ClubItemController());
+    Get.put( SocialFeedController());
+    Get.put(HomeController());
+    Get.put( ChatController());
   }
 }

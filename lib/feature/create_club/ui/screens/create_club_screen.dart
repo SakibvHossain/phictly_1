@@ -577,7 +577,7 @@ class CreateClubScreen extends StatelessWidget {
                           Stack(
                             children: [
                               ageAndSize(
-                                  titleText: "Age Registration",
+                                  titleText: "Age Restriction",
                                   controller: bookController.ageController),
 
                               Positioned(
