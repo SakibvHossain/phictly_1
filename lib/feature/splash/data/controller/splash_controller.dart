@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import '../../../../core/helper/sheared_prefarences_helper.dart';
-import '../../../../routes/app_routes.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
+import 'package:phictly/routes/app_routes.dart';
 
 class SplashController extends GetxController {
   Timer? timer;
@@ -15,7 +15,7 @@ class SplashController extends GetxController {
 
   void checkLoginStatus() async {
     await preferencesHelper.init();
-    String? token = preferencesHelper.getString("userToken");
+    final String? token = preferencesHelper.getString('userToken');
 
     timer = Timer(const Duration(seconds: 2), () {
       if (token != null && token.isNotEmpty) {

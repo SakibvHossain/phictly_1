@@ -8,9 +8,9 @@ class CreateGroupController extends GetxController{
   List<GroupModel> groupList = [];
   
   void createGroup(){
-    GroupModel groupModel = GroupModel("assets/profile/image/my_group_img_1.png", "Besties", "No Description For Now", ["hilamsam19", "earthexplorer2", "quasar2read00"]);
-    GroupModel groupModel2 = GroupModel("assets/profile/image/my_group_img_2.png", "QuickReadFlows", "No Description For Now", ["hilamsam19", "quasar2read00"]);
-    GroupModel groupModel3 = GroupModel("assets/profile/image/my_group_img_3.png", "WeLoveSpace", "No Description For Now", ["earthexplorer2", "quasar2read00"]);
+    final GroupModel groupModel = GroupModel('assets/profile/image/my_group_img_1.png', "Besties", "No Description For Now", ["hilamsam19", "earthexplorer2", "quasar2read00"]);
+    final GroupModel groupModel2 = GroupModel('assets/profile/image/my_group_img_2.png', "QuickReadFlows", "No Description For Now", ["hilamsam19", "quasar2read00"]);
+    final GroupModel groupModel3 = GroupModel('assets/profile/image/my_group_img_3.png', "WeLoveSpace", "No Description For Now", ["earthexplorer2", "quasar2read00"]);
     groupList.addAll([groupModel, groupModel2, groupModel3]);
   }
 }

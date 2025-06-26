@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:phictly/core/binding/binding.dart';
 import 'package:phictly/routes/app_routes.dart';
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

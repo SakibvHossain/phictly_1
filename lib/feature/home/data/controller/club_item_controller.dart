@@ -1,12 +1,11 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:phictly/feature/home/data/model/club_model.dart';
-import '../../../../core/helper/sheared_prefarences_helper.dart';
-import '../../../../core/network_caller/service/service.dart';
-import '../../../../core/network_caller/utils/utils.dart';
+import 'package:phictly/core/helper/sheared_prefarences_helper.dart';
+import 'package:phictly/core/network_caller/service/service.dart';
+import 'package:phictly/core/network_caller/utils/utils.dart';
 
 class ClubItemController extends GetxController {
   SharedPreferencesHelper preferencesHelper = SharedPreferencesHelper();
@@ -27,40 +26,40 @@ class ClubItemController extends GetxController {
       isTrendingDataLoading.value = true;
 
       if (!await hasInternetConnection()) {
-        debugPrint("🚫 No Internet Detected");
+        debugPrint('🚫 No Internet Detected');
         showNoConnectionDialog();
         return;
       }
 
-      await Future.delayed(Duration(milliseconds: 200));
+      await Future.delayed(const Duration(milliseconds: 200));
 
-      String url = Utils.baseUrl + Utils.trendingOrRecent;
+      final String url = Utils.baseUrl + Utils.trendingOrRecent;
       final response = await NetworkCaller().getRequest(
         url,
         token: preferencesHelper.getString('userToken'),
       );
 
       if (response.isSuccess) {
-        var trendingItemData = response.responseData['trending'];
-        for(var trending in trendingItemData){
+        final trendingItemData = response.responseData['trending'];
+        for(final trending in trendingItemData){
           trendingDataList.add(ClubModel.fromJson(trending));
-          debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trending");
+          debugPrint('+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trending');
         }
-        logger.d("Full API Response: ${response.responseData}");
-        debugPrint("+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trendingItemData");
+        logger.d('Full API Response: ${response.responseData}');
+        debugPrint('+++++++++++++++++++++++++++++++++++++++++++++++++Trending data: $trendingItemData');
       } else {
-        logger.e("API call failed with message: ${response.responseData}");
+        logger.e('API call failed with message: ${response.responseData}');
       }
     } catch (e) {
-      debugPrint("Error: $e");
-      logger.e("Exception: $e");
+      debugPrint('Error: $e');
+      logger.e('Exception: $e');
       Get.snackbar(
-        "Error",
-        "An unexpected error occurred. Please try again later.",
+        'Error',
+        'An unexpected error occurred. Please try again later.',
       );
     } finally {
       isTrendingDataLoading.value = false;
-      debugPrint("Trending Data List: ${trendingDataList.length}");
+      debugPrint('Trending Data List: ${trendingDataList.length}');
     }
   }
 
@@ -72,39 +71,39 @@ class ClubItemController extends GetxController {
     try {
       isRecentDataLoading.value = true;
 
-      await Future.delayed(Duration(milliseconds: 200));
+      await Future.delayed(const Duration(milliseconds: 200));
 
-      String url = Utils.baseUrl + Utils.trendingOrRecent;
+      final String url = Utils.baseUrl + Utils.trendingOrRecent;
       final response = await NetworkCaller().getRequest(
         url,
         token: preferencesHelper.getString('userToken'),
       );
 
       if (response.isSuccess) {
-        var recentItemData = response.responseData['recent'];
+        final recentItemData = response.responseData['recent'];
 
-        for (var recent in recentItemData) {
+        for (final recent in recentItemData) {
           recentDataList.add(ClubModel.fromJson(recent));
-          debugPrint("+++ Trending data: $recent");
+          debugPrint('+++ Trending data: $recent');
         }
 
-        logger.d("Full API Response: ${response.responseData}");
-        debugPrint("+++ Recent Data: $recentItemData");
+        logger.d('Full API Response: ${response.responseData}');
+        debugPrint('+++ Recent Data: $recentItemData');
       } else {
-        logger.e("API call failed with message: ${response.responseData}");
+        logger.e('API call failed with message: ${response.responseData}');
       }
     } catch (e) {
-      debugPrint("Error: $e");
-      logger.e("Exception: $e");
+      debugPrint('Error: $e');
+      logger.e('Exception: $e');
       Get.snackbar(
-        "Error",
-        "An unexpected error occurred. Please try again later.",
+        'Error',
+        'An unexpected error occurred. Please try again later.',
         colorText: Colors.white,
         backgroundColor: Colors.red,
       );
     } finally {
       isRecentDataLoading.value = false;
-      debugPrint("Recent Data List: ${recentDataList.length}");
+      debugPrint('Recent Data List: ${recentDataList.length}');
     }
   }
 
@@ -145,23 +144,23 @@ class ClubItemController extends GetxController {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Center(
+        title: const Center(
           child: Text(
-            "No Connection",
+            'No Connection',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
         ),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Please check your internet connectivity",
+              'Please check your internet connectivity',
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Divider(height: 1),
           ],
         ),
@@ -173,8 +172,8 @@ class ClubItemController extends GetxController {
             onPressed: () {
               Navigator.of(Get.context!).pop();
             },
-            child: Text(
-              "OK",
+            child: const Text(
+              'OK',
               style: TextStyle(color: Colors.blue),
             ),
           ),
@@ -186,7 +185,18 @@ class ClubItemController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    if (!await hasInternetConnection()) {
+      debugPrint('🚫 No Internet Detected');
+      showNoConnectionDialog();
+      return;
+    }
+
     fetchTrendingClubs();
     fetchRecentClubs();
   }
+
 }
