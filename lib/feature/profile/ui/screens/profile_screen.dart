@@ -76,11 +76,16 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  Image.asset(
-                                    "assets/profile/icons/email.png",
-                                    height: 25.h,
-                                    width: 25.w,
-                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      controller.updateIndex(17);
+                                    },
+                                    child: Image.asset(
+                                      "assets/profile/icons/email.png",
+                                      height: 25.h,
+                                      width: 25.w,
+                                    ),
+                                  ), 
                                   SizedBox(
                                     width: 16.h,
                                   ),

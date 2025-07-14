@@ -14,10 +14,7 @@ class AppRoute {
   static const String signIn = '/signIn';
 
 
-  static String getInitial() => splash;
-  static String getSignUp() => signUp;
-  static String getSignInScreen() => signIn;
-  static String getHomeScreen() => navBar;
+
 
 
 
@@ -38,7 +35,7 @@ class AppRoute {
         transition: Transition.rightToLeft),
     GetPage(
         name: splash,  // fixed this line
-        page: () => SplashScreen(),
+        page: () => const SplashScreen(),
         transition: Transition.rightToLeft),
   ];
 }

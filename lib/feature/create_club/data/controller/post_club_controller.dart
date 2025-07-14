@@ -106,7 +106,7 @@ class PostClubController extends GetxController{
     DateFormat format = DateFormat("MM-dd-yyyy");
     final Logger logger = Logger();
     debugPrint("+++++++++++++++++++++++++++THIS IS GENRE+++++++++++++++++++++++++++++++++${singleBook.genre.map((g) => g.toJson()).toList()}");
-    Map<String, dynamic> inputClubData = {
+    final Map<String, dynamic> inputClubData = {
       "clubId": clubId.value,
       "clubLebel": talkPointController.clubLabelController.text,
       "clubMediumType": changeClubController.selectedBookType.value.toUpperCase(), //* MOVIE , BOOK , SHOW

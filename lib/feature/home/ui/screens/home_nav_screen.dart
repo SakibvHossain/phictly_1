@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/utils/size_config.dart';
-import '../../../create_club/data/controller/talk_point_controller.dart';
-import '../widgets/bottom_nav_btn.dart';
-import '../widgets/screens.dart';
-import '../../data/controller/bottom_nav_controller.dart';
+import 'package:phictly/core/utils/size_config.dart';
+import 'package:phictly/feature/create_club/data/controller/talk_point_controller.dart';
+import 'package:phictly/feature/home/ui/widgets/bottom_nav_btn.dart';
+import 'package:phictly/feature/home/ui/widgets/screens.dart';
+import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
 
 class HomeNavScreen extends StatelessWidget {
   final BottomNavController controller = Get.put(BottomNavController());
@@ -22,7 +22,7 @@ class HomeNavScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: PageView(
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               controller: controller.pageController,
               onPageChanged: (index) {
                 controller.currentIndex.value = index;
@@ -45,9 +45,9 @@ class HomeNavScreen extends StatelessWidget {
     return Container(
       width: AppSizes.screenWidth,
       height: AppSizes.blockSizeHorizontal * 20,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius    .circular(20),
         ),

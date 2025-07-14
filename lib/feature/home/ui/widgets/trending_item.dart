@@ -22,14 +22,17 @@ class TrendingItem extends StatelessWidget {
   TrendingItem({super.key});
 
   final HomeController controller = Get.put(HomeController());
-  final ChangeHomeController changeHomeController = Get.find<ChangeHomeController>();
+  final ChangeHomeController changeHomeController =
+      Get.find<ChangeHomeController>();
   final SliderController sliderController = Get.put(SliderController());
   final ClubItemController clubItemController = Get.put(ClubItemController());
-  final ChangeClubController changeClubController = Get.put(ChangeClubController());
+  final ChangeClubController changeClubController =
+      Get.put(ChangeClubController());
   final BottomNavController navController = Get.put(BottomNavController());
   final ClubController clubController = Get.find<ClubController>();
   final JoinClubController joinClubController = Get.put(JoinClubController());
-  final SharedPreferencesHelper sharedPreference = Get.put(SharedPreferencesHelper());
+  final SharedPreferencesHelper sharedPreference =
+      Get.put(SharedPreferencesHelper());
   final Logger logger = Logger();
 
   @override
@@ -54,7 +57,7 @@ class TrendingItem extends StatelessWidget {
     if (clubItemController.trendingDataList.isEmpty) {
       return Center(
         child: CustomText(
-          text: "No trending data found",
+          text: 'No trending data found',
           fontSize: 16.sp,
           fontWeight: FontWeight.w500,
           color: Colors.black,
@@ -71,10 +74,13 @@ class TrendingItem extends StatelessWidget {
 
   Widget _buildClubCard(BuildContext context, int index) {
     final ClubModel trending = clubItemController.trendingDataList[index];
-    final String? status = trending.clubMember?.isNotEmpty ?? false ? trending.clubMember!.first.status : null;
+    final String? status = trending.clubMember?.isNotEmpty ?? false
+        ? trending.clubMember!.first.status
+        : null;
 
     return Obx(() {
-      final bool isExpanded = clubItemController.selectedClubIndex.value == index;
+      final bool isExpanded =
+          clubItemController.selectedClubIndex.value == index;
       return GestureDetector(
         onTap: () => clubItemController.toggleClubIndex(index),
         child: AnimatedContainer(
@@ -99,7 +105,8 @@ class TrendingItem extends StatelessWidget {
               _buildClubImage(trending),
               if (isExpanded) ...[
                 SizedBox(width: 4.w),
-                Expanded(child: _buildClubDetails(context, trending, status, index)),
+                Expanded(
+                    child: _buildClubDetails(context, trending, status, index)),
               ],
             ],
           ),
@@ -114,7 +121,8 @@ class TrendingItem extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(4.r),
         child: CachedNetworkImage(
-          imageUrl: trending.poster ?? "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+          imageUrl: trending.poster ??
+              'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg',
           height: 180.h,
           width: 100.w,
           fit: BoxFit.cover,
@@ -130,7 +138,7 @@ class TrendingItem extends StatelessWidget {
             ),
           ),
           errorWidget: (context, url, error) => Image.asset(
-            "assets/images/placeholder_image.png",
+            'assets/images/placeholder_image.png',
             fit: BoxFit.cover,
           ),
         ),
@@ -138,7 +146,8 @@ class TrendingItem extends StatelessWidget {
     );
   }
 
-  Widget _buildClubDetails(BuildContext context, ClubModel trending, String? status, int index) {
+  Widget _buildClubDetails(
+      BuildContext context, ClubModel trending, String? status, int index) {
     final double maxValue = trending.memberSize?.toDouble() ?? 100.0;
     final double minValue = trending.count?.clubMember?.toDouble() ?? 0.0;
 
@@ -151,58 +160,58 @@ class TrendingItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCustomText(
-                text: trending.clubId ?? "",
+                text: trending.clubId ?? '',
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w700,
                 color: Colors.black,
               ),
               _buildCustomText(
-                text: trending.clubLabel ?? "",
+                text: trending.clubLabel ?? '',
                 fontSize: 12.sp,
                 color: Colors.black.withOpacity(0.5),
               ),
               _buildRowCustomText(
-                firstText: "Title: ",
-                secondText: trending.title ?? "",
+                firstText: 'Title: ',
+                secondText: trending.title ?? '',
                 fontSize: 12.sp,
               ),
               if (trending.writer != null)
                 _buildRowCustomText(
-                  firstText: "Author: ",
+                  firstText: 'Author: ',
                   secondText: trending.writer!,
                   fontSize: 12.sp,
                 ),
               if (trending.totalSeasons != null)
                 _buildRowCustomText(
-                  firstText: "Season: ",
+                  firstText: 'Season: ',
                   secondText: trending.totalSeasons.toString(),
                   fontSize: 12.sp,
                 ),
               if (trending.totalEpisodes != null)
                 _buildRowCustomText(
-                  firstText: "Episode: ",
+                  firstText: 'Episode: ',
                   secondText: trending.totalEpisodes.toString(),
                   fontSize: 12.sp,
                 ),
               _buildRowCustomText(
-                firstText: "Club Creator: ",
-                secondText: trending.admin?.username ?? trending.writer ?? "",
+                firstText: 'Club Creator: ',
+                secondText: trending.admin?.username ?? trending.writer ?? '',
                 fontSize: 12.sp,
                 secondColor: const Color(0xff29605E),
               ),
               _buildRowCustomText(
-                firstText: "Member Count: ",
-                secondText: trending.memberSize?.toString() ?? "0",
+                firstText: 'Member Count: ',
+                secondText: trending.memberSize?.toString() ?? '0',
                 fontSize: 12.sp,
               ),
               _buildMemberSlider(context, minValue, maxValue),
               _buildRowCustomText(
-                firstText: "Timeline: ",
-                secondText: "${trending.timeLine ?? 0} day(s)",
+                firstText: 'Timeline: ',
+                secondText: '${trending.timeLine ?? 0} day(s)',
                 fontSize: 12.sp,
               ),
               _buildTimelineSlider(context, maxValue),
-              _buildTimelineRow(trending.timeLine?.toString() ?? "0"),
+              _buildTimelineRow(trending.timeLine?.toString() ?? '0'),
             ],
           ),
         ),
@@ -216,15 +225,15 @@ class TrendingItem extends StatelessWidget {
   }
 
   void _handleClubTap(ClubModel trending, String? status) async {
-    if (status == "ACCPECT" && trending.id != null) {
-      logger.d("Navigating to private club: ${trending.id}");
+    if (status == 'ACCPECT' && trending.id != null) {
+      logger.d('Navigating to private club: ${trending.id}');
       clubController.areYouFromHome.value = true;
-      await sharedPreference.setString("selectedClubId", trending.id!);
+      await sharedPreference.setString('selectedClubId', trending.id!);
       clubController.fetchCreatedClub(trending.id!);
       navController.updateIndex(2);
       changeClubController.updateIndex(6);
     } else {
-      logger.d("Private club access denied");
+      logger.d('Private club access denied');
     }
   }
 
@@ -263,7 +272,9 @@ class TrendingItem extends StatelessWidget {
         text: TextSpan(
           children: [
             TextSpan(
-              text: firstText.length > 20 ? '${firstText.substring(0, 20)}...' : firstText,
+              text: firstText.length > 20
+                  ? '${firstText.substring(0, 20)}...'
+                  : firstText,
               style: GoogleFonts.dmSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w600,
@@ -271,7 +282,9 @@ class TrendingItem extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: secondText.length > 16 ? '${secondText.substring(0, 16)}...' : secondText,
+              text: secondText.length > 16
+                  ? '${secondText.substring(0, 16)}...'
+                  : secondText,
               style: GoogleFonts.dmSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w400,
@@ -284,88 +297,189 @@ class TrendingItem extends StatelessWidget {
     );
   }
 
-  Widget _buildMemberSlider(BuildContext context, double minValue, double maxValue) {
-    return Flexible(
-      flex: 3,
-      child: Padding(
-        padding: EdgeInsets.only(right: 88.w, left: 6.w),
-        child: SizedBox(
-          height: 15.h,
-          child: Obx(() => SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackShape: const RoundedRectSliderTrackShape(),
-              trackHeight: 2.0,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 1.0),
-              overlayShape: SliderComponentShape.noOverlay,
-              thumbColor: const Color(0xff29605E),
-              activeTrackColor: const Color(0xff29605E),
-              inactiveTrackColor: Colors.grey.shade300,
-            ),
-            child: Slider(
-              min: 0.0,
-              max: maxValue,
-              value: sliderController.value.value.clamp(minValue, maxValue),
-              onChanged: (val) {},
-            ),
-          )),
+  // Widget _buildMemberSlider(
+  //     BuildContext context, double minValue, double maxValue) {
+  //   return Flexible(
+  //     flex: 3,
+  //     child: Padding(
+  //       padding: EdgeInsets.only(right: 88.w, left: 6.w),
+  //       child: SizedBox(
+  //         height: 15.h,
+  //         child: Obx(() => SliderTheme(
+  //               data: SliderTheme.of(context).copyWith(
+  //                 trackShape: const RoundedRectSliderTrackShape(),
+  //                 trackHeight: 2.0,
+  //                 thumbShape:
+  //                     const RoundSliderThumbShape(enabledThumbRadius: 1.0),
+  //                 overlayShape: SliderComponentShape.noOverlay,
+  //                 thumbColor: const Color(0xff29605E),
+  //                 activeTrackColor: const Color(0xff29605E),
+  //                 inactiveTrackColor: Colors.grey.shade300,
+  //               ),
+  //               child: Slider(
+  //                 min: 0.0,
+  //                 max: maxValue,
+  //                 value: sliderController.value.value.isNaN
+  //                     ? 0.0
+  //                     : sliderController.value.value
+  //                         .clamp(0.0, maxValue > 0 ? maxValue : 1.0),
+  //                 onChanged: (val) {},
+  //               ),
+  //             )),
+  //       ),
+  //     ),
+  //   );
+  // }
+  Widget _buildMemberSlider(
+      BuildContext context, double minValue, double maxValue) {
+    final double safeMax = maxValue > 0 ? maxValue : 1.0;
+    final double safeValue = sliderController.value.value.clamp(0.0, safeMax);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 6.w),
+      child: SizedBox(
+        height: 20.h,
+        width: 200.w,
+        child: SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 2.0,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5.0),
+            overlayShape: SliderComponentShape.noOverlay,
+            thumbColor: const Color(0xff29605E),
+            activeTrackColor: const Color(0xff29605E),
+            inactiveTrackColor: Colors.grey.shade300,
+          ),
+          child: Slider(
+            min: 0.0,
+            max: safeMax,
+            value: safeValue,
+            onChanged: (_) {},
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTimelineSlider(BuildContext context, double maxValue) {
-    return Flexible(
-      flex: 3,
-      child: Padding(
-        padding: EdgeInsets.only(right: 88.w, left: 2.w),
-        child: SizedBox(
-          height: 15.h,
-          child: Obx(() => SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackShape: const RoundedRectSliderTrackShape(),
-              trackHeight: 2.0,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5.0),
-              overlayShape: SliderComponentShape.noOverlay,
-              thumbColor: const Color(0xff29605E),
-              activeTrackColor: const Color(0xff29605E),
-              inactiveTrackColor: Colors.grey.shade300,
-            ),
-            child: Slider(
-              min: 0.0,
-              max: maxValue,
-              value: sliderController.value.value.clamp(maxValue, maxValue),
-              onChanged: (val) {},
-            ),
-          )),
+    final double safeMax = maxValue > 0 ? maxValue : 1.0;
+    final double safeValue = sliderController.value.value.clamp(0.0, safeMax);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 6.w),
+      child: SizedBox(
+        height: 20.h,
+        width: 200.w,
+        child: SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 2.0,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5.0),
+            overlayShape: SliderComponentShape.noOverlay,
+            thumbColor: const Color(0xff29605E),
+            activeTrackColor: const Color(0xff29605E),
+            inactiveTrackColor: Colors.grey.shade300,
+          ),
+          child: Slider(
+            min: 0.0,
+            max: safeMax,
+            value: safeValue,
+            onChanged: (_) {},
+          ),
         ),
       ),
     );
   }
 
+  // Widget _buildTimelineSlider(BuildContext context, double maxValue) {
+  //   return Flexible(
+  //     flex: 3,
+  //     child: Padding(
+  //       padding: EdgeInsets.only(right: 88.w, left: 2.w),
+  //       child: SizedBox(
+  //         height: 15.h,
+  //         child: Obx(() => SliderTheme(
+  //               data: SliderTheme.of(context).copyWith(
+  //                 trackShape: const RoundedRectSliderTrackShape(),
+  //                 trackHeight: 2.0,
+  //                 thumbShape:
+  //                     const RoundSliderThumbShape(enabledThumbRadius: 5.0),
+  //                 overlayShape: SliderComponentShape.noOverlay,
+  //                 thumbColor: const Color(0xff29605E),
+  //                 activeTrackColor: const Color(0xff29605E),
+  //                 inactiveTrackColor: Colors.grey.shade300,
+  //               ),
+  //               child: Slider(
+  //                 min: 0.0,
+  //                 max: maxValue,
+  //                 value: sliderController.value.value.isNaN
+  //                     ? 0.0
+  //                     : sliderController.value.value
+  //                         .clamp(0.0, maxValue > 0 ? maxValue : 1.0),
+  //                 onChanged: (val) {},
+  //               ),
+  //             )),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Widget _buildTimelineRow(String timeline) {
+  //   return SizedBox(
+  //     height: 16.h,
+  //     child: Flexible(
+  //       flex: 1,
+  //       fit: FlexFit.loose,
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Flexible(
+  //             flex: 1,
+  //             fit: FlexFit.loose,
+  //             child: _buildCustomText(
+  //               text: '1',
+  //               fontSize: 12.sp,
+  //               fontWeight: FontWeight.w700,
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //           Flexible(
+  //             flex: 1,
+  //             fit: FlexFit.tight,
+  //             child: Padding(
+  //               padding: const EdgeInsets.only(right: 70.0),
+  //               child: _buildCustomText(
+  //                 text: timeline,
+  //                 fontSize: 12.sp,
+  //                 fontWeight: FontWeight.w700,
+  //                 color: Colors.black,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildTimelineRow(String timeline) {
     return SizedBox(
-      height: 16.h,
-      child: Flexible(
-        flex: 1,
-        fit: FlexFit.loose,
+        height: 16.h,
+        width: 150.w,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Flexible(
-              flex: 1,
-              fit: FlexFit.loose,
-              child: _buildCustomText(
-                text: "1",
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _buildCustomText(
+                  text: '1',
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
             ),
-            Flexible(
-              flex: 1,
-              fit: FlexFit.tight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 70.0),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
                 child: _buildCustomText(
                   text: timeline,
                   fontSize: 12.sp,
@@ -375,9 +489,7 @@ class TrendingItem extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _buildActionColumn(ClubModel trending, String? status) {
@@ -390,7 +502,7 @@ class TrendingItem extends StatelessWidget {
             children: [
               SizedBox(height: 20.h, width: 20.w),
               SizedBox(width: 4.w),
-              Image.asset("assets/icons/share.png", height: 20.h, width: 20.w),
+              Image.asset('assets/icons/share.png', height: 20.h, width: 20.w),
             ],
           ),
           Column(
@@ -412,15 +524,15 @@ class TrendingItem extends StatelessWidget {
   }
 
   Widget _buildStatusIcon(ClubModel trending, String? status) {
-    if (status == null || status == "DELETED") {
+    if (status == null || status == 'DELETED') {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
           if (trending.id == null || trending.type == null) {
-            logger.e("Invalid club ID or type");
+            logger.e('Invalid club ID or type');
             return;
           }
-          if (trending.type!.contains("PRIVATE")) {
+          if (trending.type!.contains('PRIVATE')) {
             await joinClubController.joinPrivateClub(trending.id!);
           } else {
             await joinClubController.joinPublicClub(trending.id!);
@@ -430,20 +542,20 @@ class TrendingItem extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 3.0),
           child: Image.asset(
-            "assets/icons/join_read_icon.png",
+            'assets/icons/join_read_icon.png',
             height: 28.16.h,
             width: 28.52.w,
           ),
         ),
       );
-    } else if (status == "PENDING") {
+    } else if (status == 'PENDING') {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {},
         child: Padding(
           padding: const EdgeInsets.only(left: 3.0),
           child: Image.asset(
-            "assets/icons/request_icon.png",
+            'assets/icons/request_icon.png',
             height: 28.16.h,
             width: 28.52.w,
           ),
@@ -454,16 +566,16 @@ class TrendingItem extends StatelessWidget {
   }
 
   Widget _buildStatusText(String? status) {
-    if (status == null || status == "DELETED") {
+    if (status == null || status == 'DELETED') {
       return _buildCustomText(
-        text: "Join Read",
+        text: 'Join Read',
         fontSize: 9.78.sp,
         fontWeight: FontWeight.w400,
         color: Colors.black,
       );
-    } else if (status == "PENDING") {
+    } else if (status == 'PENDING') {
       return _buildCustomText(
-        text: "Request",
+        text: 'Request',
         fontSize: 9.78.sp,
         fontWeight: FontWeight.w400,
         color: Colors.black,
@@ -473,9 +585,9 @@ class TrendingItem extends StatelessWidget {
   }
 
   String _formatTimeDifference(String? startDate) {
-    if (startDate == null) return "Unknown time";
+    if (startDate == null) return 'Unknown time';
     final DateTime? createdAt = DateTime.tryParse(startDate);
-    if (createdAt == null) return "Unknown time";
+    if (createdAt == null) return 'Unknown time';
 
     final Duration diff = DateTime.now().toUtc().difference(createdAt.toUtc());
     if (diff.inSeconds < 60) return '${diff.inSeconds}s';

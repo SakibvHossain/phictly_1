@@ -43,6 +43,8 @@ class SocialFeedController extends GetxController{
 
       logger.i(responseData);
 
+      debugPrint("=======Social Feed DAta======>>>$responseData");
+
       logger.i('responseData: $responseData');
       logger.i('responseData.runtimeType: ${responseData.runtimeType}');
 
@@ -51,7 +53,7 @@ class SocialFeedController extends GetxController{
             .map((e) => SocialFeedItem.fromJson(e))
             .toList()
             .cast<SocialFeedItem>();
-        logger.i("✅ Follower Parsed: $socialFeedList");
+        logger.i("=======Social Feed Model=======✅ Follower Parsed: $socialFeedList");
         // Get.snackbar("Social Feed Length   ", "${socialFeedList.length}");
       } else {
         logger.e("❌ Unexpected response format: $responseData");

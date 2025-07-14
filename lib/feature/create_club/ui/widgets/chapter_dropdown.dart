@@ -11,6 +11,7 @@ class ChapterDropdown extends StatelessWidget {
   final DropdownController controller = Get.put(DropdownController());
 
   final List<String> chapters = [
+    "Select Chapter",
     "Chapter 1",
     "Chapter 2",
     "Chapter 3",

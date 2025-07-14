@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phictly/feature/home/ui/screens/home_screens.dart';
+import 'package:phictly/feature/home/ui/screens/mailbox_screen.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:get/get.dart';
 import 'package:phictly/feature/profile/ui/screens/my_log_screen.dart';
@@ -63,6 +64,8 @@ class ChangeProfileScreens extends StatelessWidget {
           return AddGroupMemberScreen();
         }else if (controller.currentIndex.value == 16) {
           return RedirectedProfileScreen();
+        }else if (controller.currentIndex.value == 17) {
+          return MailboxScreen();
         }else {
           return ProfileScreen();
         }

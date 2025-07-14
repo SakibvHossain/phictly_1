@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:phictly/core/binding/binding.dart';
 import 'package:phictly/routes/app_routes.dart';
-import 'feature/splash/ui/screens/splash_screen.dart';
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,8 +17,8 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Phictly',
-          initialRoute: AppRoute.getInitial(),       // ✅ use initial route
-          getPages: AppRoute.route,                  // ✅ use defined routes
+          initialRoute: AppRoute.splash,       
+          getPages: AppRoute.route,              
           initialBinding: AppBinding(),
           locale: const Locale("en", "US"),
           fallbackLocale: const Locale("en", "US"),

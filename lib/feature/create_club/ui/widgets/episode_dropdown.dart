@@ -11,6 +11,7 @@ class EpisodeDropdown extends StatelessWidget {
   final EpisodeDropdownController controller = Get.put(EpisodeDropdownController());
 
   final List<String> chapters = [
+    "Select Episode",
     "Episode 1",
     "Episode 2",
     "Episode 3",

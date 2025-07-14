@@ -1,29 +1,38 @@
 import 'package:phictly/feature/book/data/controller/change_book_controller.dart';
 import 'package:phictly/feature/create_club/data/controller/change_club_controller.dart';
 import 'package:phictly/feature/home/data/controller/change_home_controller.dart';
+import 'package:phictly/feature/home/data/controller/club_item_controller.dart';
+import 'package:phictly/feature/home/data/controller/home_controller.dart';
+import 'package:phictly/feature/home/data/controller/notification_controller.dart';
+import 'package:phictly/feature/home/data/controller/social_feed_controller.dart';
 import 'package:phictly/feature/message/data/controller/chat_controller.dart';
 import 'package:phictly/feature/profile/data/controller/change_profile_controller.dart';
 import 'package:phictly/feature/tv/data/controller/change_tv_controller.dart';
-import '../../feature/book/data/controller/book_genre_controller.dart';
-import '../../feature/create_club/data/controller/club_controller.dart';
-import '../../feature/home/data/controller/bottom_nav_controller.dart';
-import '../../feature/profile/data/controller/progress_controller.dart';
-import '../../main_app_controller.dart';
+import 'package:phictly/feature/book/data/controller/book_genre_controller.dart';
+import 'package:phictly/feature/create_club/data/controller/club_controller.dart';
+import 'package:phictly/feature/home/data/controller/bottom_nav_controller.dart';
+import 'package:phictly/feature/profile/data/controller/progress_controller.dart';
+import 'package:phictly/main_app_controller.dart';
 import 'package:get/get.dart';
 
 class AppBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(MainAppController());
-    Get.put(ChangeHomeController());
     Get.put(ChangeProfileController());
     Get.put(ChangeBookController());
     Get.put(ChangeTvController());
+    Get.put(NotificationController());
     Get.put(ChangeClubController());
     Get.put(BottomNavController());
     Get.put(ProgressController());
     Get.put(BookGenreController());
     Get.put(ClubController());
-    Get.put(ChatController()); //6850e48e5646ced38a2d5c59
+    Get.put( ChangeHomeController());
+    Get.put( NotificationController());
+    Get.put( ClubItemController());
+    Get.put( SocialFeedController());
+    Get.put(HomeController());
+    Get.put( ChatController());
   }
 }
