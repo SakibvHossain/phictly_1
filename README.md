@@ -1,6 +1,6 @@
 # Phictly
 
-Watch out Phictly update here: [Phictly](phictly.com)  
+Watch out Phictly update here: [Phictly](www.phictly.com)  
   
 PlayStore: [Phictly](https://play.google.com/store/apps/details?id=com.phictly.app)  
 App Store: [Phictly](https://apps.apple.com/us/app/phictly/id6753308823)  
