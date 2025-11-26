@@ -1,3 +1,3 @@
 # Phictly
 
-Watch out Phictly update here: [phictly.com](Phictly)
+Watch out Phictly update here: [Phictly](phictly.com)
